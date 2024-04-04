@@ -11,6 +11,10 @@ def destroy(key: str | None = None) -> None:
     cv2.destroyAllWindows()
 
 
+def win(key: str):
+    cv2.namedWindow(key)
+
+
 def path(directory: str) -> None:
     Repository.directory = directory
 
@@ -49,16 +53,23 @@ def show(key: any = None, wait: bool = False, window: str = "Homa Window") -> No
 
     if key is not None and not isinstance(key, str):
         Repository.imshow(window, key)
+        Repository.windows[key] = window
 
     elif key is None:
         for key, image in Repository.images.items():
             Repository.imshow(key, image)
+            Repository.windows[key] = key
 
     elif key is not None:
         if key in Repository.images:
             Repository.imshow(key, Repository.images[key])
+            Repository.windows[key] = key
         else:
             Logger.danger(f"No image found with key {key}")
 
     if wait:
         cv2.waitKey(0)
+
+
+def refresh(key: str) -> None:
+    cv2.imshow(Repository.windows[key], Repository.images[key])

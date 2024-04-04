@@ -8,6 +8,7 @@ class RepositoryWrapper:
 
         self.directory = "./"
         self.images = {}
+        self.windows = {}
 
         if is_colab():
             from google.colab.patches import cv2_imshow as imshow
