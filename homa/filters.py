@@ -33,12 +33,9 @@ def gaussian(key: str, kernel: None | List[int] = None, new_key: str | None = No
     if new_key is None:
         new_key = key
 
-    if isinstance(kernel, int):
-        kernel = (kernel, kernel)
-
     Repository.images[new_key] = cv2.GaussianBlur(
         Repository.images[key],
-        kernel,
+        create_kernel(kernel),
         sigmaX=Repository.sigmaX,
         sigmaY=Repository.sigmaY
     )
