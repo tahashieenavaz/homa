@@ -1,6 +1,5 @@
-from typing import List
 from .classes.Repository import Repository
-from .helpers import collection
+from .helpers.alias import collection
 import numpy
 
 
@@ -15,8 +14,11 @@ def stack(*keys, **settings):
         **settings
     }
 
+    if all(isinstance(item, str) for item in keys):
+        keys = collection(keys).map(lambda key: Repository.images[key])
+
     stacked_image = numpy.concatenate(
-        collection(keys).map(lambda key: Repository.images[key]),
+        keys,
         axis=settings["axis"]
     )
 

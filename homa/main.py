@@ -1,5 +1,5 @@
 import cv2
-from .helpers import danger
+from .classes.Logger import Logger
 from .classes.Repository import Repository
 
 
@@ -58,7 +58,7 @@ def show(key: any = None, wait: bool = False, window: str = "Homa Window") -> No
         if key in Repository.images:
             Repository.imshow(key, Repository.images[key])
         else:
-            danger(f"No image found with key {key}")
+            Logger.danger(f"No image found with key {key}")
 
     if wait:
         cv2.waitKey(0)

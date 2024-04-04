@@ -1,6 +1,6 @@
 from typing import List
 from .classes.Repository import Repository
-from .helpers import create_kernel
+from .helpers.kernel import create_kernel
 import cv2
 
 
@@ -13,7 +13,8 @@ def blur(key: str, kernel: int | List[int] = (7, 7), new_key: str | None = None)
         create_kernel(kernel)
     )
 
-def median(key: str, kernel: int | List[int] = (7, 7), new_key: str| None = None) -> None:
+
+def median(key: str, kernel: int | List[int] = (7, 7), new_key: str | None = None) -> None:
     if new_key is None:
         new_key = key
 
@@ -21,7 +22,6 @@ def median(key: str, kernel: int | List[int] = (7, 7), new_key: str| None = None
         Repository.images[key],
         create_kernel(kernel)
     )
-
 
 
 def sigma(x: float = 0, y: float = 0) -> None:

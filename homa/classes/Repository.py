@@ -1,4 +1,4 @@
-from ..helpers import is_colab
+from ..helpers.environment import is_colab
 
 
 class RepositoryWrapper:
