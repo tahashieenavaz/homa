@@ -17,6 +17,10 @@ Images could be loaded with the `image` helper, that accepts the file name and a
 from homa import *
 
 image("horse.jpg", "horse")
+show("horse", wait=True)
+
+# or alternatively
+showWait("horse")
 ```
 
 Alternatively, following code will load the file into the repository with a key of everything before the last in the filename.
@@ -25,6 +29,7 @@ Alternatively, following code will load the file into the repository with a key 
 from homa import *
 
 image("horse.jpg") # stored as "horse"
+showWait("horse")
 ```
 
 ## Smoothing
