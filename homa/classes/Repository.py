@@ -8,8 +8,6 @@ class RepositoryWrapper:
 
         self.directory = "./"
         self.images = {}
-        self.cameras = {}
-        self.window_counter = 0
 
         if is_colab():
             from google.colab.patches import cv2_imshow as imshow
@@ -23,10 +21,6 @@ class RepositoryWrapper:
                 imshow(window, image)
 
         self.imshow = final_imshow
-
-    def get_counter(self):
-        self.window_counter += 1
-        return self.window_counter
 
 
 Repository = RepositoryWrapper()
