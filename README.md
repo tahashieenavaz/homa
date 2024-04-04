@@ -62,6 +62,20 @@ gaussian("horse", 9, "gaussian blurred horse")   # as a new key in the repositor
 showWait("gaussian blurred horse")
 ```
 
+### Median Blur
+
+```python
+from homa import *
+
+image("horse.jpg")
+
+median("horse", 7)                           # rewrites "horse" key
+median("horse", (7, 19))                     # rewrites "horse" key
+median("horse", 9, "median blurred horse")   # as a new key in the repository
+
+showWait("median blurred horse")
+```
+
 ## Stacking
 
 ```python

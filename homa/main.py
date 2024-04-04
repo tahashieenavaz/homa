@@ -53,7 +53,6 @@ def show(key: any = None, wait: bool = False, window: str = "Homa Window") -> No
 
     if key is not None and not isinstance(key, str):
         Repository.imshow(window, key)
-        Repository.windows[key] = window
 
     elif key is None:
         for key, image in Repository.images.items():

@@ -1,9 +1,9 @@
 from ..classes.Repository import Repository
-from ..classes import Collection
+from ..classes.Collection import Collection
 from typing import List
 
 
-def repo(key: str|None = None):
+def repo(key: str | None = None):
     if key is None:
         return Repository.images
 
