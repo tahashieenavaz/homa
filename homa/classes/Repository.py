@@ -10,11 +10,12 @@ class RepositoryWrapper:
         self.images = {}
         self.windows = {}
 
-
         self.settings = {
             "thickness": 2,
-            "color": (0,0,0)
+            "color": (0, 0, 0)
         }
+
+        self.events = {}
 
         if is_colab():
             from google.colab.patches import cv2_imshow as imshow

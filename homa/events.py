@@ -1,6 +1,7 @@
 import cv2
 from .main import win
 from inspect import signature
+from .classes.Repository import Repository
 
 event_map = {
     "click":     cv2.EVENT_LBUTTONDOWN,
@@ -10,17 +11,45 @@ event_map = {
     "rmouseup":  cv2.EVENT_RBUTTONUP,
     "dblclick":  cv2.EVENT_LBUTTONDBLCLK,
     "rdblclick": cv2.EVENT_RBUTTONDBLCLK,
-    "move":      cv2.EVENT_MOUSEMOVE
+    "mousemove":      cv2.EVENT_MOUSEMOVE
 }
 
 
-def create_wrapper_function(event_name: str, handler: callable):
-    def wrapper_function(event, x, y, flags, param):
+def fire(key: str):
+    events = Repository.events[key]
+    finalHandler = createFinalHandler(events)
+
+    win(key)
+    cv2.setMouseCallback(key, finalHandler)
+
+
+def createFinalHandler(events):
+    def finalHandlerFunction(event, x, y, flags, param):
+        for e in events:
+            if event == event_map[e["event"]]:
+                argument_count = len(signature(e["handler"]).parameters)
+                if argument_count == 0:
+                    args = tuple()
+                elif argument_count == 2:
+                    args = (x, y)
+                elif argument_count == 3:
+                    args = (x, y, flags)
+                elif argument_count == 4:
+                    args = (x, y, flags, param)
+
+                e["handler"](*args)
+    return finalHandlerFunction
+
+
+def createWrapperFunction(event_name: str, handler: callable):
+    def wrapperFunction(event, x, y, flags, param):
         if event != event_map[event_name]:
             return
 
         argument_count = len(signature(handler).parameters)
-        if argument_count == 2:
+        if argument_count == 0:
+            args = tuple()
+        elif argument_count == 2:
             args = (x, y)
         elif argument_count == 3:
             args = (x, y, flags)
@@ -29,29 +58,46 @@ def create_wrapper_function(event_name: str, handler: callable):
 
         handler(*args)
 
-    return wrapper_function
+    return wrapperFunction
+
+
+def createEvent(name: str, handler):
+    return {
+        "event": name,
+        "handler": handler
+    }
 
 
 def onClick(key: str, handler: callable):
-    win(key)
-    cv2.setMouseCallback(key, create_wrapper_function("click", handler))
+    if not key in Repository.events:
+        Repository.events[key] = []
+
+    Repository.events[key].append(createEvent("click", handler))
 
 
 def onRightClick(key: str, handler: callable):
-    win(key)
-    cv2.setMouseCallback(key, create_wrapper_function("rclick", handler))
+    if not key in Repository.events:
+        Repository.events[key] = []
+
+    Repository.events[key].append(createEvent("rclick", handler))
 
 
 def onMouseUp(key: str, handler: callable):
-    win(key)
-    cv2.setMouseCallback(key, create_wrapper_function("mouseup", handler))
+    if not key in Repository.events:
+        Repository.events[key] = []
+
+    Repository.events[key].append(createEvent("mouseup", handler))
 
 
-def onMove(key: str, handler: callable):
-    win(key)
-    cv2.setMouseCallback(key, create_wrapper_function("mousemove", handler))
+def onMouseMove(key: str, handler: callable):
+    if not key in Repository.events:
+        Repository.events[key] = []
+
+    Repository.events[key].append(createEvent("mousemove", handler))
 
 
 def onDoubleClick(key: str, handler: callable):
-    win(key)
-    cv2.setMouseCallback(key, create_wrapper_function("dblclick", handler))
+    if not key in Repository.events:
+        Repository.events[key] = []
+
+    Repository.events[key].append(createEvent("dblclick", handler))
