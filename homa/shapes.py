@@ -1,8 +1,7 @@
 import cv2
+from .main import setting
 from .main import refresh
 from .helpers.alias import repo
-from .classes.Repository import Repository
-from .helpers.alias import setting
 
 
 def thickness(value: int = 1):

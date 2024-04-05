@@ -1,6 +1,8 @@
 import cv2
 from .classes.Logger import Logger
 from .classes.Repository import Repository
+import numpy
+from .helpers.alias import repo
 
 
 def destroy(key: str | None = None) -> None:
@@ -74,5 +76,19 @@ def refresh(key: str) -> None:
     cv2.imshow(Repository.windows[key], Repository.images[key])
 
 
-def empty(key: str, width: int, height: int, color=(0, 0, 0)):
-    repo()
+def black(key: str, width: int, height: int, channels=1):
+    repo(key, numpy.zeros([width, height, channels]))
+
+
+def white(key: str, width: int, height: int, channels=1):
+    repo(key, numpy.ones([width, height, channels],
+         dtype="uint8") * (2 ** 8 - 1))
+
+
+def setting(key: str, value: any = None) -> any:
+    if value is not None:
+        Repository[key] = value
+        return True
+
+    setting_value = Repository.settings[key]
+    return setting_value if setting_value else None
