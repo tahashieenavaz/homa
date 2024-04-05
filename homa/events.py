@@ -21,11 +21,13 @@ def create_wrapper_function(event_name: str, handler: callable):
 
         argument_count = len(signature(handler).parameters)
         if argument_count == 2:
-            handler(x, y)
+            args = (x, y)
         elif argument_count == 3:
-            handler(x, y, flags)
+            args = (x, y, flags)
         elif argument_count == 4:
-            handler(x, y, flags, param)
+            args = (x, y, flags, param)
+
+        handler(*args)
 
     return wrapper_function
 
