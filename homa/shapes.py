@@ -28,7 +28,7 @@ def randomColor() -> Tuple[int, int, int]:
 
 def color(*args):
     # no colors provided, choose a random color
-    if len(args) == 0:
+    if len(args) == 1 and isinstance(args[0], str) and args[0] in ["random", "rand"]:
         args = randomColor()
 
     setting("color", args)
