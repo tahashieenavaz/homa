@@ -10,6 +10,10 @@ class RepositoryWrapper:
         self.images = {}
         self.windows = {}
 
+        self.settings = {
+            "thickness": 2
+        }
+
         if is_colab():
             from google.colab.patches import cv2_imshow as imshow
         else:
