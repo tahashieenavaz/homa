@@ -84,12 +84,14 @@ def refresh(key: str) -> None:
 
 
 def black(key: str, width: int, height: int, channels=1):
-    repo(key, numpy.zeros([width, height, channels]))
+    repo(key, numpy.zeros([height, width, channels]))
 
 
 def white(key: str, width: int, height: int, channels=1):
-    repo(key, numpy.ones([width, height, channels],
-         dtype="uint8") * (2 ** 8 - 1))
+    repo(
+        key,
+        numpy.ones([height, width, channels], dtype="uint8") * (2 ** 8 - 1)
+    )
 
 
 def setting(key: str, value: any = None) -> any:
