@@ -83,11 +83,14 @@ def refresh(key: str) -> None:
     cv2.imshow(Repository.windows[key], Repository.images[key])
 
 
-def black(key: str, width: int, height: int, channels=1):
-    repo(key, numpy.zeros([height, width, channels]))
+def black(key: str, width: int, height: int, channels=3):
+    repo(
+        key,
+        numpy.zeros([height, width, channels], dtype="uint8")
+    )
 
 
-def white(key: str, width: int, height: int, channels=1):
+def white(key: str, width: int, height: int, channels=3):
     repo(
         key,
         numpy.ones([height, width, channels], dtype="uint8") * (2 ** 8 - 1)
@@ -96,7 +99,7 @@ def white(key: str, width: int, height: int, channels=1):
 
 def setting(key: str, value: any = None) -> any:
     if value is not None:
-        Repository[key] = value
+        Repository.settings[key] = value
         return True
 
     setting_value = Repository.settings[key]

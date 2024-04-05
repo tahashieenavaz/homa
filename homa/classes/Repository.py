@@ -10,8 +10,10 @@ class RepositoryWrapper:
         self.images = {}
         self.windows = {}
 
+
         self.settings = {
-            "thickness": 2
+            "thickness": 2,
+            "color": (0,0,0)
         }
 
         if is_colab():

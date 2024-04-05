@@ -2,12 +2,38 @@ import cv2
 from .main import setting
 from .main import refresh
 from .helpers.alias import repo
+from .classes.Repository import Repository
+from typing import Tuple
 
 
-def thickness(value: int = 1):
+def stroke(value: int = 1):
     setting("thickness", value)
 
 
-def circle(key: str, x: int = 0, y: int = 0, radius: int = 1, color=(0, 0, 255)):
-    cv2.circle(repo(key), (x, y), radius, color, setting("thickness"))
+def fill():
+    setting("thickness", -1)
+
+
+def color(*args):
+    setting("color", args)
+
+
+def circle(key: str, x: int, y: int, radius: int = 1):
+    cv2.circle(
+        repo(key),
+        (x, y),
+        radius,
+        setting("color"),
+        setting("thickness")
+    )
+    refresh(key)
+
+
+def rect(key: str, x: int, y: int, width: int, height: int):
+    cv2.rectangle(
+        repo(key),
+        (x, y), (x + width, y + height),
+        thickness=setting("thickness"),
+        color=setting("color")
+    )
     refresh(key)
