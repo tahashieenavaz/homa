@@ -1,6 +1,7 @@
 import cv2
 from .main import setting
 from .main import refresh
+from .main import equipWithRefresh
 from .helpers.alias import repo
 from typing import Tuple
 import numpy
@@ -33,6 +34,7 @@ def color(*args):
     setting("color", args)
 
 
+@equipWithRefresh
 def circle(key: str, x: int, y: int, radius: int = 1):
     cv2.circle(
         repo(key),
@@ -44,6 +46,7 @@ def circle(key: str, x: int, y: int, radius: int = 1):
     refresh(key)
 
 
+@equipWithRefresh
 def rect(key: str, x: int, y: int, width: int, height: int):
     cv2.rectangle(
         repo(key),
@@ -51,4 +54,3 @@ def rect(key: str, x: int, y: int, width: int, height: int):
         thickness=setting("thickness"),
         color=setting("color")
     )
-    refresh(key)

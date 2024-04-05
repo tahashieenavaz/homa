@@ -104,3 +104,11 @@ def setting(key: str, value: any = None) -> any:
 
 def refresh(key: str) -> None:
     cv2.imshow(Repository.windows[key], Repository.images[key])
+
+
+def equipWithRefresh(function: callable) -> callable:
+    def inner(*args, **kwargs):
+        function(*args, **kwargs)
+        refresh(args[0])
+
+    return inner
