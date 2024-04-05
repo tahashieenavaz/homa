@@ -79,10 +79,6 @@ def show(key: any = None, wait: bool = False, window: str = "Homa Window") -> No
         cv2.waitKey(0)
 
 
-def refresh(key: str) -> None:
-    cv2.imshow(Repository.windows[key], Repository.images[key])
-
-
 def black(key: str, width: int, height: int, channels=3):
     repo(
         key,
@@ -104,3 +100,7 @@ def setting(key: str, value: any = None) -> any:
 
     setting_value = Repository.settings[key]
     return setting_value if setting_value else None
+
+
+def refresh(key: str) -> None:
+    cv2.imshow(Repository.windows[key], Repository.images[key])
