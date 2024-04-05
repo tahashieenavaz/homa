@@ -72,3 +72,7 @@ def show(key: any = None, wait: bool = False, window: str = "Homa Window") -> No
 
 def refresh(key: str) -> None:
     cv2.imshow(Repository.windows[key], Repository.images[key])
+
+
+def empty(key: str, width: int, height: int, color=(0, 0, 0)):
+    repo()
