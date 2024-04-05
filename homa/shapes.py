@@ -2,19 +2,34 @@ import cv2
 from .main import setting
 from .main import refresh
 from .helpers.alias import repo
-from .classes.Repository import Repository
 from typing import Tuple
+import numpy
 
 
 def stroke(value: int = 1):
     setting("thickness", value)
 
 
-def fill():
+def fill(*args):
     setting("thickness", -1)
+
+    if len(args) == 3:
+        color(*args)
+
+
+def randomColor() -> Tuple[int, int, int]:
+    r = numpy.random.randint(0, 255)
+    g = numpy.random.randint(0, 255)
+    b = numpy.random.randint(0, 255)
+
+    return (b, g, r)
 
 
 def color(*args):
+    # no colors provided, choose a random color
+    if len(args) == 0:
+        args = randomColor()
+
     setting("color", args)
 
 
