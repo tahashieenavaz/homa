@@ -1,18 +1,3 @@
-# enum MouseEventTypes
-# {
-#     EVENT_MOUSEMOVE     = 0,
-#     EVENT_LBUTTONDOWN   = 1,
-#     EVENT_RBUTTONDOWN   = 2,
-#     EVENT_MBUTTONDOWN   = 3,
-#     EVENT_LBUTTONUP     = 4,
-#     EVENT_RBUTTONUP     = 5,
-#     EVENT_MBUTTONUP     = 6,
-#     EVENT_LBUTTONDBLCLK = 7,
-#     EVENT_RBUTTONDBLCLK = 8,
-#     EVENT_MBUTTONDBLCLK = 9,
-#     EVENT_MOUSEWHEEL    = 10,
-#     EVENT_MOUSEHWHEEL   = 11,
-# };
 import cv2
 from .main import win
 from inspect import signature
