@@ -32,7 +32,7 @@ def circle(key: str, x: int, y: int, radius: int = 1):
 def rect(key: str, x: int, y: int, width: int, height: int):
     cv2.rectangle(
         repo(key),
-        (x, y), (x + width, y + height),
+        (x - width // 2, y - height // 2), (x + width // 2, y + height // 2),
         thickness=setting("thickness"),
         color=setting("color")
     )
