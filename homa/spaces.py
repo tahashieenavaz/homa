@@ -1,5 +1,17 @@
 from typing import Tuple
 from .helpers.alias import repo
+import cv2
+
+
+def hsv(key: str):
+    image = repo(key)
+    cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    h = image[:, :, 0]
+    s = image[:, :, 1]
+    v = image[:, :, 2]
+
+    return (h, s, v)
 
 
 def bgr(key: str) -> Tuple[int, int, int]:
