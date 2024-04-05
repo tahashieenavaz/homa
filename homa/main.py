@@ -50,6 +50,13 @@ def showWait(*args, **kwargs):
     show(*args, **kwargs)
 
 
+def showMany(*keys):
+    for key in keys[0:-1]:
+        show(key)
+
+    showWait(keys[-1])
+
+
 def show(key: any = None, wait: bool = False, window: str = "Homa Window") -> None:
     # TODO: add functionality to distinguish between camera and images
 
