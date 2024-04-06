@@ -29,6 +29,7 @@ class Window:
         self.__title = title
         self.__image = image
         self.__events = {}
+        self.__circles = []
 
     def show(self):
         if isNotColab():
@@ -82,6 +83,8 @@ class Window:
         return self
 
     def median(self, kernel: int) -> Self:
+        kernel = kernel - 1 if kernel % 2 == 0 else kernel
+
         self.update(cv2.medianBlur(
             self.__image, kernel
         ))

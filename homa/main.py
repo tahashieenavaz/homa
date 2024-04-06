@@ -14,7 +14,7 @@ def show(*windows, **settings):
     for window in windows:
         window.show()
 
-    if settings["wait"] == True:
+    if "wait" in settings and settings["wait"] == True:
         cv2.waitKey()
 
 
