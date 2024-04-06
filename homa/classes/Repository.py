@@ -5,7 +5,6 @@ from ..helpers.string import randomLowercaseString
 class RepositoryWrapper:
     def __init__(self):
         self.directory = "./"
-        self.images = {}
 
         self.settings = {
             "thickness": 2,
