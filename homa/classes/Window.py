@@ -120,7 +120,6 @@ class Window:
         kernel = kernel - 1 if kernel % 2 == 0 else kernel
         medianedImage = self.__image.copy()
         medianedImage = cv2.medianBlur(medianedImage, kernel)
-        print("here")
         if inplace:
             self.update(medianedImage)
         return medianedImage
