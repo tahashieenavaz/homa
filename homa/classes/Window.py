@@ -1,9 +1,11 @@
 import numpy
 import cv2
+from ..helpers.kernel import createKernel
 from ..classes.Repository import Repository
 from ..helpers.string import randomLowercaseString
 from ..events import createMouseCallback
 from typing_extensions import Self
+from typing import List
 
 
 class Window:
@@ -41,10 +43,19 @@ class Window:
 
     def white(self) -> Self:
         self.__image = numpy.ones([
-            self.__image.shape.height,
-            self.__image.shape.width,
-            self.__image.shape.channels
+            self.__image.shape[0],
+            self.__image.shape[1],
+            self.__image.shape[2]
         ]) * (2 ** 8 - 1)
+        return self
+
+    def blur(self, kernel: int | List[int] = (7, 7)) -> Self:
+        cv2.blur(
+            self.__image,
+            createKernel(kernel),
+            self.__image
+        )
+
         return self
 
     def __getattr__(self, key):

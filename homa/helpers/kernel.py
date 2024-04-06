@@ -1,7 +1,7 @@
 from typing import Tuple
 
 
-def create_kernel(value: int | Tuple[int, int]) -> Tuple[int, int]:
+def createKernel(value: int | Tuple[int, int]) -> Tuple[int, int]:
     if isinstance(value, tuple):
         x, y = value
 
