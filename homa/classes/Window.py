@@ -19,9 +19,8 @@ class Window:
         self.__image = image
         self.__events = {}
 
-        cv2.namedWindow(self.__title)
-
     def show(self):
+        cv2.namedWindow(self.__title)
         cv2.setMouseCallback(self.__title, createMouseCallback(self.__events))
         cv2.imshow(self.__title, self.__image)
 
