@@ -8,9 +8,9 @@ def repo(key: str | None = None, value: any = None) -> any:
         return Repository.images
 
     if key is not None and value is None:
-        return Repository.images[key]
+        return Repository.addImage(key, value)
 
-    Repository.images[key] = value
+    Repository.addImage(key, value)
     return True
 
 

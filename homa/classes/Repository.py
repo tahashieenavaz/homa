@@ -1,18 +1,17 @@
 from ..helpers.environment import is_colab
+import string
+import numpy
 
 
 class RepositoryWrapper:
     def __init__(self):
-        self.sigmaX = 0
-        self.sigmaY = 0
-
         self.directory = "./"
         self.images = {}
-        self.windows = {}
 
         self.settings = {
             "thickness": 2,
-            "color": (0, 0, 0)
+            "color": (0, 0, 0),
+            "sigma": [0, 0]
         }
 
         self.events = {}
@@ -29,6 +28,15 @@ class RepositoryWrapper:
                 imshow(window, image)
 
         self.imshow = final_imshow
+
+    def addImageWithRandomKey(self, image):
+        key = "".join(numpy.random.choice(
+            list(string.ascii_lowercase), 10))
+
+        self.addImage(key, image)
+
+    def addImage(self, key, image):
+        Repository.images[key] = image
 
 
 Repository = RepositoryWrapper()
