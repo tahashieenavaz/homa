@@ -12,8 +12,6 @@ class RepositoryWrapper:
             "sigma": [0, 0]
         }
 
-        self.windows = {}
-
         if isColab():
             from google.colab.patches import cv2_imshow as imshow
         else:
@@ -26,12 +24,6 @@ class RepositoryWrapper:
                 imshow(window, image)
 
         self.imshow = final_imshow
-
-    def windowGetOrCreate(self, key: str):
-        if not key in self.windows:
-            self.windows[key] = Window()
-
-        return self.windows[key]
 
 
 Repository = RepositoryWrapper()

@@ -1,4 +1,5 @@
 from .classes.Window import Window
+from .classes.WindowRepository import WindowRepository
 from .helpers.alias import collection
 import numpy
 
@@ -12,17 +13,17 @@ def stack(*windows, **settings) -> Window:
         **settings,
     }
 
-    images = collection(windows).map(lambda x: x.getImage())
-    combined = numpy.concatenate(images, axis=settings["axis"])
-    window = Repository.windowGetOrCreate()
-    return Window(
-        image=combined,
-    )
+    rawImages = list(map(lambda x: x.getImage(), windows))
+    combinedImage = numpy.concatenate(rawImages, axis=settings["axis"])
+    windowKey = hash(f"{str(windows)}{settings['axis']}")
+    window = WindowRepository.windowGetOrCreate(windowKey)
+    window.update(combinedImage)
+    return window
 
 
 def vstack(*windows):
     return stack(*windows, axis=1)
 
 
-def vstack(*windows):
+def hstack(*windows):
     return stack(*windows, axis=0)

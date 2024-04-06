@@ -38,8 +38,11 @@ class Window:
     def show(self):
         if isNotColab():
             cv2.namedWindow(self.__title)
-            cv2.setMouseCallback(
-                self.__title, createMouseCallback(self.__events))
+            if self.__events != {}:
+                cv2.setMouseCallback(
+                    self.__title,
+                    createMouseCallback(self.__events)
+                )
 
         self.drawCircles()
         Repository.imshow(self.__title, self.__image)
