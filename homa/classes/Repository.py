@@ -1,6 +1,5 @@
 from ..helpers.environment import is_colab
-import string
-import numpy
+from ..helpers.string import randomLowercaseString
 
 
 class RepositoryWrapper:
@@ -30,10 +29,7 @@ class RepositoryWrapper:
         self.imshow = final_imshow
 
     def addImageWithRandomKey(self, image):
-        key = "".join(numpy.random.choice(
-            list(string.ascii_lowercase), 10))
-
-        self.addImage(key, image)
+        self.addImage(randomLowercaseString(), image)
 
     def addImage(self, key, image):
         Repository.images[key] = image

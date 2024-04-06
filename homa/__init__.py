@@ -7,3 +7,5 @@ from .events import *
 from .shapes import *
 
 from .helpers import *
+
+from .classes.Window import Window
