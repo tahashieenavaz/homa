@@ -3,6 +3,7 @@ import cv2
 
 from ..helpers.kernel import createKernel
 from ..helpers.string import randomLowercaseString
+from ..helpers.environment import isNotColab
 
 from ..classes.Repository import Repository
 
@@ -30,8 +31,11 @@ class Window:
         self.__events = {}
 
     def show(self):
-        cv2.namedWindow(self.__title)
-        cv2.setMouseCallback(self.__title, createMouseCallback(self.__events))
+        if isNotColab():
+            cv2.namedWindow(self.__title)
+            cv2.setMouseCallback(
+                self.__title, createMouseCallback(self.__events))
+
         Repository.imshow(self.__title, self.__image)
 
     def title(self, newTitle: str) -> Self:

@@ -1,5 +1,9 @@
 import sys
 
 
-def is_colab() -> bool:
+def isColab() -> bool:
     return 'google.colab' in sys.modules
+
+
+def isNotColab() -> bool:
+    return not isColab()

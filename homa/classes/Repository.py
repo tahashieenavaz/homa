@@ -1,4 +1,4 @@
-from ..helpers.environment import is_colab
+from ..helpers.environment import isColab
 from ..helpers.string import randomLowercaseString
 
 
@@ -12,13 +12,13 @@ class RepositoryWrapper:
             "sigma": [0, 0]
         }
 
-        if is_colab():
+        if isColab():
             from google.colab.patches import cv2_imshow as imshow
         else:
             from cv2 import imshow
 
         def final_imshow(window, image):
-            if is_colab():
+            if isColab():
                 imshow(image)
             else:
                 imshow(window, image)
