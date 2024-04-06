@@ -9,3 +9,4 @@ from .shapes import *
 from .helpers import *
 
 from .classes.Window import Window
+from .classes.Image import Image
