@@ -1,4 +1,6 @@
 import cv2
+import numpy
+from .classes.Window import Window
 from .classes.Repository import Repository
 
 
@@ -12,6 +14,8 @@ def destroy(key: str | None = None) -> None:
 
 def show(*windows, **settings):
     for window in windows:
+        if isinstance(window, numpy.ndarray):
+            window = Window(image=window)
         window.show()
 
     if "wait" in settings and settings["wait"]:
@@ -24,12 +28,3 @@ def showWait(*args, **kwargs):
         "wait": True
     }
     show(*args, **kwargs)
-
-
-def setting(key: str, value: any = None) -> any:
-    if value is not None:
-        Repository.settings[key] = value
-        return True
-
-    setting_value = Repository.settings[key]
-    return setting_value if setting_value else None

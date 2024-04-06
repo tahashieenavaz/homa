@@ -1,5 +1,5 @@
 import cv2
-from .main import setting
+from .helpers.alias import setting
 from .helpers.alias import repo
 from typing import Tuple
 import numpy

@@ -17,3 +17,11 @@ def repo(key: str | None = None, value: any = None) -> any:
 
 def collection(items: List[any] | Tuple[any]):
     return Collection(items)
+
+def setting(key: str, value: any = None) -> any:
+    if value is not None:
+        Repository.settings[key] = value
+        return True
+
+    setting_value = Repository.settings[key]
+    return setting_value if setting_value else None

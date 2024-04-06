@@ -1,5 +1,5 @@
 from typing import Tuple
-from ..main import setting
+from ..helpers.alias import setting
 
 
 class Circle(object):

@@ -60,17 +60,11 @@ horse.median(7)
 ```python
 from homa import *
 
-image("horse.jpg")
-blur("horse", 9, "blurred horse")
+horse = Image("horse.jpg")
+horse.blur(9, 7)
 
 show(
-	vstack("horse", "blurred horse"),
-	window="Vstacked"
-)
-
-showWait(
-	hstack("horse", "blurred horse"),
-	window="Hstacked"
+	vstack(horse),
 )
 ```
 

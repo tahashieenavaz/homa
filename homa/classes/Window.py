@@ -4,6 +4,7 @@ import cv2
 from ..helpers.kernel import createKernel
 from ..helpers.string import randomLowercaseString
 from ..helpers.environment import isNotColab
+from ..helpers.alias import setting
 
 from ..classes.Repository import Repository
 
@@ -13,8 +14,6 @@ from typing_extensions import Self
 from typing import Tuple
 
 from ..classes.Circle import Circle
-
-from ..main import setting
 
 
 class Window:
@@ -57,62 +56,84 @@ class Window:
                 circle.stroke
             )
 
-    def update(self, newImage) -> Self:
+    def update(self, newImage):
         self.__image = newImage
         self.refresh()
-        return self
 
-    def click(self, handler: callable) -> Self:
+    def click(self, handler: callable):
         self.__events["click"] = (handler, self)
-        return self
 
-    def move(self, handler: callable) -> Self:
+    def move(self, handler: callable):
         self.__events["mousemove"] = (handler, self)
-        return self
 
-    def white(self) -> Self:
+    def white(self):
         self.__image = numpy.ones([
             self.__image.shape[0],
             self.__image.shape[1],
             self.__image.shape[2]
         ]) * (2 ** 8 - 1)
-        return self
 
-    def blur(self, kernelX: int, kernelY: int | None = None) -> Self:
+    def blur(self, kernelX: int, kernelY: int | None = None, inplace: bool = True):
         kernel = (kernelX, kernelY)
         if kernelY is None:
             kernel = (kernelX, kernelX)
-        self.update(cv2.blur(
+        blurredImage = cv2.blur(
             self.__image,
             createKernel(kernel),
-        ))
-        return self
+        )
+        if inplace:
+            self.update(blurredImage)
+        return blurredImage
 
-    def gaussian(self, kernelX: int, kernelY: int | None = None) -> Self:
+    def blurred(self, *args, **kwargs):
+        kwargs = {
+            **kwargs,
+            "inplace": False
+        }
+        return self.blur(*args, **kwargs)
+
+    def gaussian(self, kernelX: int, kernelY: int | None = None, inplace: bool = True):
         kernel = (kernelX, kernelY)
         if kernelY is None:
             kernel = (kernelX, kernelX)
-        self.update(cv2.GaussianBlur(
+        gaussianedImage = cv2.GaussianBlur(
             self.__image,
             createKernel(kernel),
             setting("sigma")[0],
             setting("sigma")[1],
-        ))
-        return self
+        )
+        if inplace:
+            self.update(gaussianedImage)
+        return gaussianedImage
 
-    def median(self, kernel: int) -> Self:
+    def gaussianed(self, *args, **kwargs):
+        kwargs = {
+            **kwargs,
+            "inplace": True
+        }
+        return self.gaussian(*args, **kwargs)
+
+    def median(self, kernel: int, inplace: bool = True):
         kernel = kernel - 1 if kernel % 2 == 0 else kernel
-        self.update(cv2.medianBlur(
+        medianedImage = cv2.medianBlur(
             self.__image, kernel
-        ))
-        return self
+        )
+        if inplace:
+            self.update(medianedImage)
+        return medianedImage
+
+    def medianed(self, *args, **kwargs):
+        kwargs = {
+            **kwargs,
+            "inplace": False
+        }
+        return self.median(*args, **kwargs)
 
     def refresh(self):
         Repository.imshow(self.__title, self.__image)
 
     def circle(self, x: int, y: int, radius: int, color: Tuple[int, int, int] | None = None, stroke: int | None = None):
         self.__circles.append(Circle(x, y, radius, color, stroke))
-        return self
 
     def getImage(self):
         return self.__image
