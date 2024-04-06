@@ -13,12 +13,14 @@ def stack(*windows, **settings) -> Window:
         **settings,
     }
 
-    rawImages = list(map(lambda x: x.getImage(), windows))
-    combinedImage = numpy.concatenate(rawImages, axis=settings["axis"])
-    windowKey = hash(f"{str(windows)}{settings['axis']}")
-    window = WindowRepository.windowGetOrCreate(windowKey)
-    window.update(combinedImage)
-    return window
+    def mapHandler(x):
+        if isinstance(x, Window):
+            return x.getImage()
+        elif isinstance(x, numpy.ndarray):
+            return x
+
+    rawImages = list(map(mapHandler, windows))
+    return numpy.concatenate(rawImages, axis=settings["axis"])
 
 
 def vstack(*windows):

@@ -77,8 +77,9 @@ class Window:
         kernel = (kernelX, kernelY)
         if kernelY is None:
             kernel = (kernelX, kernelX)
+        blurredImage = self.__image.copy()
         blurredImage = cv2.blur(
-            self.__image,
+            blurredImage,
             createKernel(kernel),
         )
         if inplace:
@@ -96,11 +97,13 @@ class Window:
         kernel = (kernelX, kernelY)
         if kernelY is None:
             kernel = (kernelX, kernelX)
+        gaussianedImage = self.__image.copy()
         gaussianedImage = cv2.GaussianBlur(
-            self.__image,
+            gaussianedImage,
             createKernel(kernel),
             setting("sigma")[0],
-            setting("sigma")[1],
+            gaussianedImage,
+            setting("sigma")[1]
         )
         if inplace:
             self.update(gaussianedImage)
@@ -109,15 +112,15 @@ class Window:
     def gaussianed(self, *args, **kwargs):
         kwargs = {
             **kwargs,
-            "inplace": True
+            "inplace": False
         }
         return self.gaussian(*args, **kwargs)
 
     def median(self, kernel: int, inplace: bool = True):
         kernel = kernel - 1 if kernel % 2 == 0 else kernel
-        medianedImage = cv2.medianBlur(
-            self.__image, kernel
-        )
+        medianedImage = self.__image.copy()
+        medianedImage = cv2.medianBlur(medianedImage, kernel)
+        print("here")
         if inplace:
             self.update(medianedImage)
         return medianedImage
