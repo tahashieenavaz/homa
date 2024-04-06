@@ -6,6 +6,10 @@ from ..helpers.string import randomLowercaseString
 from ..events import createMouseCallback
 from typing_extensions import Self
 from typing import List
+from ..main import setting
+
+from ..shapes import color
+from ..shapes import stroke
 
 
 class Window:
@@ -34,11 +38,11 @@ class Window:
         return self
 
     def click(self, handler: callable) -> Self:
-        self.__events["click"] = handler
+        self.__events["click"] = (handler, self)
         return self
 
     def move(self, handler: callable) -> Self:
-        self.__events["mousemove"] = handler
+        self.__events["mousemove"] = (handler, self)
         return self
 
     def white(self) -> Self:
@@ -57,6 +61,42 @@ class Window:
         )
 
         return self
+
+    def gaussian(self, kernel: int | List[int] = (7, 7)) -> Self:
+        cv2.GaussianBlur(
+            self.__image,
+            createKernel(kernel),
+            setting("sigma")[0],
+            self.__image,
+            setting("sigma")[1],
+        )
+
+        return self
+
+    def refresh(self):
+        Repository.imshow(self.__title, self.__image)
+
+    def circle(self, x: int, y: int, radius: int, circleColor: tuple | None = None, thickness: int | None = None):
+        if circleColor is not None:
+            color(*circleColor)
+
+        if thickness is not None:
+            stroke(thickness)
+
+        cv2.circle(
+            self.__image,
+            (x, y),
+            radius,
+            setting("color"),
+            setting("thickness")
+        )
+        self.refresh()
+
+    def getImage(self):
+        return self.__image
+
+    def getTitle(self):
+        return self.__title
 
     def __getattr__(self, key):
         if key == "shape":

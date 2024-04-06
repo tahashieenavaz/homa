@@ -16,17 +16,20 @@ event_map = {
 
 def createMouseCallback(events: dict):
     def innerMouseCallback(event, x, y, flags, param):
-        for e, handler in events.items():
+        for e, values in events.items():
             if event != event_map[e]:
                 continue
 
+            handler, context = values
             argumentCount = len(signature(handler).parameters)
             if argumentCount == 2:
                 args = (x, y)
             elif argumentCount == 3:
-                args = (x, y, flags)
+                args = (x, y, context)
             elif argumentCount == 4:
-                args = (x, y, flags, param)
+                args = (x, y, context, flags)
+            elif argumentCount == 5:
+                args = (x, y, context, flags, param)
             elif argumentCount == 1:
                 args = (x,)
             elif args == 0:

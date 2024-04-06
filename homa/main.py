@@ -1,8 +1,5 @@
 import cv2
-from .classes.Logger import Logger
 from .classes.Repository import Repository
-import numpy
-from .helpers.alias import repo
 
 
 def destroy(key: str | None = None) -> None:
