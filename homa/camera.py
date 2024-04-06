@@ -1,6 +1,5 @@
 import cv2
 from typing import Iterator
-from .classes.Repository import Repository
 from .classes.Window import Window
 
 
