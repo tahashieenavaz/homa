@@ -66,38 +66,3 @@ def createEvent(name: str, handler):
         "event": name,
         "handler": handler
     }
-
-
-def onClick(key: str, handler: callable):
-    if not key in Repository.events:
-        Repository.events[key] = []
-
-    Repository.events[key].append(createEvent("click", handler))
-
-
-def onRightClick(key: str, handler: callable):
-    if not key in Repository.events:
-        Repository.events[key] = []
-
-    Repository.events[key].append(createEvent("rclick", handler))
-
-
-def onMouseUp(key: str, handler: callable):
-    if not key in Repository.events:
-        Repository.events[key] = []
-
-    Repository.events[key].append(createEvent("mouseup", handler))
-
-
-def onMouseMove(key: str, handler: callable):
-    if not key in Repository.events:
-        Repository.events[key] = []
-
-    Repository.events[key].append(createEvent("mousemove", handler))
-
-
-def onDoubleClick(key: str, handler: callable):
-    if not key in Repository.events:
-        Repository.events[key] = []
-
-    Repository.events[key].append(createEvent("dblclick", handler))

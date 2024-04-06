@@ -50,33 +50,12 @@ def showWait(*args, **kwargs):
     show(*args, **kwargs)
 
 
-def showMany(*keys):
-    for key in keys[0:-1]:
-        show(key)
+def show(*windows, **settings):
+    for window in windows:
+        window.show()
 
-    showWait(keys[-1])
-
-
-def show(key: any = None, wait: bool = False, window: str = "Homa Window") -> None:
-    # TODO: add functionality to distinguish between camera and images
-
-    if key is not None and not isinstance(key, str):
-        Repository.imshow(window, key)
-
-    elif key is None:
-        for key, image in Repository.images.items():
-            Repository.imshow(key, image)
-            Repository.windows[key] = key
-
-    elif key is not None:
-        if key in Repository.images:
-            Repository.imshow(key, Repository.images[key])
-            Repository.windows[key] = key
-        else:
-            Logger.danger(f"No image found with key {key}")
-
-    if wait:
-        cv2.waitKey(0)
+    if settings["wait"] == True:
+        cv2.waitKey()
 
 
 def black(key: str, width: int, height: int, channels=3):
