@@ -31,7 +31,7 @@ def createMouseCallback(events: dict):
             elif argumentCount == 5:
                 args = (x, y, context, flags, param)
             elif argumentCount == 1:
-                args = (x,)
+                args = (context,)
             elif args == 0:
                 args = tuple()
 

@@ -1,15 +1,20 @@
 import numpy
 import cv2
+
 from ..helpers.kernel import createKernel
-from ..classes.Repository import Repository
 from ..helpers.string import randomLowercaseString
+
+from ..classes.Repository import Repository
+
 from ..events import createMouseCallback
+
 from typing_extensions import Self
 from typing import List
-from ..main import setting
 
 from ..shapes import color
 from ..shapes import stroke
+
+from ..main import setting
 
 
 class Window:
@@ -35,6 +40,7 @@ class Window:
 
     def update(self, newImage) -> Self:
         self.__image = newImage
+        self.refresh()
         return self
 
     def click(self, handler: callable) -> Self:
@@ -54,22 +60,27 @@ class Window:
         return self
 
     def blur(self, kernel: int | List[int] = (7, 7)) -> Self:
-        cv2.blur(
+        self.update(cv2.blur(
             self.__image,
             createKernel(kernel),
-            self.__image
-        )
+        ))
 
         return self
 
     def gaussian(self, kernel: int | List[int] = (7, 7)) -> Self:
-        cv2.GaussianBlur(
+        self.update(cv2.GaussianBlur(
             self.__image,
             createKernel(kernel),
             setting("sigma")[0],
-            self.__image,
             setting("sigma")[1],
-        )
+        ))
+
+        return self
+
+    def median(self, kernel: int) -> Self:
+        self.update(cv2.medianBlur(
+            self.__image, kernel
+        ))
 
         return self
 
@@ -83,14 +94,13 @@ class Window:
         if thickness is not None:
             stroke(thickness)
 
-        cv2.circle(
+        self.update(cv2.circle(
             self.__image,
             (x, y),
             radius,
             setting("color"),
             setting("thickness")
-        )
-        self.refresh()
+        ))
 
     def getImage(self):
         return self.__image
