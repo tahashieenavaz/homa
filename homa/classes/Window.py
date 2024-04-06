@@ -1,5 +1,6 @@
 import numpy
 import cv2
+from ..classes.Repository import Repository
 from ..helpers.string import randomLowercaseString
 from ..events import createMouseCallback
 from typing_extensions import Self
@@ -22,7 +23,7 @@ class Window:
     def show(self):
         cv2.namedWindow(self.__title)
         cv2.setMouseCallback(self.__title, createMouseCallback(self.__events))
-        cv2.imshow(self.__title, self.__image)
+        Repository.imshow(self.__title, self.__image)
 
     def title(self, newTitle: str) -> Self:
         self.__title = newTitle
