@@ -11,9 +11,9 @@ from ..events import createMouseCallback
 
 from typing_extensions import Self
 from typing import List
+from typing import Tuple
 
-from ..shapes import color
-from ..shapes import stroke
+from ..classes.Circle import Circle
 
 from ..main import setting
 
@@ -29,7 +29,12 @@ class Window:
         self.__title = title
         self.__image = image
         self.__events = {}
+
         self.__circles = []
+
+    def title(self, newTitle: str) -> Self:
+        self.__title = newTitle
+        return self
 
     def show(self):
         if isNotColab():
@@ -37,11 +42,18 @@ class Window:
             cv2.setMouseCallback(
                 self.__title, createMouseCallback(self.__events))
 
+        self.drawCircles()
         Repository.imshow(self.__title, self.__image)
 
-    def title(self, newTitle: str) -> Self:
-        self.__title = newTitle
-        return self
+    def drawCircles(self):
+        for circle in self.__circles:
+            cv2.circle(
+                self.__image,
+                (circle.x, circle.y),
+                circle.radius,
+                circle.color,
+                circle.stroke
+            )
 
     def update(self, newImage) -> Self:
         self.__image = newImage
@@ -69,7 +81,6 @@ class Window:
             self.__image,
             createKernel(kernel),
         ))
-
         return self
 
     def gaussian(self, kernel: int | List[int] = (7, 7)) -> Self:
@@ -79,35 +90,21 @@ class Window:
             setting("sigma")[0],
             setting("sigma")[1],
         ))
-
         return self
 
     def median(self, kernel: int) -> Self:
         kernel = kernel - 1 if kernel % 2 == 0 else kernel
-
         self.update(cv2.medianBlur(
             self.__image, kernel
         ))
-
         return self
 
     def refresh(self):
         Repository.imshow(self.__title, self.__image)
 
-    def circle(self, x: int, y: int, radius: int, circleColor: tuple | None = None, thickness: int | None = None):
-        if circleColor is not None:
-            color(*circleColor)
-
-        if thickness is not None:
-            stroke(thickness)
-
-        self.update(cv2.circle(
-            self.__image,
-            (x, y),
-            radius,
-            setting("color"),
-            setting("thickness")
-        ))
+    def circle(self, x: int, y: int, radius: int, color: Tuple[int, int, int] | None = None, stroke: int | None = None):
+        self.__circles.append(Circle(x, y, radius, color, stroke))
+        return self
 
     def getImage(self):
         return self.__image

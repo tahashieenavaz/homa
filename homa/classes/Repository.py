@@ -7,7 +7,7 @@ class RepositoryWrapper:
         self.directory = "./"
 
         self.settings = {
-            "thickness": 2,
+            "stroke": 2,
             "color": (0, 0, 0),
             "sigma": [0, 0]
         }
@@ -24,12 +24,6 @@ class RepositoryWrapper:
                 imshow(window, image)
 
         self.imshow = final_imshow
-
-    def addImageWithRandomKey(self, image):
-        self.addImage(randomLowercaseString(), image)
-
-    def addImage(self, key, image):
-        Repository.images[key] = image
 
 
 Repository = RepositoryWrapper()
