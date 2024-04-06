@@ -1,6 +1,7 @@
 from ..classes.Repository import Repository
 from ..classes.Collection import Collection
 from typing import List
+from typing import Tuple
 
 
 def repo(key: str | None = None, value: any = None) -> any:
@@ -14,5 +15,5 @@ def repo(key: str | None = None, value: any = None) -> any:
     return True
 
 
-def collection(items: List[any]):
+def collection(items: List[any] | Tuple[any]):
     return Collection(items)

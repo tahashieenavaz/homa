@@ -1,38 +1,28 @@
-from .classes.Repository import Repository
+from .classes.Window import Window
 from .helpers.alias import collection
 import numpy
 
 
-def stack(*keys, **settings):
-    default_settings = {
+def stack(*windows, **settings) -> Window:
+    defaultSettings = {
         "axis": 1,
-        "new_key": None
     }
-
     settings = {
-        **default_settings,
-        **settings
+        **defaultSettings,
+        **settings,
     }
 
-    if all(isinstance(item, str) for item in keys):
-        keys = collection(keys).map(lambda key: Repository.images[key])
-
-    stacked_image = numpy.concatenate(
-        keys,
-        axis=settings["axis"]
+    images = collection(windows).map(lambda x: x.getImage())
+    combined = numpy.concatenate(images, axis=settings["axis"])
+    window = Repository.windowGetOrCreate()
+    return Window(
+        image=combined,
     )
 
-    if settings["new_key"] is not None:
-        Repository.images[settings["new_key"]] = stacked_image
 
-    return stacked_image
-
-
-def vstack(*keys, **settings):
-    settings["axis"] = 1
-    return stack(*keys, **settings)
+def vstack(*windows):
+    return stack(*windows, axis=1)
 
 
-def hstack(*keys, **settings):
-    settings["axis"] = 0
-    return stack(*keys, **settings)
+def vstack(*windows):
+    return stack(*windows, axis=0)

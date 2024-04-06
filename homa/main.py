@@ -14,12 +14,15 @@ def show(*windows, **settings):
     for window in windows:
         window.show()
 
-    if "wait" in settings and settings["wait"] == True:
+    if "wait" in settings and settings["wait"]:
         cv2.waitKey()
 
 
 def showWait(*args, **kwargs):
-    kwargs["wait"] = True
+    kwargs = {
+        **kwargs,
+        "wait": True
+    }
     show(*args, **kwargs)
 
 

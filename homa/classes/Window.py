@@ -10,7 +10,6 @@ from ..classes.Repository import Repository
 from ..events import createMouseCallback
 
 from typing_extensions import Self
-from typing import List
 from typing import Tuple
 
 from ..classes.Circle import Circle
@@ -76,14 +75,20 @@ class Window:
         ]) * (2 ** 8 - 1)
         return self
 
-    def blur(self, kernel: int | List[int] = (7, 7)) -> Self:
+    def blur(self, kernelX: int, kernelY: int | None = None) -> Self:
+        kernel = (kernelX, kernelY)
+        if kernelY is None:
+            kernel = (kernelX, kernelX)
         self.update(cv2.blur(
             self.__image,
             createKernel(kernel),
         ))
         return self
 
-    def gaussian(self, kernel: int | List[int] = (7, 7)) -> Self:
+    def gaussian(self, kernelX: int, kernelY: int | None = None) -> Self:
+        kernel = (kernelX, kernelY)
+        if kernelY is None:
+            kernel = (kernelX, kernelX)
         self.update(cv2.GaussianBlur(
             self.__image,
             createKernel(kernel),

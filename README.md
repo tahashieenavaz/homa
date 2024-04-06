@@ -11,25 +11,15 @@ Homa is an easy way to start learning Computer Vision with OpenCV.
 
 ## Loading Images
 
-Images could be loaded with the `image` helper, that accepts the file name and a key for the repository.
+Images could be loaded with the `Image` class, that accepts the file name.
 
 ```python
 from homa import *
 
-image("horse.jpg", "horse")
-show("horse", wait=True)
-
+horse = Image("horse.jpg"
+show(horse, wait=True)
 # or alternatively
-showWait("horse")
-```
-
-Alternatively, following code will load the file into the repository with a key of everything before the last in the filename.
-
-```python
-from homa import *
-
-image("horse.jpg") # stored as "horse"
-showWait("horse")
+showWait(horse)
 ```
 
 ## Smoothing
@@ -39,13 +29,10 @@ showWait("horse")
 ```python
 from homa import *
 
-image("horse.jpg")
-
-blur("horse", 7)                    # rewrites "horse" key
-blur("horse", (7, 19))              # rewrites "horse" key
-blur("horse", 9, "blurred horse")   # as a new key in the repository
-
-showWait("blurred horse")
+horse = Image("horse.jpg")
+horse.blur(7) .   # using (7, 7) kernel
+horse.blur(7, 19) # using (7, 19) kernel
+showWait(horse)
 ```
 
 ### Gaussian Blur
@@ -53,13 +40,10 @@ showWait("blurred horse")
 ```python
 from homa import *
 
-image("horse.jpg")
-
-gaussian("horse", 7)                             # rewrites "horse" key
-gaussian("horse", (7, 19))                       # rewrites "horse" key
-gaussian("horse", 9, "gaussian blurred horse")   # as a new key in the repository
-
-showWait("gaussian blurred horse")
+horse = Image("horse.jpg")
+horse.gaussian(7) .   # using (7, 7) kernel
+horse.gaussian(7, 19) # using (7, 19) kernel
+showWait(horse)
 ```
 
 ### Median Blur
@@ -67,13 +51,8 @@ showWait("gaussian blurred horse")
 ```python
 from homa import *
 
-image("horse.jpg")
-
-median("horse", 7)                           # rewrites "horse" key
-median("horse", (7, 19))                     # rewrites "horse" key
-median("horse", 9, "median blurred horse")   # as a new key in the repository
-
-showWait("median blurred horse")
+horse = Image("horse.jpg")
+horse.median(7)
 ```
 
 ## Stacking
