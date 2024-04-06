@@ -11,5 +11,28 @@ event_map = {
     "rmouseup":  cv2.EVENT_RBUTTONUP,
     "dblclick":  cv2.EVENT_LBUTTONDBLCLK,
     "rdblclick": cv2.EVENT_RBUTTONDBLCLK,
-    "mousemove":      cv2.EVENT_MOUSEMOVE
+    "mousemove": cv2.EVENT_MOUSEMOVE
 }
+
+
+def createMouseCallback(events: dict):
+    def innerMouseCallback(event, x, y, flags, param):
+        for e, handler in events.items():
+            if event != e:
+                continue
+
+            argumentCount = len(signature(handler).parameters)
+            if argumentCount == 2:
+                args = (x, y)
+            elif argumentCount == 3:
+                args = (x, y, flags)
+            elif argumentCount == 4:
+                args = (x, y, flags, param)
+            elif argumentCount == 1:
+                args = (x,)
+            elif args == 0:
+                args = tuple()
+
+            handler(*args)
+
+    return innerMouseCallback

@@ -1,6 +1,8 @@
 import numpy
 import cv2
 from ..helpers.string import randomLowercaseString
+from ..events import createMouseCallback
+from typing_extensions import Self
 
 
 class Window:
@@ -19,13 +21,22 @@ class Window:
 
         cv2.namedWindow(self.__title)
 
-    def title(self, newTitle: str):
+    def show(self):
+        cv2.setMouseCallback(self.__title, createMouseCallback(self.__events))
+        cv2.imshow(self.__title, self.__image)
+
+    def title(self, newTitle: str) -> Self:
         self.__title = newTitle
         return self
 
-    def show(self):
-        cv2.setMouseCallback(self.__title, createMouseEvent(self.__events))
-        cv2.imshow(self.__title, self.__image)
+    def update(self, newImage) -> Self:
+        self.__image = newImage
+        return self
 
-    def onClick(self, handler: callable):
-        pass
+    def onClick(self, handler: callable) -> Self:
+        self.__events["click"] = handler
+        return self
+
+    def mouseMove(self, handler: callable) -> Self:
+        self.__events["mousemove"] = handler
+        return self
