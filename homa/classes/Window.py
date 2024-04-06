@@ -32,10 +32,16 @@ class Window:
         self.__image = newImage
         return self
 
-    def onClick(self, handler: callable) -> Self:
+    def click(self, handler: callable) -> Self:
         self.__events["click"] = handler
         return self
 
-    def mouseMove(self, handler: callable) -> Self:
+    def move(self, handler: callable) -> Self:
         self.__events["mousemove"] = handler
         return self
+
+    def __getattr__(self, key):
+        if key == "shape":
+            return (self.__width, self.__height)
+
+        return None

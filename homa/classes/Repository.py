@@ -13,8 +13,6 @@ class RepositoryWrapper:
             "sigma": [0, 0]
         }
 
-        self.events = {}
-
         if is_colab():
             from google.colab.patches import cv2_imshow as imshow
         else:
