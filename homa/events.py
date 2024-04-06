@@ -1,5 +1,4 @@
 import cv2
-from .main import win
 from inspect import signature
 from .classes.Repository import Repository
 

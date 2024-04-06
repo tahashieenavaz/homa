@@ -15,8 +15,6 @@ class Window:
             image = numpy.zeros([height, width, channels], dtype=dtype)
 
         self.__title = title
-        self.__width = width
-        self.__height = height
         self.__image = image
         self.__events = {}
 
@@ -41,8 +39,16 @@ class Window:
         self.__events["mousemove"] = handler
         return self
 
+    def white(self) -> Self:
+        self.__image = numpy.ones([
+            self.__image.shape.height,
+            self.__image.shape.width,
+            self.__image.shape.channels
+        ]) * (2 ** 8 - 1)
+        return self
+
     def __getattr__(self, key):
         if key == "shape":
-            return (self.__width, self.__height)
+            return self.__image.shape
 
         return None
