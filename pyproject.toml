@@ -12,5 +12,10 @@ description = "A curated list of machine learning and deep learning helpers."
 readme = "README.md"
 requires-python = ">=3.7"
 
+dependencies = [
+  "numpy",
+  "torch",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"] 
