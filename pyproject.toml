@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "homa"
-version = "0.0.1"
+version = "0.0.11"
+description = "A curated list of machine learning and deep learning helpers."
 authors = [
   { name="Taha Shieenavaz", email="tahashieenavaz@gmail.com" },
 ]
-description = "A curated list of machine learning and deep learning helpers."
 readme = "README.md"
 requires-python = ">=3.7"
 
