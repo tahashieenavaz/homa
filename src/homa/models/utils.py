@@ -15,3 +15,7 @@ def replace_modules(
                     setattr(parent, name, replacement())
                     replaced += 1
     return replaced
+
+
+def replace_relu(model: torch.nn.Module, replacement: torch.nn.Module):
+    return replace_modules(model, torch.nn.ReLU, replacement)
