@@ -7,12 +7,14 @@ from .utils import replace_relu
 class StochasticResnet(torch.nn.Module):
     def __init__(self, outputs: int):
         super(StochasticResnet, self).__init__()
-        self.resnet = resnet50(ResNet50_Weights)
+        self.encoder = resnet50(ResNet50_Weights)
+        self.encoder.fc = torch.nn.Identity()
         self.fc = torch.nn.Linear(2048, outputs)
         replace_relu(self.resnet, self.activation_pool)
 
     def create_activation_pool(self):
         self.activation_pool = [torch.nn.ReLU()]
 
-    def forward(self, x: torch.Tensor):
-        pass
+    def forward(self, images: torch.Tensor):
+        features = self.encoder(images)
+        return self.fc(features)
