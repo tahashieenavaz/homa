@@ -43,5 +43,6 @@ class APLU(torch.nn.Module):
         b = self.alpha * torch.relu(-x + self.xi)
         c = self.beta * torch.relu(-x + self.psi)
         d = self.gamma * torch.relu(-x + self.mu)
+        z = a + b + c + d
 
-        return a + b + c + d
+        return z
