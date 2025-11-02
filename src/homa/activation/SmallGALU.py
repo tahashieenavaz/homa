@@ -2,7 +2,7 @@ import torch
 
 
 class SmallGALU(torch.nn.Module):
-    def __init__(self, max_input=1.0):
+    def __init__(self, max_input: float = 1.0):
         super(SmallGALU, self).__init__()
         if max_input <= 0:
             raise ValueError("max_input must be positive.")
