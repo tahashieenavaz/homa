@@ -9,7 +9,7 @@ class StochasticResnet(torch.nn.Module):
         super(StochasticResnet, self).__init__()
         self.resnet = resnet50(ResNet50_Weights)
         self.fc = torch.nn.Linear(2048, outputs)
-        self.activation_pool = [torch.nn.ReLU]
+        self.activation_pool = [torch.nn.ReLU()]
         replace_relu(self.resnet, self.activation_pool)
 
     def forward(self, x: torch.Tensor):
