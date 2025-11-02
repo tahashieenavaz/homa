@@ -14,7 +14,7 @@ class PDELU(torch.nn.Module):
         self.alpha = None
         self._num_channels = None
 
-    def _initialize_parameters(self, x):
+    def _initialize_parameters(self, x: torch.Tensor):
         if x.ndim < 2:
             raise ValueError(
                 f"Input tensor must have at least 2 dimensions (N, C), but got shape {x.shape}"
@@ -27,7 +27,7 @@ class PDELU(torch.nn.Module):
         init_tensor = torch.zeros(param_shape) + 0.1
         self.alpha = torch.nn.Parameter(init_tensor)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         if self.alpha is None:
             self._initialize_parameters(x)
 
