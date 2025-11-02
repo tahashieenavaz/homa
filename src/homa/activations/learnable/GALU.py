@@ -7,10 +7,10 @@ class Galu(torch.nn.Module):
         self.channels = int(channels)
         self.max_input = float(max_input)
 
-        self.Alpha = torch.nn.Parameter(torch.zeros(self.channels))
-        self.Beta = torch.nn.Parameter(torch.zeros(self.channels))
-        self.Gamma = torch.nn.Parameter(torch.zeros(self.channels))
-        self.Delta = torch.nn.Parameter(torch.zeros(self.channels))
+        self.alpha = torch.nn.Parameter(torch.zeros(self.channels))
+        self.beta = torch.nn.Parameter(torch.zeros(self.channels))
+        self.gamma = torch.nn.Parameter(torch.zeros(self.channels))
+        self.delta = torch.nn.Parameter(torch.zeros(self.channels))
 
     @staticmethod
     def positive_part(x):
@@ -42,10 +42,10 @@ class Galu(torch.nn.Module):
 
         X = x / self.max_input
 
-        A = self._as_channel_param(self.Alpha, X)
-        B = self._as_channel_param(self.Beta, X)
-        G = self._as_channel_param(self.Gamma, X)
-        D = self._as_channel_param(self.Delta, X)
+        A = self._as_channel_param(self.alpha, X)
+        B = self._as_channel_param(self.beta, X)
+        G = self._as_channel_param(self.gamma, X)
+        D = self._as_channel_param(self.delta, X)
 
         Z = self.positive_part(X) + A * self.negative_part(X)  # PReLU-like
         Z = Z + B * (
