@@ -1,7 +1,7 @@
 import torch
 from torchvision.models import resnet50
-from .utils import replace_relu
-from ..activation import StochasticActivation
+from ..utils import replace_relu
+from ...activation import StochasticActivation
 
 
 class StochasticResnet(torch.nn.Module):
