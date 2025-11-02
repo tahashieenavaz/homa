@@ -1,4 +1,10 @@
 import torch
+from .utils import (
+    as_channel_parameters,
+    negative_part,
+    positive_part,
+    device_compatibility_check,
+)
 
 
 class GALU(torch.nn.Module):
@@ -18,24 +24,6 @@ class GALU(torch.nn.Module):
         self.c1 = torch.nn.Parameter(torch.full((self.channels,), 0.5))
         self.c2 = torch.nn.Parameter(torch.full((self.channels,), 0.5))
 
-    @staticmethod
-    def negative_part(x: torch.Tensor):
-        return torch.minimum(x, torch.zeros_like(x))
-
-    @staticmethod
-    def positive_part(x):
-        return torch.maximum(x, torch.zeros_like(x))
-
-    def as_channel_parameters(self, p: torch.Tensor, x: torch.Tensor):
-        shape = [1] * x.dim()
-        shape[1] = -1
-        return p.view(*shape)
-
-    def device_compatibility_check(self, x: torch.Tensor):
-        for p in self.parameters():
-            if p.device != x.device or p.dtype != x.dtype:
-                p.data = p.data.to(device=x.device, dtype=x.dtype)
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         orig_shape = x.shape
 
@@ -53,41 +41,41 @@ class GALU(torch.nn.Module):
                 f"Unsupported input dimensions {x.dim()}; expected 1D, 2D, or 4D."
             )
 
-        self.device_compatibility_check(x)
+        device_compatibility_check(self, x)
 
         X = x / self.max_input
 
-        A1 = self.as_channel_parameters(self.alpha1, X)
-        B1 = self.as_channel_parameters(self.beta1, X)
-        G1 = self.as_channel_parameters(self.gamma1, X)
-        D1 = self.as_channel_parameters(self.delta1, X)
-        A2 = self.as_channel_parameters(self.alpha2, X)
-        B2 = self.as_channel_parameters(self.beta2, X)
-        G2 = self.as_channel_parameters(self.gamma2, X)
-        D2 = self.as_channel_parameters(self.delta2, X)
-        C1 = self.as_channel_parameters(self.c1, X)
-        C2 = self.as_channel_parameters(self.c2, X)
+        A1 = as_channel_parameters(self.alpha1, X)
+        B1 = as_channel_parameters(self.beta1, X)
+        G1 = as_channel_parameters(self.gamma1, X)
+        D1 = as_channel_parameters(self.delta1, X)
+        A2 = as_channel_parameters(self.alpha2, X)
+        B2 = as_channel_parameters(self.beta2, X)
+        G2 = as_channel_parameters(self.gamma2, X)
+        D2 = as_channel_parameters(self.delta2, X)
+        C1 = as_channel_parameters(self.c1, X)
+        C2 = as_channel_parameters(self.c2, X)
 
-        Z1 = self.positive_part(X) + A1 * self.negative_part(X)
+        Z1 = positive_part(X) + A1 * negative_part(X)
         Z1 = Z1 + B1 * (
-            self.positive_part(1 - torch.abs(X - 1))
+            positive_part(1 - torch.abs(X - 1))
             + torch.minimum(torch.abs(X - 3) - 1, torch.zeros_like(X))
         )
         Z1 = Z1 + G1 * (
-            self.positive_part(0.5 - torch.abs(X - 0.5))
+            positive_part(0.5 - torch.abs(X - 0.5))
             + torch.minimum(torch.abs(X - 1.5) - 0.5, torch.zeros_like(X))
         )
         Z1 = Z1 + D1 * (
-            self.positive_part(0.5 - torch.abs(X - 2.5))
+            positive_part(0.5 - torch.abs(X - 2.5))
             + torch.minimum(torch.abs(X - 3.5) - 0.5, torch.zeros_like(X))
         )
         Z1 = self.max_input * Z1
         Z2 = (
-            self.positive_part(X)
-            + A2 * self.negative_part(X)
+            positive_part(X)
+            + A2 * negative_part(X)
             + B2 * torch.minimum(torch.abs(X - 2) - 2, torch.zeros_like(X))
-            + G2 * self.positive_part(-torch.abs(X - 1) + 1)
-            + D2 * self.positive_part(-torch.abs(X - 3) + 1)
+            + G2 * positive_part(-torch.abs(X - 1) + 1)
+            + D2 * positive_part(-torch.abs(X - 3) + 1)
         )
         Z2 = self.max_input * Z2
         Z = C1 * Z1 + C2 * Z2

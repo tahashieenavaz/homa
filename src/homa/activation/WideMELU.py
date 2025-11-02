@@ -1,4 +1,5 @@
 import torch
+from .utils import positive_part, negative_part, as_channel_parameters
 
 
 class WideMELU(torch.nn.Module):
@@ -14,27 +15,6 @@ class WideMELU(torch.nn.Module):
         self.register_buffer("_a", a_vals.view(1, 1, 1, 1, 7))
         self.register_buffer("_lam", lam_vals.view(1, 1, 1, 1, 7))
 
-    @staticmethod
-    def positive_part(x):
-        return torch.maximum(x, torch.zeros_like(x))
-
-    @staticmethod
-    def negative_part(x):
-        return torch.minimum(x, torch.zeros_like(x))
-
-    @staticmethod
-    def phi_hat(X5, a5, lam5):
-        term_pos = torch.maximum(lam5 - torch.abs(X5 - a5), torch.zeros_like(X5))
-        term_neg = torch.minimum(
-            torch.abs(X5 - (a5 + 2 * lam5)) - lam5, torch.zeros_like(X5)
-        )
-        return term_pos + term_neg
-
-    def as_channel_parameters(self, p, x):
-        shape = [1] * x.dim()
-        shape[1] = -1
-        return p.view(*shape)
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         orig = x.shape
 
@@ -47,8 +27,8 @@ class WideMELU(torch.nn.Module):
 
         X = x / self.max_input
 
-        A = self.as_channel_parameters(self.alpha, X)
-        Z = self.positive_part(X) + A * self.negative_part(X)
+        A = as_channel_parameters(self.alpha, X)
+        Z = positive_part(X) + A * negative_part(X)
 
         X5 = X.unsqueeze(-1)  # (N,C,H,W,1)
         a5 = self._a.to(dtype=X.dtype, device=X.device)

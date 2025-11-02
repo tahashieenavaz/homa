@@ -1,4 +1,5 @@
 import torch
+from .utils import as_channel_parameters, positive_part, negative_part
 
 
 class SmallGALU(torch.nn.Module):
@@ -8,19 +9,6 @@ class SmallGALU(torch.nn.Module):
         self.max_input = float(max_input)
         self.alpha = torch.nn.Parameter(torch.zeros(self.channels))
         self.beta = torch.nn.Parameter(torch.zeros(self.channels))
-
-    @staticmethod
-    def positive_part(x):
-        return torch.maximum(x, torch.zeros_like(x))
-
-    @staticmethod
-    def negative_part(x):
-        return torch.minimum(x, torch.zeros_like(x))
-
-    def as_channel_parameters(self, p: torch.Tensor, x: torch.Tensor):
-        shape = [1] * x.dim()
-        shape[1] = -1
-        return p.view(*shape)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         orig_shape = x.shape
@@ -33,13 +21,13 @@ class SmallGALU(torch.nn.Module):
             raise ValueError(f"Expected 1D, 2D, or 4D input, got rank {x.dim()}")
 
         X = x / self.max_input
-        A = self.as_channel_parameters(self.alpha, X)
-        B = self.as_channel_parameters(self.beta, X)
+        A = as_channel_parameters(self.alpha, X)
+        B = as_channel_parameters(self.beta, X)
 
-        Z = self.positive_part(X) + A * self.negative_part(X)
+        Z = positive_part(X) + A * negative_part(X)
 
         Z = Z + B * (
-            self.positive_part(1 - torch.abs(X - 1))
+            positive_part(1 - torch.abs(X - 1))
             + torch.minimum(torch.abs(X - 3) - 1, torch.zeros_like(X))
         )
 

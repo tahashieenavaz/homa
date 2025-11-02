@@ -1,7 +1,8 @@
 import torch
+from .utils import negative_part, positive_part, as_channel_parameters
 
 
-class Galu(torch.nn.Module):
+class GALU(torch.nn.Module):
     def __init__(self, channels: int, max_input: float):
         super().__init__()
         self.channels = int(channels)
@@ -11,19 +12,6 @@ class Galu(torch.nn.Module):
         self.beta = torch.nn.Parameter(torch.zeros(self.channels))
         self.gamma = torch.nn.Parameter(torch.zeros(self.channels))
         self.delta = torch.nn.Parameter(torch.zeros(self.channels))
-
-    @staticmethod
-    def positive_part(x):
-        return torch.maximum(x, torch.zeros_like(x))
-
-    @staticmethod
-    def negative_part(x):
-        return torch.minimum(x, torch.zeros_like(x))
-
-    def as_channel_parameters(self, p: torch.Tensor, x: torch.Tensor):
-        shape = [1] * x.dim()
-        shape[1] = -1
-        return p.view(*shape)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         orig_shape = x.shape
@@ -42,22 +30,22 @@ class Galu(torch.nn.Module):
 
         X = x / self.max_input
 
-        A = self._as_channel_param(self.alpha, X)
-        B = self._as_channel_param(self.beta, X)
-        G = self._as_channel_param(self.gamma, X)
-        D = self._as_channel_param(self.delta, X)
+        A = as_channel_parameters(self.alpha, X)
+        B = as_channel_parameters(self.beta, X)
+        G = as_channel_parameters(self.gamma, X)
+        D = as_channel_parameters(self.delta, X)
 
-        Z = self.positive_part(X) + A * self.negative_part(X)  # PReLU-like
+        Z = positive_part(X) + A * negative_part(X)
         Z = Z + B * (
-            self.positive_part(1 - torch.abs(X - 1))
+            positive_part(1 - torch.abs(X - 1))
             + torch.minimum(torch.abs(X - 3) - 1, torch.zeros_like(X))
         )
         Z = Z + G * (
-            self.positive_part(0.5 - torch.abs(X - 0.5))
+            positive_part(0.5 - torch.abs(X - 0.5))
             + torch.minimum(torch.abs(X - 1.5) - 0.5, torch.zeros_like(X))
         )
         Z = Z + D * (
-            self.positive_part(0.5 - torch.abs(X - 2.5))
+            positive_part(0.5 - torch.abs(X - 2.5))
             + torch.minimum(torch.abs(X - 3.5) - 0.5, torch.zeros_like(X))
         )
         Z = self.max_input * Z
