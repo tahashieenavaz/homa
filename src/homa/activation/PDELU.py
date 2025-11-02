@@ -10,7 +10,7 @@ class PDELU(torch.nn.Module):
             )
         self.theta = theta
         self._power_val = 1.0 / (1.0 - self.theta)
-        self.alpha = None
+        self.alpha = torch.nn.UninitializedParameter()
         self._num_channels = None
 
     def _initialize_parameters(self, x: torch.Tensor):
