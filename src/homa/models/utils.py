@@ -1,13 +1,11 @@
 import torch
-import random
 
 
-def replace_relu(model: torch.nn.Module, pool: list) -> int:
+def replace_relu(model: torch.nn.Module, activation: torch.nn.Module) -> int:
     replaced = 0
     for parent in model.modules():
         for name, child in list(parent.named_children()):
             if isinstance(child, torch.nn.ReLU):
-                activation_instance = random.choice(pool)
-                setattr(parent, name, activation_instance)
+                setattr(parent, name, activation())
                 replaced += 1
     return replaced
