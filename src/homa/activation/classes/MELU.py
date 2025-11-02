@@ -2,7 +2,7 @@ import torch
 
 
 class MELU(torch.nn.Module):
-    def __init__(self, maxInput: float = 1):
+    def __init__(self, maxInput: float = 1.0):
         super().__init__()
         self.maxInput = float(maxInput)
         self.alpha = None
