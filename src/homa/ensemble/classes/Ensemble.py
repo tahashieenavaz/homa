@@ -1,10 +1,11 @@
 import torch
+from typing import List
 
 
 class Ensemble:
     def __init__(self, num_classes: int):
         super().__init__()
-        self.models: list = []
+        self.models: List[torch.nn.Module] = []
         self.num_classes = num_classes
 
     @property
