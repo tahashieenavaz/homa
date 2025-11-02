@@ -36,7 +36,7 @@ class SmallGALU(torch.nn.Module):
         A = self.as_channel_parameters(self.alpha, X)
         B = self.as_channel_parameters(self.beta, X)
 
-        Z = self.positive_part(X) + A * self.negative_part(X)  # PReLU core
+        Z = self.positive_part(X) + A * self.negative_part(X)
 
         Z = Z + B * (
             self.positive_part(1 - torch.abs(X - 1))
