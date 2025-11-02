@@ -1,11 +1,17 @@
 import torch
 
 
-def replace_relu(model: torch.nn.Module, activation: torch.nn.Module) -> int:
+def replace_modules(
+    model: torch.nn.Module, find: list | torch.Tensor, replacement: torch.nn.Module
+) -> int:
+    if not isinstance(find, list):
+        find = [find]
+
     replaced = 0
     for parent in model.modules():
         for name, child in list(parent.named_children()):
-            if isinstance(child, torch.nn.ReLU):
-                setattr(parent, name, activation())
-                replaced += 1
+            for needle in find:
+                if isinstance(child, needle):
+                    setattr(parent, name, replacement())
+                    replaced += 1
     return replaced
