@@ -10,7 +10,7 @@ from .PDELU import PDELU
 from .SReLU import SReLU
 
 
-class RandomActivation(torch.nn.Module):
+class StochasticActivation(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.gate = random.choice([APLU, GALU, SmallGALU, MELU, WideMELU, PDELU, SReLU])

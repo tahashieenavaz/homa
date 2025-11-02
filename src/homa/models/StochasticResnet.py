@@ -1,7 +1,7 @@
 import torch
 from torchvision.models import resnet50
 from .utils import replace_relu
-from ..activation import RandomActivation
+from ..activation import StochasticActivation
 
 
 class StochasticResnet(torch.nn.Module):
@@ -9,7 +9,7 @@ class StochasticResnet(torch.nn.Module):
         super(StochasticResnet, self).__init__()
         self._create_encoder()
         self.fc = torch.nn.Linear(2048, outputs)
-        replace_relu(self.resnet, RandomActivation)
+        replace_relu(self.resnet, StochasticActivation)
 
     def _create_encoder(self):
         self.encoder = resnet50(weights="DEFAULT")

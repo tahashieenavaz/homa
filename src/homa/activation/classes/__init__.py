@@ -5,4 +5,4 @@ from .MELU import MELU
 from .WideMELU import WideMELU
 from .PDELU import PDELU
 from .SReLU import SReLU
-from .RandomActivation import RandomActivation
+from .StochasticActivation import StochasticActivation
