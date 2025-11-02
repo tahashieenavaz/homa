@@ -4,7 +4,6 @@ import torch
 class PDELU(torch.nn.Module):
     def __init__(self, theta: float = 0.5):
         super(PDELU, self).__init__()
-
         if theta == 1.0:
             raise ValueError(
                 "theta cannot be 1.0, as it would cause a division by zero."
