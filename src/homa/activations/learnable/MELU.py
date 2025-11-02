@@ -57,7 +57,6 @@ class GALU(torch.nn.Module):
 
         X = x / self.max_input
 
-        # Prepare broadcastable views of parameters
         A1 = self.as_channel_parameters(self.alpha1, X)
         B1 = self.as_channel_parameters(self.beta1, X)
         G1 = self.as_channel_parameters(self.gamma1, X)
