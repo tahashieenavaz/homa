@@ -1,40 +1,39 @@
 import torch
-from .utils import as_channel_parameters, positive_part, negative_part
 
 
 class SmallGALU(torch.nn.Module):
-    def __init__(self, channels: int, max_input: float):
-        super().__init__()
-        self.channels = int(channels)
-        self.max_input = float(max_input)
-        self.alpha = torch.nn.Parameter(torch.zeros(self.channels))
-        self.beta = torch.nn.Parameter(torch.zeros(self.channels))
+    def __init__(self, max_input=1.0):
+        super(SmallGALU, self).__init__()
+        if max_input <= 0:
+            raise ValueError("max_input must be positive.")
+        self.max_input = max_input
+        self.alpha = None
+        self.beta = None
+        self._num_channels = None
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        orig_shape = x.shape
-        # normalize to NCHW for clean broadcasting
-        if x.dim() == 1:  # (C,)
-            x = x.unsqueeze(0).unsqueeze(-1).unsqueeze(-1)
-        elif x.dim() == 2:  # (N,C)
-            x = x.unsqueeze(-1).unsqueeze(-1)
-        elif x.dim() != 4:
-            raise ValueError(f"Expected 1D, 2D, or 4D input, got rank {x.dim()}")
+    def _initialize_parameters(self, x):
+        if x.ndim < 2:
+            raise ValueError(
+                f"Input tensor must have at least 2 dimensions (N, C), but got shape {x.shape}"
+            )
 
-        X = x / self.max_input
-        A = as_channel_parameters(self.alpha, X)
-        B = as_channel_parameters(self.beta, X)
+        num_channels = x.shape[1]
+        self._num_channels = num_channels
+        param_shape = [1] * x.ndim
+        param_shape[1] = num_channels
+        self.alpha = torch.nn.Parameter(torch.zeros(param_shape))
+        self.beta = torch.nn.Parameter(torch.zeros(param_shape))
 
-        Z = positive_part(X) + A * negative_part(X)
+    def forward(self, x):
+        if self.alpha is None:
+            self._initialize_parameters(x)
 
-        Z = Z + B * (
-            positive_part(1 - torch.abs(X - 1))
-            + torch.minimum(torch.abs(X - 3) - 1, torch.zeros_like(X))
+        zero = torch.tensor(0.0, device=x.device, dtype=x.dtype)
+        x_norm = x / self.max_input
+        part_prelu = torch.relu(x_norm) + self.alpha * torch.min(x_norm, zero)
+        part_beta = self.beta * (
+            torch.relu(1.0 - torch.abs(x_norm - 1.0))
+            + torch.min(torch.abs(x_norm - 3.0) - 1.0, zero)
         )
-
-        Z = self.max_input * Z
-
-        if len(orig_shape) == 1:
-            Z = Z.squeeze(-1).squeeze(-1).squeeze(0)
-        elif len(orig_shape) == 2:
-            Z = Z.squeeze(-1).squeeze(-1)
-        return Z
+        z = part_prelu + part_beta
+        return z * self.max_input
