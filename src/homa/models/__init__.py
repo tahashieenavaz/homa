@@ -1,2 +1,2 @@
-from .classes import *
+from .architectures import *
 from .utils import *
