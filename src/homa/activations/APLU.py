@@ -14,5 +14,7 @@ class APLU(torch.nn.Module):
         self.psi = torch.nn.Parameter(max_init * torch.rand(channels))
         self.mu = torch.nn.Parameter(max_init * torch.rand(channels))
 
+        self.relu = torch.nn.ReLU()
+
     def forward(self, x):
         pass
