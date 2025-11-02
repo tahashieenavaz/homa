@@ -2,35 +2,46 @@ import torch
 
 
 class APLU(torch.nn.Module):
-    def __init__(self, channels: int, max_init: float = 1.0):
+    def __init__(self, max_input: float = 1.0):
         super(APLU, self).__init__()
-        self.channels = channels
+        self.max_input = max_input
+        self.alpha = None
+        self.beta = None
+        self.gamma = None
+        self.xi = None
+        self.psi = None
+        self.mu = None
+        self._num_channels = None
 
-        self.alpha = torch.nn.Parameter(torch.zeros(channels))
-        self.beta = torch.nn.Parameter(torch.zeros(channels))
-        self.gamma = torch.nn.Parameter(torch.zeros(channels))
+    def _initialize_parameters(self, x):
+        if x.ndim < 2:
+            raise ValueError(
+                f"Input tensor must have at least 2 dimensions (N, C), but got shape {x.shape}"
+            )
 
-        self.xi = torch.nn.Parameter(max_init * torch.rand(channels))
-        self.psi = torch.nn.Parameter(max_init * torch.rand(channels))
-        self.mu = torch.nn.Parameter(max_init * torch.rand(channels))
+        num_channels = x.shape[1]
+        self._num_channels = num_channels
 
-        self.relu = torch.nn.ReLU()
+        param_shape = [1] * x.ndim
+        param_shape[1] = num_channels
+
+        self.alpha = torch.nn.Parameter(torch.zeros(param_shape))
+        self.beta = torch.nn.Parameter(torch.zeros(param_shape))
+        self.gamma = torch.nn.Parameter(torch.zeros(param_shape))
+
+        self.xi = torch.nn.Parameter(self.max_input * torch.rand(param_shape))
+        self.psi = torch.nn.Parameter(self.max_input * torch.rand(param_shape))
+        self.mu = torch.nn.Parameter(self.max_input * torch.rand(param_shape))
 
     def forward(self, x):
-        broadcast_shape = [1] * x.dim()
-        broadcast_shape[1] = -1  # channel dimension
+        if self.alpha is None:
+            self._initialize_parameters(x)
 
-        alpha = self.alpha.view(broadcast_shape)
-        beta = self.beta.view(broadcast_shape)
-        gamma = self.gamma.view(broadcast_shape)
-        xi = self.xi.view(broadcast_shape)
-        psi = self.psi.view(broadcast_shape)
-        mu = self.mu.view(broadcast_shape)
+        a = torch.relu(x)
 
-        x_activated = self.relu(x)
+        # following are called hinges
+        b = self.alpha * torch.relu(-x + self.xi)
+        c = self.beta * torch.relu(-x + self.psi)
+        d = self.gamma * torch.relu(-x + self.mu)
 
-        hinge1 = alpha * self.relu(-x + xi)
-        hinge2 = beta * self.relu(-x + psi)
-        hinge3 = gamma * self.relu(-x + mu)
-
-        return x_activated + hinge1 + hinge2 + hinge3
+        return a + b + c + d

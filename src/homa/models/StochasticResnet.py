@@ -1,6 +1,7 @@
 import torch
 from torchvision.models import resnet50
 from .utils import replace_relu
+from ..activation import APLU, MELU, WideMELU, GALU, SmallGALU
 
 
 class StochasticResnet(torch.nn.Module):
@@ -16,7 +17,17 @@ class StochasticResnet(torch.nn.Module):
         self.encoder.fc = torch.nn.Identity()
 
     def _create_activation_pool(self):
-        self.activation_pool = [torch.nn.ReLU()]
+        self.activation_pool = [
+            torch.nn.ReLU(),
+            torch.nn.LeakyReLU(),
+            torch.nn.PReLU(),
+            torch.nn.ELU(),
+            APLU(),
+            MELU(),
+            WideMELU(),
+            GALU(),
+            SmallGALU(),
+        ]
 
     def forward(self, images: torch.Tensor):
         features = self.encoder(images)

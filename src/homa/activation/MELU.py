@@ -7,7 +7,7 @@ from .utils import (
 )
 
 
-class GALU(torch.nn.Module):
+class MELU(torch.nn.Module):
     def __init__(self, channels: int, max_input: float):
         super().__init__()
         self.channels = int(channels)
