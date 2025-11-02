@@ -4,8 +4,8 @@ import torch
 class Ensemble:
     def __init__(self, num_classes: int):
         super().__init__()
-        self.num_classes = num_classes
         self.models: list = []
+        self.num_classes = num_classes
 
     @property
     def size(self):
@@ -30,3 +30,7 @@ class Ensemble:
         for model in self.models:
             logits += model(x)
         return logits
+
+    def predict(self, x: torch.Tensor) -> torch.Tensor:
+        logits = self.logits(x)
+        return torch.nn.functional.softmax(logits, dim=1)
