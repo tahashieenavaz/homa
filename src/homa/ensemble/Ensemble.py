@@ -4,12 +4,13 @@ from .concerns import (
     RecordsStateDictionaries,
     ReportsClassificationMetrics,
 )
+from ..models import Model
 
 
 class Ensemble(ReportsSize, ReportsClassificationMetrics, RecordsStateDictionaries):
-    def __init__(self):
+    def __init__(self, variant: Model):
         super().__init__()
-        self.model = None
+        self.model = variant().model
 
     def logits(self, x: torch.Tensor) -> torch.Tensor:
         batch_size = x.shape[0]

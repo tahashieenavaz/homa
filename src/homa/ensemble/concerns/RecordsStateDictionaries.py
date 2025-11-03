@@ -1,7 +1,6 @@
 from typing import List
 from collections import OrderedDict
-from copy import deepcopy
-from ...models.wrappers import ModelWrapper
+from ...models import Model
 
 
 class RecordsStateDictionaries:
@@ -9,10 +8,8 @@ class RecordsStateDictionaries:
         super().__init__(*args, **kwargs)
         self.state_dicts: List[OrderedDict] = []
 
-    def record(self, wrapper: ModelWrapper):
-        if self.model is None:
-            self.model = deepcopy(wrapper.model)
-        self.state_dicts.append(wrapper.model.state_dict())
+    def record(self, model: Model):
+        self.state_dicts.append(model.network.state_dict())
 
     def push(self, *args, **kwargs):
         self.record(*args, **kwargs)
