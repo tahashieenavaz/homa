@@ -2,7 +2,7 @@ import torch
 from typing import List
 from copy import deepcopy
 from collections import OrderedDict
-from ...models.wrappers import ModelWrapper
+from ..models.wrappers import ModelWrapper
 
 
 class Ensemble:

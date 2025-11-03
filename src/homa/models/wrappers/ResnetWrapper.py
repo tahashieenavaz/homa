@@ -21,11 +21,6 @@ class ResnetWrapper(ModelWrapper):
         loss.backward()
         self.optimizer.step()
 
-    def f1(self, x: torch.Tensor, y: torch.Tensor):
-        self.model.eval()
-        predictions = self.model(x)
-        return f1(y, predictions)
-
     def kappa(self, x: torch.Tensor, y: torch.Tensor):
         self.model.eval()
         predictions = self.model(x)
