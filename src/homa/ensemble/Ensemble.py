@@ -1,5 +1,9 @@
 import torch
-from .concerns import ReportsSize, RecordsStateDictionaries
+from .concerns import (
+    ReportsSize,
+    RecordsStateDictionaries,
+    ReportsClassificationMetrics,
+)
 
 
 class Ensemble(ReportsSize, ReportsClassificationMetrics, RecordsStateDictionaries):
