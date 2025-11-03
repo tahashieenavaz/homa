@@ -1,13 +1,15 @@
 import torch
 from typing import List
+from copy import deepcopy
+from collections import OrderedDict
 from ...models.wrappers import ModelWrapper
 
 
 class Ensemble:
-    def __init__(self, num_classes: int):
+    def __init__(self):
         super().__init__()
-        self.models: List[torch.nn.Module] = []
-        self.num_classes = num_classes
+        self.state_dicts: List[OrderedDict] = []
+        self.model = None
 
     @property
     def size(self):
@@ -17,8 +19,10 @@ class Ensemble:
     def length(self):
         return len(self.models)
 
-    def record(self, model: torch.nn.Module | ModelWrapper):
-        self.models.append(model)
+    def record(self, wrapper: ModelWrapper):
+        if self.model is None:
+            self.model = deepcopy(wrapper.model)
+        self.state_dicts.append(wrapper.model.state_dict())
 
     def push(self, *args, **kwargs):
         self.record(*args, **kwargs)

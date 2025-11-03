@@ -7,7 +7,8 @@ from .ModelWrapper import ModelWrapper
 class ResnetWrapper(ModelWrapper):
     def __init__(self, architecture: torch.nn.Module, lr: float, num_classes: int):
         super().__init__()
-        self.model = architecture()
+        self.architecture = architecture
+        self.model = self.architecture()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=0.9)
         self.criterion = torch.nn.CrossEntropyLoss()
         self.num_classes = num_classes
