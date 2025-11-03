@@ -2,6 +2,7 @@ import pytest
 import torch
 from homa.vision import Resnet, Model
 from homa.vision.modules import ResnetModule
+from homa import get_device
 
 
 @pytest.fixture
@@ -22,8 +23,8 @@ def test_resnet_initialization(resnet_model):
 
 
 def test_reports_accuracy(resnet_model):
-    x = torch.randn(10, 3, 84, 84)
-    y = torch.randint(0, 3, (10, 1))
+    x = torch.randn(10, 3, 84, 84).to(get_device())
+    y = torch.randint(0, 3, (10, 1)).to(get_device())
     accuracy = resnet_model.accuracy(x, y)
     assert isinstance(accuracy, float)
 
