@@ -1,17 +1,14 @@
 import torch
 from torchvision.models import resnet50
-from ..utils import replace_relu
-from ...activations import StochasticActivation
-from torch.nn.init import kaiming_normal_ as kaiming
+from torch.nn.init import kaiming_uniform_ as kaiming
 
 
-class StochasticResnet(torch.nn.Module):
+class ResnetModule(torch.nn.Module):
     def __init__(self, num_classes: int):
-        super(StochasticResnet, self).__init__()
+        super().__init__()
         self.num_classes = num_classes
         self._create_encoder()
         self._create_fc()
-        replace_relu(self.encoder, torch.nn.ReLU, StochasticActivation)
 
     def _create_encoder(self):
         self.encoder = resnet50(weights="DEFAULT")
