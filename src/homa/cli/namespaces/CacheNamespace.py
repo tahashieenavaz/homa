@@ -1,11 +1,10 @@
 import shutil
 import sys
-from .Command import Command
 from pathlib import Path
 
 
-class RemovePyCacheCommand(Command):
-    def __call__(self):
+class CacheNamespace:
+    def clear(self):
         root = Path.cwd()
         removed = 0
         errors: list[str] = []
