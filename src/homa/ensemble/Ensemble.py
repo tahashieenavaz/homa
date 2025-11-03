@@ -2,7 +2,7 @@ import torch
 from .concerns import ReportsSize, RecordsStateDictionaries
 
 
-class Ensemble(ReportsSize, RecordsStateDictionaries):
+class Ensemble(ReportsSize, ReportsClassificationMetrics, RecordsStateDictionaries):
     def __init__(self):
         super().__init__()
         self.model = None
