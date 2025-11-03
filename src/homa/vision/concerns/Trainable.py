@@ -1,9 +1,11 @@
 from torch import Tensor
 from torch.utils.data.dataloader import DataLoader
+from .ReportsLogits import ReportsLogits
+from .Predicts import Predicts
 from ...device import get_device
 
 
-class Trainable:
+class Trainable(ReportsLogits, Predicts):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

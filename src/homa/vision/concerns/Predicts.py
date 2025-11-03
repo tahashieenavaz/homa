@@ -5,5 +5,5 @@ class Predicts:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def predictions(self, x: torch.Tensor):
+    def predict(self, x: torch.Tensor):
         return torch.softmax(self.logits(x), dim=1)

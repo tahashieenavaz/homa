@@ -19,3 +19,15 @@ def test_resnet_initialization(resnet_model):
     assert isinstance(resnet_model.network, ResnetModule)
     assert isinstance(resnet_model.optimizer, torch.optim.SGD)
     assert isinstance(resnet_model.criterion, torch.nn.CrossEntropyLoss)
+
+
+def test_reports_accuracy(resnet_model):
+    x = torch.randn(10, 3, 84, 84)
+    y = torch.randint(0, 3, (10, 1))
+    accuracy = resnet_model.accuracy(x, y)
+    assert isinstance(accuracy, float)
+
+    dataset = torch.utils.data.TensorDataset(x, y)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=2, shuffle=True)
+    accuracy = resnet_model.accuracy(dataloader)
+    assert isinstance(accuracy, float)
