@@ -16,7 +16,7 @@ class Trainable:
     def train_tensors(self, x: Tensor, y: Tensor):
         self.network.train()
         self.optimizer.zero_grad()
-        loss = self.criterion(x, y)
+        loss = self.criterion(y, self.network(x))
         loss.backward()
         self.optimizer.step()
 
