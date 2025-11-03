@@ -1,6 +1,6 @@
 import torch
 from typing import List
-from ...models.wrappers import Wrapper
+from ...models.wrappers import ModelWrapper
 
 
 class Ensemble:
@@ -17,7 +17,7 @@ class Ensemble:
     def length(self):
         return len(self.models)
 
-    def record(self, model: torch.nn.Module | Wrapper):
+    def record(self, model: torch.nn.Module | ModelWrapper):
         self.models.append(model)
 
     def push(self, *args, **kwargs):
