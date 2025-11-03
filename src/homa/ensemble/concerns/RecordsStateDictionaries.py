@@ -1,8 +1,6 @@
-from typing import List
 from copy import deepcopy
-from collections import OrderedDict
 from .HasStateDicts import HasStateDicts
-from ...models import Model
+from ...vision import Model
 
 
 class RecordsStateDictionaries(HasStateDicts):
