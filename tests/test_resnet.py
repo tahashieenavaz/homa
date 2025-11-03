@@ -6,7 +6,7 @@ from homa.models.modules import ResnetModule
 
 @pytest.fixture
 def resnet_model():
-    model = Resnet(5, 0.001)
+    model = Resnet(num_classes=5, lr=0.001)
     return model
 
 
