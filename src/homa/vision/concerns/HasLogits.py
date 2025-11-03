@@ -1,7 +1,7 @@
 import torch
 
 
-class ReportsLogits:
+class HasLogits:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

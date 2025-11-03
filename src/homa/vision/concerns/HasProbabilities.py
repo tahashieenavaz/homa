@@ -1,9 +1,9 @@
 import torch
 
 
-class Predicts:
+class HasProbabilities:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def predict(self, x: torch.Tensor):
+    def probabilities(self, x: torch.Tensor):
         return torch.softmax(self.logits(x), dim=1)
