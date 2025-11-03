@@ -3,21 +3,14 @@ from typing import List
 from copy import deepcopy
 from collections import OrderedDict
 from ..models.wrappers import ModelWrapper
+from .concerns import ReportsSize
 
 
-class Ensemble:
+class Ensemble(ReportsSize):
     def __init__(self):
         super().__init__()
         self.state_dicts: List[OrderedDict] = []
         self.model = None
-
-    @property
-    def size(self):
-        return len(self.models)
-
-    @property
-    def length(self):
-        return len(self.models)
 
     def record(self, wrapper: ModelWrapper):
         if self.model is None:
