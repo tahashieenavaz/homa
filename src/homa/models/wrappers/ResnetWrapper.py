@@ -1,6 +1,4 @@
 import torch
-from sklearn.metrics import f1_score as f1
-from sklearn.metrics import cohen_kappa_score as kappa
 from .ModelWrapper import ModelWrapper
 
 
@@ -20,8 +18,3 @@ class ResnetWrapper(ModelWrapper):
         loss = self.criterion(predictions, y)
         loss.backward()
         self.optimizer.step()
-
-    def kappa(self, x: torch.Tensor, y: torch.Tensor):
-        self.model.eval()
-        predictions = self.model(x)
-        return kappa(y, predictions)
