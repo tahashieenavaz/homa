@@ -1,7 +1,7 @@
 import pytest
 import torch
-from homa.models import Resnet, Model
-from homa.models.modules import ResnetModule
+from homa.vision import Resnet, Model
+from homa.vision.modules import ResnetModule
 
 
 @pytest.fixture

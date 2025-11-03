@@ -1,6 +1,6 @@
 import pytest
 from homa.ensemble import Ensemble
-from homa.models import Resnet
+from homa.vision import Resnet
 
 
 @pytest.fixture
