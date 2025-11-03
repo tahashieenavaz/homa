@@ -1,9 +1,10 @@
 import torch
 from sklearn.metrics import f1_score as f1
 from sklearn.metrics import cohen_kappa_score as kappa
+from .Wrapper import Wrapper
 
 
-class ResnetWrapper:
+class ResnetWrapper(Wrapper):
     def __init__(self, architecture: torch.nn.Module, lr: float, num_classes: int):
         super().__init__()
         self.model = architecture()
