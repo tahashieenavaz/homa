@@ -1,13 +1,11 @@
 from .ReportsEnsembleF1 import ReportsEnsembleF1
 from .ReportsEnsembleAccuracy import ReportsEnsembleAccuracy
 from .ReportsEnsembleKappa import ReportsEnsembleKappa
-from .CalculatesEnsembleLabels import CalculatesEnsembleLabels
-from .CalculatesEnsemblePredictions import CalculatesEnsemblePredictions
+from .CalculatesMetricNecessities import CalculatesMetricNecessities
 
 
 class ReportsClassificationMetrics(
-    CalculatesEnsembleLabels,
-    CalculatesEnsemblePredictions,
+    CalculatesMetricNecessities,
     ReportsEnsembleF1,
     ReportsEnsembleAccuracy,
     ReportsEnsembleKappa,

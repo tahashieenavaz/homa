@@ -6,6 +6,5 @@ class ReportsEnsembleF1:
         super().__init__(*args, **kwargs)
 
     def f1(self) -> float:
-        labels = self.get_labels()
-        predictions = self.get_predictions()
+        predictions, labels = self.metric_necessities()
         return f1(labels, predictions, average="weighted")
