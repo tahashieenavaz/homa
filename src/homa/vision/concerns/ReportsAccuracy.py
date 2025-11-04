@@ -7,17 +7,15 @@ class ReportsAccuracy:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @no_grad()
     def accuracy_tensors(self, x: Tensor, y: Tensor) -> float:
-        predictions = self.predict(x)
+        predictions = self.predict_(x)
         return (predictions == y).float().mean().item()
 
-    @no_grad()
     def accuracy_dataloader(self, dataloader: DataLoader):
         correct, total = 0, 0
         for x, y in dataloader:
             x, y = x.to(get_device()), y.to(get_device())
-            predictions = self.predict(x)
+            predictions = self.predict_(x)
             correct += (predictions == y).sum().item()
             total += y.numel()
         return correct / total if total > 0 else 0.0

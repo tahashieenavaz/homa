@@ -7,3 +7,7 @@ class HasLabels:
 
     def predict(self, x: torch.Tensor):
         return torch.argmax(self.logits(x), dim=1)
+
+    @torch.no_grad()
+    def predict_(self, x: torch.Tensor):
+        return torch.argmax(self.logits(x), dim=1)
