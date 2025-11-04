@@ -17,7 +17,7 @@ class CalculatesMetricNecessities:
                 model.to(device)
                 model.eval()
                 logits = model(x)
-                sum_logits = logits if logits is None else sum_logits + logits
+                sum_logits = logits if sum_logits is None else sum_logits + logits
             predictions = sum_logits.argmax(dim=1)
             predictions.extend(predictions.cpu().numpy())
             labels.extend(y.cpu().numpy())
