@@ -1,4 +1,5 @@
 import torch
+from ...device import get_device
 
 
 class WideMELU(torch.nn.Module):
@@ -14,6 +15,7 @@ class WideMELU(torch.nn.Module):
         self.theta = None
         self.lam = None
         self._initialized = False
+        self.device = get_device()
 
     def _initialize_parameters(self, X: torch.Tensor):
         if X.dim() != 4:
@@ -24,14 +26,14 @@ class WideMELU(torch.nn.Module):
         num_channels = X.shape[1]
         shape = (1, num_channels, 1, 1)
 
-        self.alpha = torch.nn.Parameter(torch.zeros(shape))
-        self.beta = torch.nn.Parameter(torch.zeros(shape))
-        self.gamma = torch.nn.Parameter(torch.zeros(shape))
-        self.delta = torch.nn.Parameter(torch.zeros(shape))
-        self.xi = torch.nn.Parameter(torch.zeros(shape))
-        self.psi = torch.nn.Parameter(torch.zeros(shape))
-        self.theta = torch.nn.Parameter(torch.zeros(shape))
-        self.lam = torch.nn.Parameter(torch.zeros(shape))
+        self.alpha = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
+        self.beta = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
+        self.gamma = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
+        self.delta = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
+        self.xi = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
+        self.psi = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
+        self.theta = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
+        self.lam = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
         self._initialized = True
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
