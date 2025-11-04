@@ -1,50 +1,37 @@
 import torch
-from torch import nn
 
 
-class SReLU(nn.Module):
-    def __init__(
-        self,
-        channels: int,
-        alpha_init: float = 0.0,
-        beta_init: float = 0.0,
-        gamma_init: float = 1.0,
-        delta_init: float = 1.0,
-    ):
+class SReLU(torch.nn.Module):
+    def __init__(self, channels: int | None = None, max_input: float = 1.0):
         super().__init__()
-        if channels <= 0:
-            raise ValueError(f"channels must be positive, got {channels}.")
-        self.channels = int(channels)
-        self.alpha_init_val = float(alpha_init)
-        self.beta_init_val = float(beta_init)
-        self.gamma_init_val = float(gamma_init)
-        self.delta_init_val = float(delta_init)
-        shape = (1, self.channels, 1, 1)
-        self.alpha = nn.Parameter(torch.empty(shape))
-        self.beta = nn.Parameter(torch.empty(shape))
-        self.gamma = nn.Parameter(torch.empty(shape))
-        self.delta = nn.Parameter(torch.empty(shape))
-        self.reset_parameters()
+        self.M = float(max_input)
+        if channels is None:
+            self.register_parameter("t_l", None)
+            self.register_parameter("t_r", None)
+            self.register_parameter("a_l", None)
+            self.register_parameter("a_r", None)
+        else:
+            self._init_params(channels, None, None)
 
-    def reset_parameters(self):
-        with torch.no_grad():
-            self.alpha.fill_(self.alpha_init_val)
-            self.beta.fill_(self.beta_init_val)
-            self.gamma.fill_(self.gamma_init_val)
-            self.delta.fill_(self.delta_init_val)
+    def _init_params(self, C: int, device, dtype):
+        self.t_l = torch.nn.Parameter(torch.zeros(C, device=device, dtype=dtype))
+        self.t_r = torch.nn.Parameter(
+            torch.full((C,), self.M, device=device, dtype=dtype)
+        )
+        self.a_l = torch.nn.Parameter(torch.zeros(C, device=device, dtype=dtype))
+        self.a_r = torch.nn.Parameter(torch.ones(C, device=device, dtype=dtype))
+
+    def _expand_param(p: torch.Tensor, x: torch.Tensor):
+        return p.view((1, x.shape[1]) + (1,) * (x.dim() - 2))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if x.dim() != 4:
-            raise ValueError(
-                f"Expected 4D input (N, C, H, W), got {x.dim()}D with shape {tuple(x.shape)}"
-            )
-        if int(x.shape[1]) != self.channels:
-            raise ValueError(
-                f"SReLU was initialized with C={self.channels} but received input with C={int(x.shape[1])}."
-            )
+        if self.t_l is None:
+            self._init_params(x.shape[1], x.device, x.dtype)
 
-        start = self.beta + self.alpha * (x - self.beta)
-        finish = self.delta + self.gamma * (x - self.delta)
-        out = torch.where(x < self.beta, start, x)
-        out = torch.where(x > self.delta, finish, out)
-        return out
+        t_l = self._expand_param(self.t_l, x)
+        t_r = self._expand_param(self.t_r, x)
+        a_l = self._expand_param(self.a_l, x)
+        a_r = self._expand_param(self.a_r, x)
+        y = torch.where(x < t_l, t_l + a_l * (x - t_l), x)
+        y = torch.where(x > t_r, t_r + a_r * (x - t_r), y)
+        return y
