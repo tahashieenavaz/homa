@@ -6,8 +6,8 @@ from .CalculatesMetricNecessities import CalculatesMetricNecessities
 
 class ReportsClassificationMetrics(
     CalculatesMetricNecessities,
-    ReportsEnsembleF1,
     ReportsEnsembleAccuracy,
+    ReportsEnsembleF1,
     ReportsEnsembleKappa,
 ):
     pass

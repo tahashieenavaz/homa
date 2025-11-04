@@ -1,10 +1,11 @@
 from sklearn.metrics import accuracy_score as accuracy
+from torch.utils.data import DataLoader
 
 
 class ReportsEnsembleAccuracy:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def accuracy(self) -> float:
-        predictions, labels = self.metric_necessities()
+    def accuracy(self, dataloader: DataLoader) -> float:
+        predictions, labels = self.metric_necessities(dataloader)
         return accuracy(labels, predictions)
