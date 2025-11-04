@@ -1,9 +1,9 @@
+import torch
 from .Resnet import Resnet
-from .utils import replace_relu
-from ..activations import StochasticActivation
+from .StochasticClassifier import StochasticClassifier
 
 
-class StochasticResnet(Resnet):
+class StochasticResnet(Resnet, StochasticClassifier):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        replace_relu(self.network, StochasticActivation)
+        self.replace_activations(torch.nn.ReLU)

@@ -1,9 +1,9 @@
+import torch
 from .Swin import Swin
-from .utils import replace_gelu
-from ..activations import StochasticActivation
+from .StochasticClassifier import StochasticClassifier
 
 
-class StochasticSwin(Swin):
+class StochasticSwin(Swin, StochasticClassifier):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        replace_gelu(self.network.encoder, StochasticActivation)
+        self.replace_activations(torch.nn.GELU)
