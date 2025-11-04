@@ -8,7 +8,6 @@ from .MELU import MELU
 from .WideMELU import WideMELU
 from .PDELU import PDELU
 from .SReLU import SReLU
-from torch.nn import ReLU, LeakyReLU, PReLU, ELU
 
 
 class StochasticActivation(torch.nn.Module):
@@ -23,10 +22,10 @@ class StochasticActivation(torch.nn.Module):
                 WideMELU,
                 PDELU,
                 SReLU,
-                ReLU,
-                PReLU,
-                LeakyReLU,
-                ELU,
+                torch.nn.ReLU,
+                torch.nn.PReLU,
+                torch.nn.LeakyReLU,
+                torch.nn.ELU,
             ]
         )
         self.gate = self.gate()
