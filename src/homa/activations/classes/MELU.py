@@ -4,51 +4,44 @@ import torch.nn.functional as F
 
 
 class MELU(nn.Module):
-    def __init__(self, maxInput: float = 1.0):
+    def __init__(self, channels: int, max_input: float = 1.0):
         super().__init__()
-        self.maxInput = float(maxInput)
-        self._num_channels = None
-        self.register_parameter("alpha", None)
-        self.register_parameter("beta", None)
-        self.register_parameter("gamma", None)
-        self.register_parameter("delta", None)
-        self.register_parameter("xi", None)
-        self.register_parameter("psi", None)
-
-    def _ensure_parameters(self, x: torch.Tensor):
-        if x.dim() != 4:
-            raise ValueError(
-                f"Expected 4D input (N, C, H, W), got {x.dim()}D with shape {tuple(x.shape)}"
-            )
-        c = int(x.shape[1])
-        if self._num_channels is None:
-            self._num_channels = c
-        elif c != self._num_channels:
-            raise RuntimeError(
-                f"MELU was initialized with C={self._num_channels} but got C={c}. "
-                "Create a new MELU for a different channel size."
-            )
-
-        if self.alpha is None:
-            shape = (1, c, 1, 1)
-            device, dtype = x.device, x.dtype
-            for name in ("alpha", "beta", "gamma", "delta", "xi", "psi"):
-                setattr(
-                    self,
-                    name,
-                    nn.Parameter(torch.zeros(shape, dtype=dtype, device=device)),
-                )
+        if channels <= 0:
+            raise ValueError(f"channels must be positive, got {channels}.")
+        self.channels = int(channels)
+        self.max_input = float(max_input)
+        shape = (1, self.channels, 1, 1)
+        self.alpha = nn.Parameter(torch.empty(shape))
+        self.beta = nn.Parameter(torch.empty(shape))
+        self.gamma = nn.Parameter(torch.empty(shape))
+        self.delta = nn.Parameter(torch.empty(shape))
+        self.xi = nn.Parameter(torch.empty(shape))
+        self.psi = nn.Parameter(torch.empty(shape))
+        self.reset_parameters()
 
     def reset_parameters(self):
-        for p in (self.alpha, self.beta, self.gamma, self.delta, self.xi, self.psi):
-            if p is not None:
-                with torch.no_grad():
-                    p.zero_()
+        with torch.no_grad():
+            for param in (
+                self.alpha,
+                self.beta,
+                self.gamma,
+                self.delta,
+                self.xi,
+                self.psi,
+            ):
+                param.zero_()
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
-        self._ensure_parameters(X)
+        if X.dim() != 4:
+            raise ValueError(
+                f"Expected 4D input (N, C, H, W), got {X.dim()}D with shape {tuple(X.shape)}"
+            )
+        if int(X.shape[1]) != self.channels:
+            raise ValueError(
+                f"MELU was initialized with C={self.channels} but received input with C={int(X.shape[1])}."
+            )
 
-        X_norm = X / self.maxInput
+        X_norm = X / self.max_input
         Y = torch.roll(X_norm, shifts=-1, dims=1)
 
         term1 = F.relu(X_norm)
@@ -67,4 +60,4 @@ class MELU(nn.Module):
         term7 = self.psi * torch.sqrt(F.relu(1 - dist_sq_psi))
 
         Z_norm = term1 + term2 + term3 + term4 + term5 + term6 + term7
-        return Z_norm * self.maxInput
+        return Z_norm * self.max_input

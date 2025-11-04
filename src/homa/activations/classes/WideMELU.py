@@ -4,70 +4,48 @@ import torch.nn.functional as F
 
 
 class WideMELU(nn.Module):
-    def __init__(self, maxInput: float = 1.0):
+    def __init__(self, channels: int, max_input: float = 1.0):
         super().__init__()
-        self.maxInput = float(maxInput)
-        self._num_channels = None
-        self.register_parameter("alpha", None)
-        self.register_parameter("beta", None)
-        self.register_parameter("gamma", None)
-        self.register_parameter("delta", None)
-        self.register_parameter("xi", None)
-        self.register_parameter("psi", None)
-        self.register_parameter("theta", None)
-        self.register_parameter("lam", None)
+        if channels <= 0:
+            raise ValueError(f"channels must be positive, got {channels}.")
+        self.channels = int(channels)
+        self.max_input = float(max_input)
+        shape = (1, self.channels, 1, 1)
+        self.alpha = nn.Parameter(torch.empty(shape))
+        self.beta = nn.Parameter(torch.empty(shape))
+        self.gamma = nn.Parameter(torch.empty(shape))
+        self.delta = nn.Parameter(torch.empty(shape))
+        self.xi = nn.Parameter(torch.empty(shape))
+        self.psi = nn.Parameter(torch.empty(shape))
+        self.theta = nn.Parameter(torch.empty(shape))
+        self.lam = nn.Parameter(torch.empty(shape))
+        self.reset_parameters()
 
-    def _ensure_parameters(self, x: torch.Tensor):
+    def reset_parameters(self):
+        with torch.no_grad():
+            for param in (
+                self.alpha,
+                self.beta,
+                self.gamma,
+                self.delta,
+                self.xi,
+                self.psi,
+                self.theta,
+                self.lam,
+            ):
+                param.zero_()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.dim() != 4:
             raise ValueError(
                 f"Expected 4D input (N, C, H, W), got {x.dim()}D with shape {tuple(x.shape)}"
             )
-
-        c = int(x.shape[1])
-        if self._num_channels is None:
-            self._num_channels = c
-        elif c != self._num_channels:
-            raise RuntimeError(
-                f"WideMELU was initialized with C={self._num_channels} but got C={c}. "
-                "Create a new WideMELU for different channel sizes."
+        if int(x.shape[1]) != self.channels:
+            raise ValueError(
+                f"WideMELU was initialized with C={self.channels} but received input with C={int(x.shape[1])}."
             )
 
-        if self.alpha is None:
-            shape = (1, c, 1, 1)
-            device, dtype = x.device, x.dtype
-            for name in (
-                "alpha",
-                "beta",
-                "gamma",
-                "delta",
-                "xi",
-                "psi",
-                "theta",
-                "lam",
-            ):
-                param = nn.Parameter(torch.zeros(shape, dtype=dtype, device=device))
-                setattr(self, name, param)
-
-    def reset_parameters(self):
-        params = (
-            self.alpha,
-            self.beta,
-            self.gamma,
-            self.delta,
-            self.xi,
-            self.psi,
-            self.theta,
-            self.lam,
-        )
-        for p in params:
-            if p is not None:
-                with torch.no_grad():
-                    p.zero_()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        self._ensure_parameters(x)
-
-        X_norm = x / self.maxInput
+        X_norm = x / self.max_input
         Y = torch.roll(X_norm, shifts=-1, dims=1)
 
         term1 = F.relu(X_norm)
@@ -87,4 +65,4 @@ class WideMELU(nn.Module):
         term8 = self.theta * torch.sqrt(F.relu(1 - dist_sq_theta))
         term9 = self.lam * torch.sqrt(F.relu(1 - dist_sq_lambda))
         Z_norm = term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9
-        return Z_norm * self.maxInput
+        return Z_norm * self.max_input
