@@ -19,8 +19,6 @@ class SReLU(torch.nn.modules.lazy.LazyModuleMixin, torch.nn.Module):
         self.beta: torch.Tensor = UninitializedParameter()
         self.gamma: torch.Tensor = UninitializedParameter()
         self.delta: torch.Tensor = UninitializedParameter()
-
-        # track channels once inferred
         self.num_channels = None
 
     def _infer_parameters(self, x: torch.Tensor):
