@@ -1,4 +1,5 @@
 import torch
+from ...device import get_device
 
 
 class PDELU(torch.nn.Module):
@@ -12,6 +13,7 @@ class PDELU(torch.nn.Module):
         self._power_val = 1.0 / (1.0 - self.theta)
         self.alpha = torch.nn.UninitializedParameter()
         self._num_channels = None
+        self.device = get_device()
 
     def _initialize_parameters(self, x: torch.Tensor):
         if x.ndim < 2:
@@ -23,14 +25,14 @@ class PDELU(torch.nn.Module):
         self._num_channels = num_channels
         param_shape = [1] * x.ndim
         param_shape[1] = num_channels
-        init_tensor = torch.zeros(param_shape) + 0.1
-        self.alpha = torch.nn.Parameter(init_tensor)
+        init_tensor = torch.zeros(param_shape, device=self.device) + 0.1
+        self.alpha = torch.nn.Parameter(init_tensor).to(self.device)
 
     def forward(self, x: torch.Tensor):
         if self.alpha is None:
             self._initialize_parameters(x)
 
-        zero = torch.tensor(0.0, device=x.device, dtype=x.dtype)
+        zero = torch.tensor(0.0, device=self.device, dtype=x.dtype)
         positive_part = torch.relu(x)
         inner_term = torch.relu(1.0 + (1.0 - self.theta) * x)
         powered_term = torch.pow(inner_term, self._power_val)
