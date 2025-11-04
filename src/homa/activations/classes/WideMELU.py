@@ -17,13 +17,13 @@ class WideMELU(torch.nn.Module):
         self._initialized = False
         self.device = get_device()
 
-    def _initialize_parameters(self, X: torch.Tensor):
-        if X.dim() != 4:
+    def _initialize_parameters(self, x: torch.Tensor):
+        if x.dim() != 4:
             raise ValueError(
-                f"Expected 4D input (B, C, H, W), but got {X.dim()}D input."
+                f"Expected 4D input (B, C, H, W), but got {x.dim()}D input."
             )
 
-        num_channels = X.shape[1]
+        num_channels = x.shape[1]
         shape = (1, num_channels, 1, 1)
 
         self.alpha = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
@@ -36,10 +36,11 @@ class WideMELU(torch.nn.Module):
         self.lam = torch.nn.Parameter(torch.zeros(shape)).to(self.device)
         self._initialized = True
 
-    def forward(self, X: torch.Tensor) -> torch.Tensor:
-        if not self._initialized:
-            self._initialize_parameters(X)
-        X_norm = X / self.maxInput
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if (not self._initialized) or (self.alpha.shape[1] != x.shape[1]):
+            self._initialize_parameters(x)
+
+        X_norm = x / self.maxInput
         Y = torch.roll(X_norm, shifts=-1, dims=1)
         term1 = torch.relu(X_norm)
         term2 = self.alpha * torch.clamp(X_norm, max=0)
