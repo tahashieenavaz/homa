@@ -1,5 +1,6 @@
 import random
 import torch
+from ..device import get_device
 from ..activations import (
     APLU,
     GALU,
@@ -45,6 +46,10 @@ class StochasticClassifier:
                     replacement = random.choice(self._activation_pool)
                     if replacement in self._requires_channels:
                         channels = infer_activation_channels(parent, name, child)
-                        setattr(parent, name, replacement(channels=channels))
+                        setattr(
+                            parent,
+                            name,
+                            replacement(channels=channels).to(get_device()),
+                        )
                     else:
-                        setattr(parent, name, replacement())
+                        setattr(parent, name, replacement().to(get_device()))

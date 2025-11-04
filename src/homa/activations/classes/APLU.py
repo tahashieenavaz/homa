@@ -1,53 +1,49 @@
 import torch
-from torch import nn
 
 
-class APLU(nn.Module):
-    def __init__(self, channels: int, max_input: float = 1.0):
+class APLU(torch.nn.Module):
+    def __init__(
+        self, channels: int | None = None, n: int = 2, init_b: str = "linspace"
+    ):
         super().__init__()
-        if channels <= 0:
-            raise ValueError(f"Number of channels must be positive, got {channels}.")
-        self.channels = int(channels)
-        self.max_input = float(max_input)
-        self.alpha = nn.Parameter(torch.empty(self.channels))
-        self.beta = nn.Parameter(torch.empty(self.channels))
-        self.gamma = nn.Parameter(torch.empty(self.channels))
-        self.xi = nn.Parameter(torch.empty(self.channels))
-        self.psi = nn.Parameter(torch.empty(self.channels))
-        self.mu = nn.Parameter(torch.empty(self.channels))
-        self.reset_parameters()
+        self.n = n
+        self.init_b = init_b
+        if channels is None:
+            self.register_parameter("a", None)
+            self.register_parameter("b", None)
+        else:
+            self._init_params(channels, device=None, dtype=None)
 
-    def reset_parameters(self) -> None:
-        with torch.no_grad():
-            self.alpha.zero_()
-            self.beta.zero_()
-            self.gamma.zero_()
-            self.xi.uniform_(0.0, self.max_input)
-            self.psi.uniform_(0.0, self.max_input)
-            self.mu.uniform_(0.0, self.max_input)
-
-    @staticmethod
-    def _reshape_for_broadcast(param: torch.Tensor, ref: torch.Tensor) -> torch.Tensor:
-        return param.view(1, param.shape[0], *([1] * (ref.ndim - 2)))
+    def _init_params(self, channels, device, dtype):
+        a = torch.zeros(channels, self.n, device=device, dtype=dtype)
+        if self.init_b == "linspace":
+            b = (
+                torch.linspace(-1.0, 1.0, steps=self.n, device=device, dtype=dtype)
+                .expand(channels, -1)
+                .contiguous()
+            )
+        else:
+            b = torch.empty(channels, self.n, device=device, dtype=dtype).uniform_(
+                -1.0, 1.0
+            )
+        self.a = torch.nn.Parameter(a)
+        self.b = torch.nn.Parameter(b)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if x.ndim < 2:
-            raise ValueError(
-                f"APLU expects inputs with at least two dimensions (N, C, ...), got {tuple(x.shape)}."
-            )
-        if int(x.shape[1]) != self.channels:
-            raise ValueError(
-                f"APLU was initialized with {self.channels} channels but received input with {int(x.shape[1])}."
-            )
+        if self.a is None or self.b is None:
+            self._init_params(x.shape[1], device=x.device, dtype=x.dtype)
 
-        alpha = self._reshape_for_broadcast(self.alpha, x)
-        beta = self._reshape_for_broadcast(self.beta, x)
-        gamma = self._reshape_for_broadcast(self.gamma, x)
-        xi = self._reshape_for_broadcast(self.xi, x)
-        psi = self._reshape_for_broadcast(self.psi, x)
-        mu = self._reshape_for_broadcast(self.mu, x)
-        output = torch.relu(x)
-        output = output + alpha * torch.relu(-x + xi)
-        output = output + beta * torch.relu(-x + psi)
-        output = output + gamma * torch.relu(-x + mu)
-        return output
+        y = F.relu(x)
+        x_exp = x.unsqueeze(-1)
+        expand_shape = (
+            (
+                1,
+                x.shape[1],
+            )
+            + (1,) * (x.dim() - 2)
+            + (self.n,)
+        )
+        a = self.a.view(*expand_shape)
+        b = self.b.view(*expand_shape)
+        hinges = (-x_exp + b).clamp_max(0.0)
+        return y + (a * hinges).sum(dim=-1)
