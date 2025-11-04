@@ -7,3 +7,6 @@ class HasLogits:
 
     def logits(self, x: torch.Tensor) -> torch.Tensor:
         return self.network(x)
+
+    def logits_(self, x: torch.Tensor) -> torch.Tensor:
+        return self.network(x)
