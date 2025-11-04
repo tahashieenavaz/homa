@@ -1,5 +1,5 @@
 import torch
-from ...device import device
+from ...device import get_device
 
 
 class APLU(torch.nn.Module):
@@ -13,7 +13,7 @@ class APLU(torch.nn.Module):
         self.psi = None
         self.mu = None
         self._num_channels = None
-        self.device = device()
+        self.device = get_device()
 
     def _initialize_parameters(self, x):
         if x.ndim < 2:

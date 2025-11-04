@@ -1,5 +1,5 @@
 import torch
-from ...device import device
+from ...device import get_device
 
 
 class MELU(torch.nn.Module):
@@ -13,7 +13,7 @@ class MELU(torch.nn.Module):
         self.xi = None
         self.psi = None
         self._initialized = False
-        self.device = device()
+        self.device = get_device()
 
     def _initialize_parameters(self, X: torch.Tensor):
         if X.dim() != 4:
