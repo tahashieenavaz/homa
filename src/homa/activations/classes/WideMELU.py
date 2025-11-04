@@ -19,7 +19,22 @@ class WideMELU(LazyModuleMixin, nn.Module):
         self.lam: torch.Tensor = UninitializedParameter()
         self.num_channels = None
 
-    def _infer_parameters(self, x: torch.Tensor):
+    def _infer_parameters(self, *args, **kwargs):
+        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
+            x = args[0]
+        elif (
+            len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1
+        ):
+            x = args[1][0]
+        else:
+            inp = kwargs.get("input", None)
+            if isinstance(inp, (tuple, list)) and len(inp) >= 1:
+                x = inp[0]
+            else:
+                raise RuntimeError(
+                    "WideMELU._infer_parameters: could not locate input tensor."
+                )
+
         if x.dim() != 4:
             raise ValueError(
                 f"Expected 4D input (N, C, H, W), got {x.dim()}D with shape {tuple(x.shape)}"
