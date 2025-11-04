@@ -1,53 +1,87 @@
 import torch
-from ...device import get_device
+from torch import nn
+from torch.nn.parameter import Parameter, UninitializedParameter
+from torch.nn.modules.lazy import LazyModuleMixin
+import torch.nn.functional as F
 
 
-class GALU(torch.nn.Module):
+class GALU(LazyModuleMixin, nn.Module):
     def __init__(self, max_input: float = 1.0):
-        super(GALU, self).__init__()
+        super().__init__()
         if max_input <= 0:
             raise ValueError("max_input must be positive.")
-        self.max_input = max_input
-        self.alpha = None
-        self.beta = None
-        self.gamma = None
-        self.delta = None
+        self.max_input = float(max_input)
+        self.alpha: torch.Tensor = UninitializedParameter()
+        self.beta: torch.Tensor = UninitializedParameter()
+        self.gamma: torch.Tensor = UninitializedParameter()
+        self.delta: torch.Tensor = UninitializedParameter()
         self._num_channels = None
-        self.device = get_device()
 
-    def _initialize_parameters(self, x):
+    def _infer_parameters(self, x: torch.Tensor):
         if x.ndim < 2:
             raise ValueError(
-                f"Input tensor must have at least 2 dimensions (N, C), but got shape {x.shape}"
+                f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
 
-        num_channels = x.shape[1]
-        self._num_channels = num_channels
+        c = int(x.shape[1])
+        self._num_channels = c
         param_shape = [1] * x.ndim
-        param_shape[1] = num_channels
-        self.alpha = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
-        self.beta = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
-        self.gamma = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
-        self.delta = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
+        param_shape[1] = c
+        with torch.no_grad():
+            self.alpha = Parameter(
+                self.alpha.new_empty(
+                    param_shape, dtype=x.dtype, device=x.device
+                ).zero_()
+            )
+            self.beta = Parameter(
+                self.beta.new_empty(param_shape, dtype=x.dtype, device=x.device).zero_()
+            )
+            self.gamma = Parameter(
+                self.gamma.new_empty(
+                    param_shape, dtype=x.dtype, device=x.device
+                ).zero_()
+            )
+            self.delta = Parameter(
+                self.delta.new_empty(
+                    param_shape, dtype=x.dtype, device=x.device
+                ).zero_()
+            )
+        self._lazy_materialized = True
 
-    def forward(self, x):
-        if self.alpha is None:
-            self._initialize_parameters(x)
+    def reset_parameters(self):
+        for p in (self.alpha, self.beta, self.gamma, self.delta):
+            if not isinstance(p, UninitializedParameter):
+                with torch.no_grad():
+                    p.zero_()
 
-        zero = torch.tensor(0.0, device=x.device, dtype=x.dtype)
+    def forward(self, x: torch.Tensor):
+        if isinstance(self.alpha, UninitializedParameter):
+            self._infer_parameters(x)
+
+        if x.ndim < 2:
+            raise ValueError(
+                f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
+            )
+        if self._num_channels is not None and x.shape[1] != self._num_channels:
+            raise RuntimeError(
+                f"GALU was initialized with C={self._num_channels} but got C={x.shape[1]}. "
+                "Create a new GALU for a different channel size."
+            )
+
         x_norm = x / self.max_input
-        part_prelu = torch.relu(x_norm) + self.alpha * torch.min(x_norm, zero)
+        zero = torch.zeros(1, dtype=x.dtype, device=x.device)
+        part_prelu = F.relu(x_norm) + self.alpha * torch.minimum(x_norm, zero)
         part_beta = self.beta * (
-            torch.relu(1.0 - torch.abs(x_norm - 1.0))
-            + torch.min(torch.abs(x_norm - 3.0) - 1.0, zero)
+            F.relu(1.0 - torch.abs(x_norm - 1.0))
+            + torch.minimum(torch.abs(x_norm - 3.0) - 1.0, zero)
         )
         part_gamma = self.gamma * (
-            torch.relu(0.5 - torch.abs(x_norm - 0.5))
-            + torch.min(torch.abs(x_norm - 1.5) - 0.5, zero)
+            F.relu(0.5 - torch.abs(x_norm - 0.5))
+            + torch.minimum(torch.abs(x_norm - 1.5) - 0.5, zero)
         )
         part_delta = self.delta * (
-            torch.relu(0.5 - torch.abs(x_norm - 2.5))
-            + torch.min(torch.abs(x_norm - 3.5) - 0.5, zero)
+            F.relu(0.5 - torch.abs(x_norm - 2.5))
+            + torch.minimum(torch.abs(x_norm - 3.5) - 0.5, zero)
         )
         z = part_prelu + part_beta + part_gamma + part_delta
         return z * self.max_input
