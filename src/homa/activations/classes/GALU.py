@@ -17,12 +17,11 @@ class GALU(LazyModuleMixin, nn.Module):
         self.delta: torch.Tensor = UninitializedParameter()
         self._num_channels = None
 
-    def _infer_parameters(self, x: torch.Tensor):
+    def _materialize(self, x: torch.Tensor):
         if x.ndim < 2:
             raise ValueError(
                 f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
-
         c = int(x.shape[1])
         self._num_channels = c
         param_shape = [1] * x.ndim
@@ -47,6 +46,20 @@ class GALU(LazyModuleMixin, nn.Module):
                 ).zero_()
             )
         self._lazy_materialized = True
+
+    def _infer_parameters(self, *args, **kwargs):
+        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
+            return self._materialize(args[0])
+        if len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1:
+            return self._materialize(args[1][0])
+        inp = kwargs.get("input", None)
+        if (
+            isinstance(inp, (tuple, list))
+            and len(inp) >= 1
+            and isinstance(inp[0], torch.Tensor)
+        ):
+            return self._materialize(inp[0])
+        raise RuntimeError("GALU._infer_parameters: could not locate input tensor.")
 
     def reset_parameters(self):
         for p in (self.alpha, self.beta, self.gamma, self.delta):
