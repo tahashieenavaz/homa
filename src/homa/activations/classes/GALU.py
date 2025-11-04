@@ -1,4 +1,5 @@
 import torch
+from ...device import device
 
 
 class GALU(torch.nn.Module):
@@ -12,6 +13,7 @@ class GALU(torch.nn.Module):
         self.gamma = None
         self.delta = None
         self._num_channels = None
+        self.device = device()
 
     def _initialize_parameters(self, x):
         if x.ndim < 2:
@@ -23,10 +25,10 @@ class GALU(torch.nn.Module):
         self._num_channels = num_channels
         param_shape = [1] * x.ndim
         param_shape[1] = num_channels
-        self.alpha = torch.nn.Parameter(torch.zeros(param_shape))
-        self.beta = torch.nn.Parameter(torch.zeros(param_shape))
-        self.gamma = torch.nn.Parameter(torch.zeros(param_shape))
-        self.delta = torch.nn.Parameter(torch.zeros(param_shape))
+        self.alpha = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
+        self.beta = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
+        self.gamma = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
+        self.delta = torch.nn.Parameter(torch.zeros(param_shape)).to(self.device)
 
     def forward(self, x):
         if self.alpha is None:
