@@ -18,9 +18,9 @@ def test_ensemble_initialization(ensemble):
 
 
 def test_ensemble_records_models(ensemble, resnet):
-    assert ensemble.network is None
+    assert ensemble.size == 0
     ensemble.record(resnet)
-    assert ensemble.network is not None
+    assert ensemble.size != 0
     ensemble.append(resnet)
     ensemble.push(resnet)
     ensemble.add(resnet)

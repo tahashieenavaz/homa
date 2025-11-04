@@ -4,8 +4,8 @@ class ReportsSize:
 
     @property
     def size(self):
-        return len(self.state_dicts)
+        return len(self.models)
 
     @property
     def length(self):
-        return len(self.state_dicts)
+        return len(self.models)
