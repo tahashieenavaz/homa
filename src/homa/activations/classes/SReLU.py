@@ -1,8 +1,8 @@
 import torch
-from ...device import get_device
+from torch.nn.parameter import Parameter, UninitializedParameter
 
 
-class SReLU(torch.nn.Module):
+class SReLU(torch.nn.modules.lazy.LazyModuleMixin, torch.nn.Module):
     def __init__(
         self,
         alpha_init: float = 0.0,
@@ -11,41 +11,66 @@ class SReLU(torch.nn.Module):
         delta_init: float = 1.0,
     ):
         super().__init__()
-        self.alpha_init_val = alpha_init
-        self.beta_init_val = beta_init
-        self.gamma_init_val = gamma_init
-        self.delta_init_val = delta_init
-        self.alpha = torch.nn.UninitializedParameter()
-        self.beta = torch.nn.UninitializedParameter()
-        self.gamma = torch.nn.UninitializedParameter()
-        self.delta = torch.nn.UninitializedParameter()
-        self.device = get_device()
+        self.alpha_init_val = float(alpha_init)
+        self.beta_init_val = float(beta_init)
+        self.gamma_init_val = float(gamma_init)
+        self.delta_init_val = float(delta_init)
+        self.alpha: torch.Tensor = UninitializedParameter()
+        self.beta: torch.Tensor = UninitializedParameter()
+        self.gamma: torch.Tensor = UninitializedParameter()
+        self.delta: torch.Tensor = UninitializedParameter()
 
-    def _initialize_parameters(self, x: torch.Tensor):
-        if isinstance(self.alpha, torch.nn.UninitializedParameter):
-            if x.dim() < 2:
-                raise ValueError(
-                    f"Input tensor must have at least 2 dimensions (N, C), but got {x.dim()}"
+        # track channels once inferred
+        self.num_channels = None
+
+    def _infer_parameters(self, x: torch.Tensor):
+        if x.dim() < 2:
+            raise ValueError(
+                f"Input must have shape (N, C, ...). Got dim={x.dim()} with shape {tuple(x.shape)}"
+            )
+
+        c = x.shape[1]
+        self.num_channels = int(c)
+
+        param_shape = [1] * x.dim()
+        param_shape[1] = c
+
+        with torch.no_grad():
+            self.alpha = Parameter(
+                self.alpha.new_empty(param_shape, dtype=x.dtype, device=x.device).fill_(
+                    self.alpha_init_val
                 )
+            )
+            self.beta = Parameter(
+                self.beta.new_empty(param_shape, dtype=x.dtype, device=x.device).fill_(
+                    self.beta_init_val
+                )
+            )
+            self.gamma = Parameter(
+                self.gamma.new_empty(param_shape, dtype=x.dtype, device=x.device).fill_(
+                    self.gamma_init_val
+                )
+            )
+            self.delta = Parameter(
+                self.delta.new_empty(param_shape, dtype=x.dtype, device=x.device).fill_(
+                    self.delta_init_val
+                )
+            )
 
-            num_channels = x.shape[1]
-            param_shape = [1] * x.dim()
-            param_shape[1] = num_channels
-            self.alpha = torch.nn.Parameter(
-                torch.full(param_shape, self.alpha_init_val)
-            ).to(self.device)
-            self.beta = torch.nn.Parameter(
-                torch.full(param_shape, self.beta_init_val)
-            ).to(self.device)
-            self.gamma = torch.nn.Parameter(
-                torch.full(param_shape, self.gamma_init_val)
-            ).to(self.device)
-            self.delta = torch.nn.Parameter(
-                torch.full(param_shape, self.delta_init_val)
-            ).to(self.device)
+        self._lazy_materialized = True
+
+    def reset_parameters(self):
+        if not isinstance(self.alpha, UninitializedParameter):
+            with torch.no_grad():
+                self.alpha.fill_(self.alpha_init_val)
+                self.beta.fill_(self.beta_init_val)
+                self.gamma.fill_(self.gamma_init_val)
+                self.delta.fill_(self.delta_init_val)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        self._initialize_parameters(x)
+        if isinstance(self.alpha, UninitializedParameter):
+            self._infer_parameters(x)
+
         start = self.beta + self.alpha * (x - self.beta)
         finish = self.delta + self.gamma * (x - self.delta)
         out = torch.where(x < self.beta, start, x)
