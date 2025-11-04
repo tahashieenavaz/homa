@@ -17,16 +17,14 @@ class MELU(LazyModuleMixin, nn.Module):
         self.psi: torch.Tensor = UninitializedParameter()
         self._num_channels = None
 
-    def _infer_parameters(self, x: torch.Tensor):
+    def _materialize(self, x: torch.Tensor):
         if x.dim() != 4:
             raise ValueError(
                 f"Expected 4D input (N, C, H, W), got {x.dim()}D with shape {tuple(x.shape)}"
             )
-
         c = int(x.shape[1])
         self._num_channels = c
         shape = (1, c, 1, 1)
-
         with torch.no_grad():
             self.alpha = Parameter(
                 self.alpha.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
@@ -46,8 +44,21 @@ class MELU(LazyModuleMixin, nn.Module):
             self.psi = Parameter(
                 self.psi.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
             )
-
         self._lazy_materialized = True
+
+    def _infer_parameters(self, *args, **kwargs):
+        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
+            return self._materialize(args[0])
+        if len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1:
+            return self._materialize(args[1][0])
+        inp = kwargs.get("input", None)
+        if (
+            isinstance(inp, (tuple, list))
+            and len(inp) >= 1
+            and isinstance(inp[0], torch.Tensor)
+        ):
+            return self._materialize(inp[0])
+        raise RuntimeError("MELU._infer_parameters: could not locate input tensor.")
 
     def reset_parameters(self):
         for p in (self.alpha, self.beta, self.gamma, self.delta, self.xi, self.psi):
