@@ -1,2 +1,2 @@
 from .LogitNormLoss import LogitNormLoss
-from .Loss import .Loss
+from .Loss import Loss
