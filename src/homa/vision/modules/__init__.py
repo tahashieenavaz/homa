@@ -1,2 +1,2 @@
-from .SwinModule import ResnetModule
-from .StochasticResnetModule import StochasticResnetModule
+from .ResnetModule import ResnetModule
+from .SwinModule import SwinModule
