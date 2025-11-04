@@ -8,12 +8,27 @@ from .MELU import MELU
 from .WideMELU import WideMELU
 from .PDELU import PDELU
 from .SReLU import SReLU
+from torch.nn import ReLU, LeakyReLU, PReLU, ELU
 
 
 class StochasticActivation(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.gate = random.choice([APLU, GALU, SmallGALU, MELU, WideMELU, PDELU, SReLU])
+        self.gate = random.choice(
+            [
+                APLU,
+                GALU,
+                SmallGALU,
+                MELU,
+                WideMELU,
+                PDELU,
+                SReLU,
+                ReLU,
+                PReLU,
+                LeakyReLU,
+                ELU,
+            ]
+        )
         self.gate = self.gate()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
