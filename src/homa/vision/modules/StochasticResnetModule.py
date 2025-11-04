@@ -1,4 +1,4 @@
-from .ResnetModule import ResnetModule
+from .SwinModule import ResnetModule
 from ..utils import replace_relu
 from ...activations import StochasticActivation
 
