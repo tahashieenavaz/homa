@@ -1,54 +1,93 @@
 import torch
-from ...device import get_device
+from torch import nn
+from torch.nn.parameter import Parameter, UninitializedParameter
+from torch.nn.modules.lazy import LazyModuleMixin
+import torch.nn.functional as F
 
 
-class APLU(torch.nn.Module):
+class APLU(LazyModuleMixin, nn.Module):
     def __init__(self, max_input: float = 1.0):
-        super(APLU, self).__init__()
-        self.max_input = max_input
-        self.alpha = None
-        self.beta = None
-        self.gamma = None
-        self.xi = None
-        self.psi = None
-        self.mu = None
-        self._num_channels = None
-        self.device = get_device()
+        super().__init__()
+        self.max_input = float(max_input)
+        self.alpha: torch.Tensor = UninitializedParameter()
+        self.beta: torch.Tensor = UninitializedParameter()
+        self.gamma: torch.Tensor = UninitializedParameter()
 
-    def _initialize_parameters(self, x):
+        # hinge locations (learnable), initialized ~ U(0, max_input)
+        self.xi: torch.Tensor = UninitializedParameter()
+        self.psi: torch.Tensor = UninitializedParameter()
+        self.mu: torch.Tensor = UninitializedParameter()
+
+        self._num_channels = None
+
+    def _infer_parameters(self, x: torch.Tensor):
         if x.ndim < 2:
             raise ValueError(
-                f"Input tensor must have at least 2 dimensions (N, C), but got shape {x.shape}"
+                f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
 
-        num_channels = x.shape[1]
-        self._num_channels = num_channels
-
+        c = int(x.shape[1])
+        self._num_channels = c
         param_shape = [1] * x.ndim
-        param_shape[1] = num_channels
+        param_shape[1] = c
 
-        self.alpha = torch.nn.Parameter(torch.zeros(param_shape), device=device())
-        self.beta = torch.nn.Parameter(torch.zeros(param_shape), device=device())
-        self.gamma = torch.nn.Parameter(torch.zeros(param_shape), device=device())
+        with torch.no_grad():
+            # Slopes start at zero
+            self.alpha = Parameter(
+                torch.zeros(param_shape, dtype=x.dtype, device=x.device)
+            )
+            self.beta = Parameter(
+                torch.zeros(param_shape, dtype=x.dtype, device=x.device)
+            )
+            self.gamma = Parameter(
+                torch.zeros(param_shape, dtype=x.dtype, device=x.device)
+            )
 
-        self.xi = torch.nn.Parameter(self.max_input * torch.rand(param_shape)).to(
-            self.device
-        )
-        self.psi = torch.nn.Parameter(self.max_input * torch.rand(param_shape)).to(
-            self.device
-        )
-        self.mu = torch.nn.Parameter(self.max_input * torch.rand(param_shape)).to(
-            self.device
-        )
+            # hinge positions ~ U(0, max_input)
+            self.xi = Parameter(
+                torch.empty(param_shape, dtype=x.dtype, device=x.device).uniform_(
+                    0.0, self.max_input
+                )
+            )
+            self.psi = Parameter(
+                torch.empty(param_shape, dtype=x.dtype, device=x.device).uniform_(
+                    0.0, self.max_input
+                )
+            )
+            self.mu = Parameter(
+                torch.empty(param_shape, dtype=x.dtype, device=x.device).uniform_(
+                    0.0, self.max_input
+                )
+            )
 
-    def forward(self, x):
-        if self.alpha is None:
-            self._initialize_parameters(x)
-        a = torch.relu(x)
+        self._lazy_materialized = True
 
-        # following are called hinges
-        b = self.alpha * torch.relu(-x + self.xi)
-        c = self.beta * torch.relu(-x + self.psi)
-        d = self.gamma * torch.relu(-x + self.mu)
-        z = a + b + c + d
-        return z
+    def reset_parameters(self):
+        if not isinstance(self.alpha, UninitializedParameter):
+            with torch.no_grad():
+                self.alpha.zero_()
+                self.beta.zero_()
+                self.gamma.zero_()
+                self.xi.uniform_(0.0, self.max_input)
+                self.psi.uniform_(0.0, self.max_input)
+                self.mu.uniform_(0.0, self.max_input)
+
+    def forward(self, x: torch.Tensor):
+        if isinstance(self.alpha, UninitializedParameter):
+            self._infer_parameters(x)
+
+        if x.ndim < 2:
+            raise ValueError(
+                f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
+            )
+        if self._num_channels is not None and x.shape[1] != self._num_channels:
+            raise RuntimeError(
+                f"APLU was initialized with C={self._num_channels} but got C={x.shape[1]}. "
+                "Create a new APLU for a different channel size."
+            )
+
+        a = F.relu(x)
+        b = self.alpha * F.relu(-x + self.xi)
+        c = self.beta * F.relu(-x + self.psi)
+        d = self.gamma * F.relu(-x + self.mu)
+        return a + b + c + d
