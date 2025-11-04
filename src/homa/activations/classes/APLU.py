@@ -1,4 +1,5 @@
 import torch
+from ...device import device
 
 
 class APLU(torch.nn.Module):
@@ -12,6 +13,7 @@ class APLU(torch.nn.Module):
         self.psi = None
         self.mu = None
         self._num_channels = None
+        self.device = device()
 
     def _initialize_parameters(self, x):
         if x.ndim < 2:
@@ -25,18 +27,23 @@ class APLU(torch.nn.Module):
         param_shape = [1] * x.ndim
         param_shape[1] = num_channels
 
-        self.alpha = torch.nn.Parameter(torch.zeros(param_shape))
-        self.beta = torch.nn.Parameter(torch.zeros(param_shape))
-        self.gamma = torch.nn.Parameter(torch.zeros(param_shape))
+        self.alpha = torch.nn.Parameter(torch.zeros(param_shape), device=device())
+        self.beta = torch.nn.Parameter(torch.zeros(param_shape), device=device())
+        self.gamma = torch.nn.Parameter(torch.zeros(param_shape), device=device())
 
-        self.xi = torch.nn.Parameter(self.max_input * torch.rand(param_shape))
-        self.psi = torch.nn.Parameter(self.max_input * torch.rand(param_shape))
-        self.mu = torch.nn.Parameter(self.max_input * torch.rand(param_shape))
+        self.xi = torch.nn.Parameter(self.max_input * torch.rand(param_shape)).to(
+            self.device
+        )
+        self.psi = torch.nn.Parameter(self.max_input * torch.rand(param_shape)).to(
+            self.device
+        )
+        self.mu = torch.nn.Parameter(self.max_input * torch.rand(param_shape)).to(
+            self.device
+        )
 
     def forward(self, x):
         if self.alpha is None:
             self._initialize_parameters(x)
-
         a = torch.relu(x)
 
         # following are called hinges
@@ -44,5 +51,4 @@ class APLU(torch.nn.Module):
         c = self.beta * torch.relu(-x + self.psi)
         d = self.gamma * torch.relu(-x + self.mu)
         z = a + b + c + d
-
         return z
