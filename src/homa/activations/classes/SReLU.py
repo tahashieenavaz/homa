@@ -1,4 +1,5 @@
 import torch
+from ...device import get_device
 
 
 class SReLU(torch.nn.Module):
@@ -18,6 +19,7 @@ class SReLU(torch.nn.Module):
         self.beta = torch.nn.UninitializedParameter()
         self.gamma = torch.nn.UninitializedParameter()
         self.delta = torch.nn.UninitializedParameter()
+        self.device = get_device()
 
     def _initialize_parameters(self, x: torch.Tensor):
         if isinstance(self.alpha, torch.nn.UninitializedParameter):
@@ -31,14 +33,16 @@ class SReLU(torch.nn.Module):
             param_shape[1] = num_channels
             self.alpha = torch.nn.Parameter(
                 torch.full(param_shape, self.alpha_init_val)
-            )
-            self.beta = torch.nn.Parameter(torch.full(param_shape, self.beta_init_val))
+            ).to(self.device)
+            self.beta = torch.nn.Parameter(
+                torch.full(param_shape, self.beta_init_val)
+            ).to(self.device)
             self.gamma = torch.nn.Parameter(
                 torch.full(param_shape, self.gamma_init_val)
-            )
+            ).to(self.device)
             self.delta = torch.nn.Parameter(
                 torch.full(param_shape, self.delta_init_val)
-            )
+            ).to(self.device)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         self._initialize_parameters(x)
