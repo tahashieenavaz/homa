@@ -1,8 +1,7 @@
 from .concerns import (
     ReportsSize,
-    RecordsStateDictionaries,
+    StoresModels,
     ReportsClassificationMetrics,
-    HasNetwork,
     PredictsProbabilities,
 )
 
@@ -10,9 +9,8 @@ from .concerns import (
 class Ensemble(
     ReportsSize,
     ReportsClassificationMetrics,
-    RecordsStateDictionaries,
     PredictsProbabilities,
-    HasNetwork,
+    StoresModels,
 ):
     def __init__(self):
         super().__init__()

@@ -13,9 +13,7 @@ class CalculatesMetricNecessities:
         for x, y in dataloader:
             x, y = x.to(device), y.to(device)
             sum_logits = None
-            for state_dict in self.state_dicts:
-                model = self.network.__class__()
-                model.load_state_dict(state_dict)
+            for model in self.models:
                 model.to(device)
                 model.eval()
                 logits = model(x)
