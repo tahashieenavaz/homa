@@ -1,8 +1,8 @@
 import torch
-from torch.nn.parameter import Parameter, UninitializedParameter
+from torch import nn
 
 
-class SReLU(torch.nn.modules.lazy.LazyModuleMixin, torch.nn.Module):
+class SReLU(nn.Module):
     def __init__(
         self,
         alpha_init: float = 0.0,
@@ -15,63 +15,44 @@ class SReLU(torch.nn.modules.lazy.LazyModuleMixin, torch.nn.Module):
         self.beta_init_val = float(beta_init)
         self.gamma_init_val = float(gamma_init)
         self.delta_init_val = float(delta_init)
-        self.alpha: torch.Tensor = UninitializedParameter()
-        self.beta: torch.Tensor = UninitializedParameter()
-        self.gamma: torch.Tensor = UninitializedParameter()
-        self.delta: torch.Tensor = UninitializedParameter()
-        self.num_channels = None
+        self._num_channels = None
+        self.register_parameter("alpha", None)
+        self.register_parameter("beta", None)
+        self.register_parameter("gamma", None)
+        self.register_parameter("delta", None)
 
-    def _materialize(self, x: torch.Tensor):
+    def _ensure_parameters(self, x: torch.Tensor):
         if x.dim() != 4:
             raise ValueError(
                 f"Expected 4D input (N, C, H, W), got {x.dim()}D with shape {tuple(x.shape)}"
             )
         c = int(x.shape[1])
-        self.num_channels = c
-        shape = (1, c, 1, 1)
-        with torch.no_grad():
-            self.alpha = Parameter(
-                self.alpha.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
+        if self._num_channels is None:
+            self._num_channels = c
+        elif c != self._num_channels:
+            raise RuntimeError(
+                f"SReLU was initialized with C={self._num_channels} but got C={c}. "
+                "Create a new SReLU for different channel sizes."
             )
-            self.beta = Parameter(
-                self.beta.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
-            )
-            self.gamma = Parameter(
-                self.gamma.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
-            )
-            self.delta = Parameter(
-                self.delta.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
-            )
-            self.xi = Parameter(
-                self.xi.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
-            )
-            self.psi = Parameter(
-                self.psi.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
-            )
-            self.theta = Parameter(
-                self.theta.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
-            )
-            self.lam = Parameter(
-                self.lam.new_empty(shape, dtype=x.dtype, device=x.device).zero_()
-            )
-        self._lazy_materialized = True
 
-    def _infer_parameters(self, *args, **kwargs):
-        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
-            return self._materialize(args[0])
-        if len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1:
-            return self._materialize(args[1][0])
-        inp = kwargs.get("input", None)
-        if (
-            isinstance(inp, (tuple, list))
-            and len(inp) >= 1
-            and isinstance(inp[0], torch.Tensor)
-        ):
-            return self._materialize(inp[0])
-        raise RuntimeError("_infer_parameters: could not locate input tensor")
+        if self.alpha is None:
+            shape = (1, c, 1, 1)
+            device, dtype = x.device, x.dtype
+            self.alpha = nn.Parameter(
+                torch.full(shape, self.alpha_init_val, dtype=dtype, device=device)
+            )
+            self.beta = nn.Parameter(
+                torch.full(shape, self.beta_init_val, dtype=dtype, device=device)
+            )
+            self.gamma = nn.Parameter(
+                torch.full(shape, self.gamma_init_val, dtype=dtype, device=device)
+            )
+            self.delta = nn.Parameter(
+                torch.full(shape, self.delta_init_val, dtype=dtype, device=device)
+            )
 
     def reset_parameters(self):
-        if not isinstance(self.alpha, UninitializedParameter):
+        if self.alpha is not None:
             with torch.no_grad():
                 self.alpha.fill_(self.alpha_init_val)
                 self.beta.fill_(self.beta_init_val)
@@ -79,8 +60,7 @@ class SReLU(torch.nn.modules.lazy.LazyModuleMixin, torch.nn.Module):
                 self.delta.fill_(self.delta_init_val)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if isinstance(self.alpha, UninitializedParameter):
-            self._infer_parameters(x)
+        self._ensure_parameters(x)
 
         start = self.beta + self.alpha * (x - self.beta)
         finish = self.delta + self.gamma * (x - self.delta)
