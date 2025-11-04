@@ -1,80 +1,51 @@
 import torch
 from torch import nn
-from torch.nn.parameter import Parameter, UninitializedParameter
-from torch.nn.modules.lazy import LazyModuleMixin
+from torch.nn.parameter import Parameter
 import torch.nn.functional as F
 
 
-class SmallGALU(LazyModuleMixin, nn.Module):
+class SmallGALU(nn.Module):
     def __init__(self, max_input: float = 1.0):
         super().__init__()
         if max_input <= 0:
             raise ValueError("max_input must be positive.")
         self.max_input = float(max_input)
-        self.alpha: torch.Tensor = UninitializedParameter()
-        self.beta: torch.Tensor = UninitializedParameter()
+        self.register_parameter("alpha", None)
+        self.register_parameter("beta", None)
         self._num_channels = None
 
-    def _materialize(self, x: torch.Tensor):
+    def _initialize_parameters(self, x: torch.Tensor):
         if x.ndim < 2:
             raise ValueError(
                 f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
-        c = int(x.shape[1])
-        self._num_channels = c
+        self._num_channels = int(x.shape[1])
         param_shape = [1] * x.ndim
-        param_shape[1] = c
-        with torch.no_grad():
-            self.alpha = Parameter(
-                self.alpha.new_empty(
-                    param_shape, dtype=x.dtype, device=x.device
-                ).zero_()
-            )
-            self.beta = Parameter(
-                self.beta.new_empty(param_shape, dtype=x.dtype, device=x.device).zero_()
-            )
-        self._lazy_materialized = True
-
-    def _infer_parameters(self, *args, **kwargs):
-        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
-            x = args[0]
-            return self._materialize(x)
-
-        if len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1:
-            x = args[1][0]
-            return self._materialize(x)
-
-        if (
-            "input" in kwargs
-            and isinstance(kwargs["input"], (tuple, list))
-            and len(kwargs["input"]) >= 1
-        ):
-            x = kwargs["input"][0]
-            return self._materialize(x)
-
-        raise RuntimeError(
-            "SmallGALU._infer_parameters could not find the input tensor."
-        )
+        param_shape[1] = self._num_channels
+        device = x.device
+        dtype = x.dtype
+        self.alpha = Parameter(torch.zeros(param_shape, dtype=dtype, device=device))
+        self.beta = Parameter(torch.zeros(param_shape, dtype=dtype, device=device))
 
     def reset_parameters(self):
-        if not isinstance(self.alpha, UninitializedParameter):
+        if self.alpha is not None:
             with torch.no_grad():
                 self.alpha.zero_()
                 self.beta.zero_()
 
     def forward(self, x: torch.Tensor):
-        if isinstance(self.alpha, UninitializedParameter):
-            self._infer_parameters(x)
-
-        if x.ndim < 2:
-            raise ValueError(
-                f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
-            )
-        if self._num_channels is not None and x.shape[1] != self._num_channels:
-            raise RuntimeError(
-                f"SmallGALU was initialized with C={self._num_channels} but got C={x.shape[1]}. "
-                "Create a new SmallGALU for a different channel size."
-            )
+        if self.alpha is None:
+            self._initialize_parameters(x)
+        else:
+            if x.ndim < 2:
+                raise ValueError(
+                    f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
+                )
+            if x.shape[1] != self._num_channels:
+                raise RuntimeError(
+                    f"SmallGALU was initialized with C={self._num_channels} but got C={x.shape[1]}. "
+                    "Create a new SmallGALU for a different channel size."
+                )
 
         x_norm = x / self.max_input
         zero = torch.zeros(1, dtype=x.dtype, device=x.device)
