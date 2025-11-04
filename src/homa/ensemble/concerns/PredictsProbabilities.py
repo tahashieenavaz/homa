@@ -9,3 +9,7 @@ class PredictsProbabilities(ReportsLogits):
     def predict(self, x: torch.Tensor) -> torch.Tensor:
         logits = self.logits(x)
         return torch.nn.functional.softmax(logits, dim=1)
+
+    @torch.no_grad()
+    def predict_(self, x: torch.Tensor) -> torch.Tensor:
+        return self.predict(x)
