@@ -19,3 +19,7 @@ def replace_modules(
 
 def replace_relu(model: torch.nn.Module, replacement: torch.nn.Module):
     return replace_modules(model, torch.nn.ReLU, replacement)
+
+
+def replace_gelu(model: torch.nn.Module, replacement: torch.nn.Module):
+    return replace_modules(model, torch.nn.GELU, replacement)

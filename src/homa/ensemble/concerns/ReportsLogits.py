@@ -1,7 +1,8 @@
 import torch
+from .errors import PanicsWithoutNetwork
 
 
-class ReportsLogits:
+class ReportsLogits(PanicsWithoutNetwork):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
