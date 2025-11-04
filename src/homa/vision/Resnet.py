@@ -6,7 +6,7 @@ from ..device import get_device
 
 
 class Resnet(ClassificationModel, Trainable, ReportsMetrics):
-    def __init__(self, num_classes: int, lr: float):
+    def __init__(self, num_classes: int, lr: float = 0.001):
         super().__init__()
         self.network = ResnetModule(num_classes).to(get_device())
         self.criterion = torch.nn.CrossEntropyLoss()
