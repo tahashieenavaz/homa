@@ -17,11 +17,28 @@ class PDELU(LazyModuleMixin, nn.Module):
         self.alpha: torch.Tensor = UninitializedParameter()
         self._num_channels = None
 
-    def _infer_parameters(self, x: torch.Tensor):
+    def _infer_parameters(self, *args, **kwargs):
+        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
+            x = args[0]
+        elif (
+            len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1
+        ):
+            x = args[1][0]
+        else:
+            x = kwargs.get("input", None)
+            if isinstance(x, (tuple, list)):
+                x = x[0]
+
+        if not isinstance(x, torch.Tensor):
+            raise RuntimeError(
+                "PDELU._infer_parameters: could not locate input tensor."
+            )
+
         if x.ndim < 2:
             raise ValueError(
                 f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
+
         c = int(x.shape[1])
         self._num_channels = c
         param_shape = [1] * x.ndim
