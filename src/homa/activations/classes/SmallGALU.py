@@ -15,17 +15,15 @@ class SmallGALU(LazyModuleMixin, nn.Module):
         self.beta: torch.Tensor = UninitializedParameter()
         self._num_channels = None
 
-    def _infer_parameters(self, x: torch.Tensor):
+    def _materialize(self, x: torch.Tensor):
         if x.ndim < 2:
             raise ValueError(
                 f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
-
         c = int(x.shape[1])
         self._num_channels = c
         param_shape = [1] * x.ndim
         param_shape[1] = c
-
         with torch.no_grad():
             self.alpha = Parameter(
                 self.alpha.new_empty(
@@ -35,8 +33,28 @@ class SmallGALU(LazyModuleMixin, nn.Module):
             self.beta = Parameter(
                 self.beta.new_empty(param_shape, dtype=x.dtype, device=x.device).zero_()
             )
-
         self._lazy_materialized = True
+
+    def _infer_parameters(self, *args, **kwargs):
+        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
+            x = args[0]
+            return self._materialize(x)
+
+        if len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1:
+            x = args[1][0]
+            return self._materialize(x)
+
+        if (
+            "input" in kwargs
+            and isinstance(kwargs["input"], (tuple, list))
+            and len(kwargs["input"]) >= 1
+        ):
+            x = kwargs["input"][0]
+            return self._materialize(x)
+
+        raise RuntimeError(
+            "SmallGALU._infer_parameters could not find the input tensor."
+        )
 
     def reset_parameters(self):
         if not isinstance(self.alpha, UninitializedParameter):
