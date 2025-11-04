@@ -1,11 +1,10 @@
 import torch
 from torch import nn
 from torch.nn.parameter import Parameter, UninitializedParameter
-from torch.nn.modules.lazy import LazyModuleMixin
 import torch.nn.functional as F
 
 
-class GALU(LazyModuleMixin, nn.Module):
+class GALU(nn.Module):
     def __init__(self, max_input: float = 1.0):
         super().__init__()
         if max_input <= 0:
@@ -15,74 +14,42 @@ class GALU(LazyModuleMixin, nn.Module):
         self.beta: torch.Tensor = UninitializedParameter()
         self.gamma: torch.Tensor = UninitializedParameter()
         self.delta: torch.Tensor = UninitializedParameter()
-        self._num_channels = None
 
-    def _materialize(self, x: torch.Tensor):
+    def _initialize_parameters(self, x: torch.Tensor):
         if x.ndim < 2:
             raise ValueError(
                 f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
-        c = int(x.shape[1])
-        self._num_channels = c
         param_shape = [1] * x.ndim
-        param_shape[1] = c
+        param_shape[1] = int(x.shape[1])
+        zeros = torch.zeros(param_shape, dtype=x.dtype, device=x.device)
         with torch.no_grad():
-            self.alpha = Parameter(
-                self.alpha.new_empty(
-                    param_shape, dtype=x.dtype, device=x.device
-                ).zero_()
-            )
-            self.beta = Parameter(
-                self.beta.new_empty(param_shape, dtype=x.dtype, device=x.device).zero_()
-            )
-            self.gamma = Parameter(
-                self.gamma.new_empty(
-                    param_shape, dtype=x.dtype, device=x.device
-                ).zero_()
-            )
-            self.delta = Parameter(
-                self.delta.new_empty(
-                    param_shape, dtype=x.dtype, device=x.device
-                ).zero_()
-            )
-        self._lazy_materialized = True
-
-    def _infer_parameters(self, *args, **kwargs):
-        if len(args) >= 1 and isinstance(args[0], torch.Tensor):
-            return self._materialize(args[0])
-        if len(args) >= 2 and isinstance(args[1], (tuple, list)) and len(args[1]) >= 1:
-            return self._materialize(args[1][0])
-        inp = kwargs.get("input", None)
-        if (
-            isinstance(inp, (tuple, list))
-            and len(inp) >= 1
-            and isinstance(inp[0], torch.Tensor)
-        ):
-            return self._materialize(inp[0])
-        raise RuntimeError("GALU._infer_parameters: could not locate input tensor.")
+            for name in ("alpha", "beta", "gamma", "delta"):
+                setattr(self, name, Parameter(zeros.clone()))
 
     def reset_parameters(self):
-        for p in (self.alpha, self.beta, self.gamma, self.delta):
+        for name in ("alpha", "beta", "gamma", "delta"):
+            p = getattr(self, name)
             if not isinstance(p, UninitializedParameter):
                 with torch.no_grad():
                     p.zero_()
 
     def forward(self, x: torch.Tensor):
         if isinstance(self.alpha, UninitializedParameter):
-            self._infer_parameters(x)
+            self._initialize_parameters(x)
 
         if x.ndim < 2:
             raise ValueError(
                 f"Input tensor must have at least 2 dimensions (N, C), but got shape {tuple(x.shape)}"
             )
-        if self._num_channels is not None and x.shape[1] != self._num_channels:
+        if not isinstance(self.alpha, UninitializedParameter) and x.shape[1] != self.alpha.shape[1]:
             raise RuntimeError(
-                f"GALU was initialized with C={self._num_channels} but got C={x.shape[1]}. "
+                f"GALU was initialized with C={self.alpha.shape[1]} but got C={x.shape[1]}. "
                 "Create a new GALU for a different channel size."
             )
 
         x_norm = x / self.max_input
-        zero = torch.zeros(1, dtype=x.dtype, device=x.device)
+        zero = x.new_zeros(1)
         part_prelu = F.relu(x_norm) + self.alpha * torch.minimum(x_norm, zero)
         part_beta = self.beta * (
             F.relu(1.0 - torch.abs(x_norm - 1.0))
