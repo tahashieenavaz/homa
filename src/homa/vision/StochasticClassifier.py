@@ -11,6 +11,10 @@ from ..activations import (
     Logish,
     LogLogish,
     ExpExpish,
+    SelfArctan,
+    ParametricLogish,
+    Phish,
+    Suish,
 )
 
 
@@ -37,4 +41,8 @@ class StochasticClassifier:
             SigmoidDerivative,
             Gish,
             Logish,
+            LogLogish,
+            ExpExpish,
+            SelfArctan,
+            ParametricLogish,
         ]
