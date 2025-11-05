@@ -1,6 +1,6 @@
 from .ActivationFunction import ActivationFunction
 from .APLU import APLU
-from .CaLU import APLU
+from .CaLU import CaLU
 from .Elliot import Elliot
 from .ERF import ERF
 from .GaLU import GaLU
