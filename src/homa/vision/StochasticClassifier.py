@@ -1,5 +1,5 @@
 import torch
-from ..activations import ERF, GCU, Logish, Smish, TeLU
+from ..activations import SGELU, LaLU, CaLU
 
 
 class StochasticClassifier:
@@ -16,9 +16,4 @@ class StochasticClassifier:
             torch.nn.GELU,
             torch.nn.SiLU,
             torch.nn.Mish,
-            ERF,
-            GCU,
-            Logish,
-            Smish,
-            TeLU,
         ]

@@ -1,4 +1,6 @@
+from .ActivationFunction import ActivationFunction
 from .APLU import APLU
+from .CaLU import APLU
 from .Elliot import Elliot
 from .ERF import ERF
 from .GaLU import GaLU
@@ -7,6 +9,7 @@ from .GCU import GCU
 from .Logish import Logish
 from .MeLU import MeLU
 from .MexicanReLU import MexicanReLU
+from .SGELU import SGELU
 from .SmallGaLU import SmallGaLU
 from .Smish import Smish
 from .SReLU import SReLU
