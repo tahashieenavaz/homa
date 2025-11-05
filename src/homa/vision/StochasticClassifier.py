@@ -1,5 +1,5 @@
 import torch
-from ..activations import SGELU, LaLU, CaLU
+from ..activations import SGELU, LaLU, CaLU, TripleStateSwish
 
 
 class StochasticClassifier:
@@ -16,4 +16,8 @@ class StochasticClassifier:
             torch.nn.GELU,
             torch.nn.SiLU,
             torch.nn.Mish,
+            SGELU,
+            LaLU,
+            CaLU,
+            TripleStateSwish,
         ]

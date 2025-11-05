@@ -6,6 +6,7 @@ from .ERF import ERF
 from .GaLU import GaLU
 from .GaussianReLU import GaussianReLU
 from .GCU import GCU
+from .LaLU import LaLU
 from .Logish import Logish
 from .MeLU import MeLU
 from .MexicanReLU import MexicanReLU
@@ -14,4 +15,5 @@ from .SmallGaLU import SmallGaLU
 from .Smish import Smish
 from .SReLU import SReLU
 from .TeLU import TeLU
+from .TripleStateSwish import TripleStateSwish
 from .WideMeLU import WideMeLU
