@@ -8,11 +8,14 @@ from .GaLU import GaLU
 from .GaussianReLU import GaussianReLU
 from .GCU import GCU
 from .GeneralizedSwish import GeneralizedSwish
+from .Gish import Gish
 from .LaLU import LaLU
 from .Logish import Logish
+from .LogLogish import LogLogish
 from .MeLU import MeLU
 from .MexicanReLU import MexicanReLU
 from .SGELU import SGELU
+from .SigmoidDerivative import SigmoidDerivative
 from .SmallGaLU import SmallGaLU
 from .Smish import Smish
 from .SReLU import SReLU

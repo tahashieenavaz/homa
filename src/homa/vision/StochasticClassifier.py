@@ -6,6 +6,11 @@ from ..activations import (
     TripleStateSwish,
     GeneralizedSwish,
     ExponentialSwish,
+    SigmoidDerivative,
+    Gish,
+    Logish,
+    LogLogish,
+    ExpExpish,
 )
 
 
@@ -27,4 +32,9 @@ class StochasticClassifier:
             LaLU,
             CaLU,
             TripleStateSwish,
+            GeneralizedSwish,
+            ExponentialSwish,
+            SigmoidDerivative,
+            Gish,
+            Logish,
         ]
