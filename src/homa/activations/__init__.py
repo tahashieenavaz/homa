@@ -5,6 +5,7 @@ from .ExpExpish import ExpExpish
 from .GeneralizedSwish import GeneralizedSwish
 from .TBSReLU import TBSReLU
 from .NoisyReLU import NoisyReLU
+from .ExponentialDLReLU import ExponentialDLReLU
 from .SReLU import SReLU
 from .TangentSigmoidReLU import TangentSigmoidReLU
 from .Phish import Phish
@@ -19,6 +20,8 @@ from .MexicanReLU import MexicanReLU
 from .APLU import APLU
 from .ERF import ERF
 from .TangentBipolarSigmoidReLU import TangentBipolarSigmoidReLU
+from .BaseDLReLU import BaseDLReLU
+from .ShiLU import ShiLU
 from .Logish import Logish
 from .TripleStateSwish import TripleStateSwish
 from .ExponentialSwish import ExponentialSwish
@@ -28,6 +31,7 @@ from .MeLU import MeLU
 from .GaussianReLU import GaussianReLU
 from .ActivationFunction import ActivationFunction
 from .RReLU import RReLU
+from .AOAF import AOAF
 from .Suish import Suish
 from .SoftsignRReLU import SoftsignRReLU
 from .Gish import Gish
@@ -37,6 +41,7 @@ from .SGELU import SGELU
 from .GaLU import GaLU
 from .TSReLU import TSReLU
 from .SineReLU import SineReLU
+from .DLReLU import DLReLU
 from .CaLU import CaLU
 from .RandomizedSlopedReLU import RandomizedSlopedReLU
 from .GCU import GCU
