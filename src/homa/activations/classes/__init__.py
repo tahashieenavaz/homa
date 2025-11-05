@@ -1,4 +1,5 @@
 from .APLU import APLU
+from .ERF import ERF
 from .GaLU import GaLU
 from .GaussianReLU import GaussianReLU
 from .MELU import MELU
