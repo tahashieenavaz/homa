@@ -4,10 +4,10 @@ from .GaLU import GaLU
 from .GaussianReLU import GaussianReLU
 from .GCU import GCU
 from .Logish import Logish
-from .MELU import MELU
+from .MeLU import MeLU
 from .MexicanReLU import MexicanReLU
 from .SmallGaLU import SmallGaLU
 from .Smish import Smish
 from .SReLU import SReLU
 from .TeLU import TeLU
-from .WideMELU import WideMELU
+from .WideMeLU import WideMeLU
