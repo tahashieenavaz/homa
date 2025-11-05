@@ -27,4 +27,5 @@ from .SReLU import SReLU
 from .Suish import Suish
 from .TeLU import TeLU
 from .TripleStateSwish import TripleStateSwish
+from .TSReLU import TSReLU
 from .WideMeLU import WideMeLU
