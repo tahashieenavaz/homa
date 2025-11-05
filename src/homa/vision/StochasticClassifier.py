@@ -23,6 +23,8 @@ from ..activations import (
     SoftsignRReLU,
     RandomizedSlopedReLU,
     NoisyReLU,
+    SineReLU,
+    MinSin,
 )
 
 
@@ -53,4 +55,16 @@ class StochasticClassifier:
             ExpExpish,
             SelfArctan,
             ParametricLogish,
+            Phish,
+            Suish,
+            TSReLU,
+            TBSReLU,
+            LogSigmoid,
+            ShiftedReLU,
+            RReLU,
+            SoftsignRReLU,
+            RandomizedSlopedReLU,
+            NoisyReLU,
+            SineReLU,
+            MinSin,
         ]

@@ -13,6 +13,7 @@ from .SelfArctan import SelfArctan
 from .LogSigmoid import LogSigmoid
 from .SlopedReLU import SlopedReLU
 from .SmallGaLU import SmallGaLU
+from .MinSin import MinSin
 from .LaLU import LaLU
 from .MexicanReLU import MexicanReLU
 from .APLU import APLU
@@ -35,6 +36,7 @@ from .LogLogish import LogLogish
 from .SGELU import SGELU
 from .GaLU import GaLU
 from .TSReLU import TSReLU
+from .SineReLU import SineReLU
 from .CaLU import CaLU
 from .RandomizedSlopedReLU import RandomizedSlopedReLU
 from .GCU import GCU
