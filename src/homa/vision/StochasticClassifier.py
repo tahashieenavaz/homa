@@ -1,43 +1,24 @@
 import random
 import torch
 from ..device import get_device
-from ..activations import (
-    APLU,
-    GALU,
-    SmallGALU,
-    MELU,
-    WideMELU,
-    PDELU,
-    SReLU,
-    infer_activation_channels,
-)
+from ..activations import ERF
 
 
 class StochasticClassifier:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._activation_pool = [
-            APLU,
-            GALU,
-            SmallGALU,
-            MELU,
-            WideMELU,
-            PDELU,
-            SReLU,
-            torch.nn.ReLU,
-            torch.nn.PReLU,
-            torch.nn.LeakyReLU,
             torch.nn.ELU,
+            torch.nn.PReLU,
+            torch.nn.ReLU,
+            torch.nn.ReLU6,
+            torch.nn.RReLU,
+            torch.nn.SELU,
+            torch.nn.CELU,
+            torch.nn.GELU,
+            torch.nn.SiLU,
+            torch.nn.Mish,
         ]
-        self._requires_channels = {
-            APLU,
-            GALU,
-            SmallGALU,
-            MELU,
-            WideMELU,
-            PDELU,
-            SReLU,
-        }
 
     def replace_activations(self, needle: torch.nn.Module) -> None:
         for parent in self.network.modules():
