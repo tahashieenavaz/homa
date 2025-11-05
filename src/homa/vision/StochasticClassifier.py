@@ -15,6 +15,14 @@ from ..activations import (
     ParametricLogish,
     Phish,
     Suish,
+    TSReLU,
+    TBSReLU,
+    LogSigmoid,
+    ShiftedReLU,
+    RReLU,
+    SoftsignRReLU,
+    RandomizedSlopedReLU,
+    NoisyReLU,
 )
 
 
