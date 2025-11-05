@@ -6,6 +6,7 @@ from .ERF import ERF
 from .GaLU import GaLU
 from .GaussianReLU import GaussianReLU
 from .GCU import GCU
+from .GeneralizedSwish import GeneralizedSwish
 from .LaLU import LaLU
 from .Logish import Logish
 from .MeLU import MeLU
