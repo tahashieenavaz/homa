@@ -25,6 +25,7 @@ from ..activations import (
     NoisyReLU,
     SineReLU,
     MinSin,
+    AOAF,
 )
 
 
