@@ -2,6 +2,7 @@ from .APLU import APLU
 from .ERF import ERF
 from .GaLU import GaLU
 from .GaussianReLU import GaussianReLU
+from .Logish import Logish
 from .MELU import MELU
 from .MexicanReLU import MexicanReLU
 from .SmallGaLU import SmallGaLU
