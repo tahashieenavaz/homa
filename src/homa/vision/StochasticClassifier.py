@@ -1,5 +1,12 @@
 import torch
-from ..activations import SGELU, LaLU, CaLU, TripleStateSwish
+from ..activations import (
+    SGELU,
+    LaLU,
+    CaLU,
+    TripleStateSwish,
+    GeneralizedSwish,
+    ExponentialSwish,
+)
 
 
 class StochasticClassifier:
