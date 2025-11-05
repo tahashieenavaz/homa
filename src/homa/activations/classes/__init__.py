@@ -9,4 +9,5 @@ from .MexicanReLU import MexicanReLU
 from .SmallGaLU import SmallGaLU
 from .Smish import Smish
 from .SReLU import SReLU
+from .TeLU import TeLU
 from .WideMELU import WideMELU

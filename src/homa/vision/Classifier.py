@@ -1,5 +1,5 @@
 from .Model import Model
 
 
-class ClassificationModel(Model):
+class Classifier(Model):
     pass

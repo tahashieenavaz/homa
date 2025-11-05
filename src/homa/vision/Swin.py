@@ -1,5 +1,5 @@
 import torch
-from .ClassificationModel import ClassificationModel
+from .Classifier import ClassificationModel
 from .concerns import Trainable, ReportsMetrics
 from .modules import SwinModule
 
