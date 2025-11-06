@@ -12,5 +12,5 @@ class AOAF(AdaptiveActivationFunction, ChannelBased):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         self.initialize(x, "a")
-        a = self.a.view(self.parameter_view(x))
+        a = self.a.view(self.parameter_shape(x))
         return torch.relu(x - self.b * a) + self.c * a
