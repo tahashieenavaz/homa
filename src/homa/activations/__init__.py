@@ -21,7 +21,6 @@ from .APLU import APLU
 from .ERF import ERF
 from .TangentBipolarSigmoidReLU import TangentBipolarSigmoidReLU
 from .BaseDLReLU import BaseDLReLU
-from .ShiLU import ShiLU
 from .Logish import Logish
 from .TripleStateSwish import TripleStateSwish
 from .ExponentialSwish import ExponentialSwish
@@ -31,7 +30,6 @@ from .MeLU import MeLU
 from .GaussianReLU import GaussianReLU
 from .ActivationFunction import ActivationFunction
 from .RReLU import RReLU
-from .learnable.AOAF import AOAF
 from .Suish import Suish
 from .SoftsignRReLU import SoftsignRReLU
 from .Gish import Gish
