@@ -1,7 +1,29 @@
-from ..activations import AOAF, FReLU, LeLeLU, PERU
+from ..activations import (
+    AOAF,
+    AReLU,
+    DPReLU,
+    DualLine,
+    FReLU,
+    LeLeLU,
+    PERU,
+    PiLU,
+    ShiLU,
+    StarReLU,
+)
 
 
 class StochasticClassifier:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._activation_pool = [AOAF, FReLU, LeLeLU, PERU]
+        self._activation_pool = [
+            AOAF,
+            AReLU,
+            DPReLU,
+            DualLine,
+            FReLU,
+            LeLeLU,
+            PERU,
+            PiLU,
+            ShiLU,
+            StarReLU,
+        ]

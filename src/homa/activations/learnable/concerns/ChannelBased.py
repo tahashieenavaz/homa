@@ -8,18 +8,25 @@ class ChannelBased:
         self._initialized = False
         self.num_channels = None
 
-    def initialize(self, x: torch.Tensor, attrs: List[str] | str):
+    def initialize(
+        self, x: torch.Tensor, attrs: List[str] | str, values: List[float] | float = []
+    ):
         if getattr(self, "_initialized", False):
             return
-        self.num_channels = x.shape[1]
 
-        if isinstance(attrs, str):
+        if not isinstance(values, list):
+            values = [values]
+
+        if not isinstance(attrs, list):
             attrs = [attrs]
 
-        for attr in attrs:
-            param = torch.nn.Parameter(
-                torch.ones(self.num_channels, requires_grad=True)
-            )
+        self.num_channels = x.shape[1]
+        for index, attr in enumerate(attrs):
+            if index < len(values) and values[index] is not None:
+                default_value = float(values[index])
+            else:
+                default_value = 1.0
+            param = torch.nn.Parameter(torch.full((self.num_channels,), default_value))
             setattr(self, attr, param)
         self._initialized = True
 
