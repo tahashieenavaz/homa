@@ -3,7 +3,7 @@ from ..AdaptiveActivationFunction import AdaptiveActivationFunction
 from .concerns import ChannelBased
 
 
-class DualLine(AdaptiveActivationFunction, ChannelBased):
+class PiLU(AdaptiveActivationFunction, ChannelBased):
     def __init__(self):
         super().__init__()
         self.a = None
