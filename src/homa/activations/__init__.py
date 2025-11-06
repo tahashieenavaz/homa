@@ -31,7 +31,7 @@ from .MeLU import MeLU
 from .GaussianReLU import GaussianReLU
 from .ActivationFunction import ActivationFunction
 from .RReLU import RReLU
-from .AOAF import AOAF
+from .learnable.AOAF import AOAF
 from .Suish import Suish
 from .SoftsignRReLU import SoftsignRReLU
 from .Gish import Gish
@@ -48,3 +48,4 @@ from .GCU import GCU
 from .SigmoidDerivative import SigmoidDerivative
 from .Smish import Smish
 from .AdaptiveActivationFunction import AdaptiveActivationFunction
+from .learnable import *
