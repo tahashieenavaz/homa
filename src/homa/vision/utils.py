@@ -3,10 +3,10 @@ import random
 
 
 def replace_activations(module, needle: torch.nn.Module, candidates: list):
-    for name, module in module.named_children():
-        if isinstance(module, needle):
-            factory = random.choice(candidates)
-            new_module = factory()
-            setattr(module, name, new_module)
+    for name, child in module.named_children():
+        if isinstance(child, needle):
+            new_activation = random.choice(candidates)
+            setattr(module, name, new_activation())
         else:
-            replace_activations(module, needle, candidates)
+            replace_activations(child, needle, candidates)
+    return module
