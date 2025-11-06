@@ -5,8 +5,8 @@ from ..AdaptiveActivationFunction import AdaptiveActivationFunction
 class AReLU(AdaptiveActivationFunction):
     def __init__(self):
         super(AReLU, self).__init__()
-        self.a = torch.nn.Parameter(torch.tensor(0.9))
-        self.b = torch.nn.Parameter(torch.tensor(2.0))
+        self.a = torch.nn.Parameter(torch.tensor(0.9, requires_grad=True))
+        self.b = torch.nn.Parameter(torch.tensor(2.0, requires_grad=True))
 
     def forward(self, z):
         negative_slope = torch.clamp(self.a, 0.01, 0.99)
