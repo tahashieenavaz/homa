@@ -8,7 +8,9 @@ class ReportsLogits:
     def logits(self, x: torch.Tensor) -> torch.Tensor:
         batch_size = x.shape[0]
         logits = torch.zeros((batch_size, self.num_classes))
-        for model in self.models:
+        for factory, weight in zip(self.factories, self.weights):
+            model = factory(num_classes=self.num_classes)
+            model.load_state_dict(weight)
             logits += model(x)
         return logits
 
