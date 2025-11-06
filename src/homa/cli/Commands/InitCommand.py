@@ -1,9 +1,11 @@
-from pathlib import Path
 import ast
+from pathlib import Path
+from .Command import Command
 
 
-class InitNamespace:
-    def class_(self):
+class InitCommand(Command):
+    @staticmethod
+    def run():
         path = Path(".")
         init_file = path / "__init__.py"
         init_file.write_text("")
