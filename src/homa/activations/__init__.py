@@ -47,3 +47,4 @@ from .RandomizedSlopedReLU import RandomizedSlopedReLU
 from .GCU import GCU
 from .SigmoidDerivative import SigmoidDerivative
 from .Smish import Smish
+from .AdaptiveActivationFunction import AdaptiveActivationFunction
