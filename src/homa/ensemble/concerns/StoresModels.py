@@ -2,6 +2,7 @@ import torch
 import io
 from typing import List
 from ...vision import Model
+from ..utils import get_model_device
 
 
 class StoresModels:
@@ -18,7 +19,7 @@ class StoresModels:
         else:
             raise TypeError("Wrong input to ensemble record")
 
-        device = model_.device
+        device = get_model_device(model_)
         buffer = io.BytesIO()
         torch.save(model_.to("cpu"), buffer)
         buffer.seek(0)
