@@ -1,14 +1,14 @@
 import torch
-import io
 from typing import List
+from collections import OrderedDict
 from ...vision import Model
-from ..utils import get_model_device
 
 
 class StoresModels:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.models: List[torch.nn.Module] = []
+        self.factories: List[torch.nn.Module] = []
+        self.weights: List[OrderedDict] = []
 
     def record(self, model: Model | torch.nn.Module):
         model_: torch.nn.Module | None = None
@@ -19,12 +19,8 @@ class StoresModels:
         else:
             raise TypeError("Wrong input to ensemble record")
 
-        device = get_model_device(model_)
-        buffer = io.BytesIO()
-        torch.save(model_.to("cpu"), buffer)
-        buffer.seek(0)
-        model_ = torch.load(buffer, map_location=device)
-        self.models.append(model_)
+        self.factories.append(model_.__class__)
+        self.weights.append(model_.state_dict())
 
     def push(self, *args, **kwargs):
         self.record(*args, **kwargs)
