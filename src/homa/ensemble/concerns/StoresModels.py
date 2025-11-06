@@ -1,5 +1,5 @@
 import torch
-from copy import deepcopy
+import io
 from typing import List
 from ...vision import Model
 
@@ -12,11 +12,17 @@ class StoresModels:
     def record(self, model: Model | torch.nn.Module):
         model_: torch.nn.Module | None = None
         if isinstance(model, Model):
-            model_ = deepcopy(model.network)
+            model_ = model.network
         elif isinstance(model, torch.nn.Module):
-            model_ = deepcopy(model)
+            model_ = model
         else:
             raise TypeError("Wrong input to ensemble record")
+
+        device = model_.device
+        buffer = io.BytesIO()
+        torch.save(model_.to("cpu"), buffer)
+        buffer.seek(0)
+        model_ = torch.load(buffer, map_location=device)
         self.models.append(model_)
 
     def push(self, *args, **kwargs):
