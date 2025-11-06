@@ -1,7 +1,8 @@
 import torch
+from .ActivationFunction import ActivationFunction
 
 
-class AdaptiveActivationFunction(torch.nn.Module):
+class AdaptiveActivationFunction(ActivationFunction):
     def __init__(self):
         super().__init__()
 

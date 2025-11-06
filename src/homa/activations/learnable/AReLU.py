@@ -1,7 +1,8 @@
 import torch
+from ..AdaptiveActivationFunction import AdaptiveActivationFunction
 
 
-class AReLU(torch.nn.Module):
+class AReLU(AdaptiveActivationFunction):
     def __init__(self):
         super(AReLU, self).__init__()
         self.a = torch.nn.Parameter(torch.tensor(0.9))
