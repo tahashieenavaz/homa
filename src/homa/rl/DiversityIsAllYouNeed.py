@@ -79,17 +79,14 @@ class DiversityIsAllYouNeed:
         return rewards + update - values
 
     def train(self, skill: torch.Tensor):
-        states, actions, rewards, next_states, terminations, probabilities = (
-            self.buffer.all_tensor()
-        )
-
-        self.discriminator.train(states=states)
+        data = self.buffer.all_tensor()
+        self.discriminator.train(states=data.states)
         advantages = self.advantages(
-            states=states,
+            states=data.states,
+            rewards=data.rewards,
+            terminations=data.terminations,
+            next_states=data.next_states,
             skills=skills,
-            rewards=rewards,
-            terminations=terminations,
-            next_states=next_states,
         )
-        self.critic.train(advantages=advantages)
-        self.actor.train(advantages=advantages)
+        self.critic.train(advantages=data.advantages)
+        self.actor.train(advantages=data.advantages)
