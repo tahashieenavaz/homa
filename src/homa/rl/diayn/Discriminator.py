@@ -7,11 +7,11 @@ from ...core.concerns import MovesNetworkToDevice
 class Discriminator(MovesNetworkToDevice):
     def __init__(
         self,
-        decay: float,
-        lr: float,
         state_dimension: int,
         hidden_dimension: int,
         num_skills: int,
+        decay: float,
+        lr: float,
     ):
         self.network = DiscriminatorModule(
             state_dimension=state_dimension,
