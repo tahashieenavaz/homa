@@ -88,5 +88,5 @@ class DiversityIsAllYouNeed:
             next_states=data.next_states,
             skills=skills,
         )
-        self.critic.train(advantages=data.advantages)
-        self.actor.train(advantages=data.advantages)
+        self.critic.train(advantages=advantages)
+        self.actor.train(advantages=advantages)
