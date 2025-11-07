@@ -1,7 +1,7 @@
-from collections import deque
+from .concerns import ResetsCollection, SamplesItems
 
 
-class Buffer:
+class Buffer(ResetsCollection, SamplesItems):
     def __init__(self, capacity: int):
         self.capacity: int = capacity
-        self.collection = deque(maxlen=capacity)
+        self.reset()

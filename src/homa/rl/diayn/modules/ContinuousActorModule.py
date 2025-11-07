@@ -1,19 +1,22 @@
 import torch
+from torch.distributions import Normal
 
 
-class CriticModule(torch.nn.Module):
+class ContinuousActorModule(torch.nn.Module):
     def __init__(
         self,
         state_dimension: int,
         action_dimension: int,
-        num_skills: int,
         hidden_dimension: int,
+        num_skills: int,
+        epsilon: float,
     ):
         super().__init__()
         self.state_dimension: int = state_dimension
         self.action_dimension: int = action_dimension
         self.num_skills: int = num_skills
         self.hidden_dimension: int = hidden_dimension
+        self.epsilon: float = epsilon
         self.input_dimension = self.state_dimension + self.num_skills
 
         self.phi = torch.nn.Sequential(
@@ -21,8 +24,11 @@ class CriticModule(torch.nn.Module):
             torch.nn.ReLU(),
             torch.nn.Linear(self.hidden_dimension, self.hidden_dimension),
             torch.nn.ReLU(),
-            torch.nn.Linear(self.hidden_dimension, 1),
+            torch.nn.Linear(self.hidden_dimension, self.action_dimension),
         )
+
+        self.mu = torch.nn.Linear(self.hidden_dimension, self.action_dimension)
+        self.xi = torch.nn.Linear(self.hidden_dimension, self.action_dimension)
 
     def forward(self, state: torch.Tensor, skill: torch.Tensor) -> torch.Tensor:
         psi = torch.cat([state, skill], dim=-1)
@@ -30,3 +36,14 @@ class CriticModule(torch.nn.Module):
         mean = self.mu(features)
         std = self.xi(features).clamp(-20, 2)
         return mean, std
+
+    def get_action(self, state: torch.Tensor, skill: torch.Tensor):
+        mean, std = self(state, skill)
+        std = std.exp()
+        distribution = Normal(mean, std)
+        raw_action = distribution.rsample()
+        action = torch.tanh(raw_action)
+        corrected_probabilities = torch.log(1.0 - action.pow(2) + self.epsilon)
+        probabilities = distribution.log_prob(raw_action) - corrected_probabilities
+        probabilities = probabilities.sum(dim=-1, keepdim=True)
+        return action, probabilities

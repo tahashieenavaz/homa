@@ -1,3 +1,4 @@
+import torch
 from .diayn.Actor import Actor
 from .diayn.Critic import Critic
 from .diayn.Discriminator import Discriminator
@@ -18,6 +19,8 @@ class DiversityIsAllYouNeed:
         critic_lr: float = 0.001,
         discriminator_lr=0.001,
         buffer_capacity: int = 1_000_000,
+        actor_epsilon: float = 1e-6,
+        gamma: float = 0.99,
     ):
         self.buffer = DiversityIsAllYouNeedBuffer(capacity=buffer_capacity)
         self.actor = Actor(
@@ -27,12 +30,14 @@ class DiversityIsAllYouNeed:
             num_skills=num_skills,
             lr=actor_lr,
             decay=actor_decay,
+            epsilon=actor_epsilon,
         )
         self.critic = Critic(
             lr=critic_lr,
             num_skills=num_skills,
             hidden_dimension=hidden_dimension,
             decay=critic_decay,
+            gamma=gamma,
         )
         self.discriminator = Discriminator(
             state_dimension=state_dimension,
@@ -42,7 +47,11 @@ class DiversityIsAllYouNeed:
             decay=discriminator_decay,
         )
 
-    def train(self):
-        self.discriminator.train()
+    def train(self, skill: torch.Tensor):
+        states, actions, rewards, next_states, terminations, log_probabilities = (
+            self.buffer.all_tensor()
+        )
+
+        self.discriminator.train(states=states)
         self.critic.train()
         self.actor.train()
