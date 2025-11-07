@@ -23,3 +23,7 @@ def mps():
 
 def device():
     return get_device()
+
+
+def move(module: torch.nn.Module):
+    module.to(get_device())
