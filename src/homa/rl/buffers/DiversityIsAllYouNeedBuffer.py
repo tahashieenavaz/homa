@@ -4,6 +4,9 @@ from .concerns import HasRecordAlternatives
 
 
 class DiversityIsAllYouNeedBuffer(Buffer, HasRecordAlternatives):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def record(
         self,
         state: numpy.ndarray,
@@ -13,4 +16,6 @@ class DiversityIsAllYouNeedBuffer(Buffer, HasRecordAlternatives):
         termination: bool,
         log_probability: numpy.ndarray,
     ):
-        pass
+        self.collection.append(
+            (state, action, reward, next_state, termination, log_probability)
+        )

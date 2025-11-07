@@ -17,8 +17,9 @@ class DiversityIsAllYouNeed:
         actor_lr: float = 0.0001,
         critic_lr: float = 0.001,
         discriminator_lr=0.001,
+        buffer_capacity: int = 1_000_000,
     ):
-        self.buffer = DiversityIsAllYouNeedBuffer()
+        self.buffer = DiversityIsAllYouNeedBuffer(capacity=buffer_capacity)
         self.actor = Actor(
             state_dimension=state_dimension,
             action_dimension=action_dimension,
