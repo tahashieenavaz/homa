@@ -1,6 +1,7 @@
-from .Actor import Actor
-from .Critic import Critic
-from .Discriminator import Discriminator
+from .diayn.Actor import Actor
+from .diayn.Critic import Critic
+from .diayn.Discriminator import Discriminator
+from .buffers import DiversityIsAllYouNeedBuffer
 
 
 class DiversityIsAllYouNeed:
@@ -17,6 +18,7 @@ class DiversityIsAllYouNeed:
         critic_lr: float = 0.001,
         discriminator_lr=0.001,
     ):
+        self.buffer = DiversityIsAllYouNeedBuffer()
         self.actor = Actor(
             state_dimension=state_dimension,
             action_dimension=action_dimension,
@@ -38,3 +40,8 @@ class DiversityIsAllYouNeed:
             lr=discriminator_lr,
             decay=discriminator_decay,
         )
+
+    def train(self):
+        self.discriminator.train()
+        self.critic.train()
+        self.actor.train()

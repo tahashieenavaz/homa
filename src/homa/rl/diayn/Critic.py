@@ -22,5 +22,5 @@ class Critic(MovesNetworkToDevice):
         )
         self.criterion = torch.nn.SmoothL1Loss()
 
-    def forward(self, state: torch.Tensor, skill: torch.Tensor):
+    def train(self):
         pass

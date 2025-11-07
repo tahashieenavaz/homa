@@ -22,3 +22,6 @@ class Actor(MovesNetworkToDevice):
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=decay
         )
+
+    def train(self):
+        pass

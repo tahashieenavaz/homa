@@ -21,3 +21,6 @@ class Discriminator(MovesNetworkToDevice):
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = torch.nn.SmoothL1Loss()
+
+    def train(self):
+        pass
