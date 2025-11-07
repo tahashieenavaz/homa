@@ -28,13 +28,13 @@ class Discriminator(MovesNetworkToDevice):
         return self.criterion(logits, skills_indices)
 
     @torch.no_grad()
-    def reward(self, state: torch.Tensor, skill_z_index: int):
+    def reward(self, state: torch.Tensor, skill_index: torch.Tensor):
         logits = self.network(state)
-        log_probabilities = torch.nn.functional.log_softmax(logits, dim=-1)
-        entropy_log = numpy.log(1.0 / self.num_skills)
-        if skill_z_index.dim() == 1:
-            skill_z_index = skill_z_index.unsqueeze(-1)
-        reward = log_probabilities.gather(1, skill_z_index) - entropy_log
+        probabilities = torch.nn.functional.log_softmax(logits, dim=-1)
+        entropy = numpy.log(1.0 / self.num_skills)
+        if skill_index.dim() == 1:
+            skill_index = skill_index.unsqueeze(-1)
+        reward = probabilities.gather(1, skill_index) - entropy
         return reward.squeeze(-1)
 
     def train(self, states: torch.Tensor, skills_indices: torch.Tensor):
