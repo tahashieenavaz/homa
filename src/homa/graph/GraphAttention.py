@@ -1,9 +1,8 @@
-from ..device import move
 from .modules import GraphAttentionModule
+from ..core.concerns import MovesNetworkToDevice
 
 
-class GraphAttention:
+class GraphAttention(MovesNetworkToDevice):
     def __init__(self):
         super().__init__()
         self.network = GraphAttentionModule()
-        move(self.network)
