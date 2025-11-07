@@ -5,5 +5,5 @@ from .ReportsEnsembleAccuracy import ReportsEnsembleAccuracy
 from .ReportsEnsembleF1 import ReportsEnsembleF1
 from .ReportsEnsembleKappa import ReportsEnsembleKappa
 from .ReportsLogits import ReportsLogits
-from .ReportsSize import ReportsSize
+from .ReportsEnsembleSize import ReportsEnsembleSize
 from .StoresModels import StoresModels

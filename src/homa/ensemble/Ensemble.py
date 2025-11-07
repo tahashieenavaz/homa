@@ -1,5 +1,5 @@
 from .concerns import (
-    ReportsSize,
+    ReportsEnsembleSize,
     StoresModels,
     ReportsClassificationMetrics,
     PredictsProbabilities,
@@ -7,7 +7,7 @@ from .concerns import (
 
 
 class Ensemble(
-    ReportsSize,
+    ReportsEnsembleSize,
     ReportsClassificationMetrics,
     PredictsProbabilities,
     StoresModels,
