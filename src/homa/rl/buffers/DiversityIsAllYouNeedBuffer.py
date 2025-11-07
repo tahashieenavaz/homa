@@ -13,7 +13,7 @@ class DiversityIsAllYouNeedBuffer(Buffer, HasRecordAlternatives):
         return self.all(tensor=True)
 
     def all(self, tensor: bool = False) -> SimpleNamespace:
-        states, actions, rewards, next_states, terminations, log_probabilities = zip(
+        states, actions, rewards, next_states, terminations, probabilities = zip(
             *self.collection
         )
 
@@ -23,7 +23,7 @@ class DiversityIsAllYouNeedBuffer(Buffer, HasRecordAlternatives):
             rewards = torch.cat(rewards)
             next_states = torch.cat(next_states)
             terminations = torch.cat(terminations)
-            log_probabilities = torch.cat(log_probabilities)
+            probabilities = torch.cat(probabilities)
 
         return SimpleNamespace(
             **{
@@ -32,7 +32,7 @@ class DiversityIsAllYouNeedBuffer(Buffer, HasRecordAlternatives):
                 "rewards": rewards,
                 "next_states": next_states,
                 "terminations": terminations,
-                "log_probabilities": log_probabilities,
+                "probabilities": probabilities,
             }
         )
 
@@ -43,8 +43,8 @@ class DiversityIsAllYouNeedBuffer(Buffer, HasRecordAlternatives):
         reward: float,
         next_state: numpy.ndarray,
         termination: bool,
-        log_probability: numpy.ndarray,
+        probability: numpy.ndarray,
     ) -> None:
         self.collection.append(
-            (state, action, reward, next_state, termination, log_probability)
+            (state, action, reward, next_state, termination, probability)
         )

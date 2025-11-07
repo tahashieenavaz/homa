@@ -1,4 +1,5 @@
 import torch
+import numpy
 from .modules import DiscriminatorModule
 from ...core.concerns import MovesNetworkToDevice
 
@@ -25,6 +26,16 @@ class Discriminator(MovesNetworkToDevice):
     def loss(self, states: torch.Tensor, skills_indices: torch.Tensor):
         logits = self.network(states)
         return self.criterion(logits, skills_indices)
+
+    @torch.no_grad()
+    def reward(self, state: torch.Tensor, skill_z_index: int):
+        logits = self.network(state)
+        log_probabilities = torch.nn.functional.log_softmax(logits, dim=-1)
+        entropy_log = numpy.log(1.0 / self.num_skills)
+        if skill_z_index.dim() == 1:
+            skill_z_index = skill_z_index.unsqueeze(-1)
+        reward = log_probabilities.gather(1, skill_z_index) - entropy_log
+        return reward.squeeze(-1)
 
     def train(self, states: torch.Tensor, skills_indices: torch.Tensor):
         self.optimizer.zero_grad()

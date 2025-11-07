@@ -36,14 +36,3 @@ class ContinuousActorModule(torch.nn.Module):
         mean = self.mu(features)
         std = self.xi(features).clamp(-20, 2)
         return mean, std
-
-    def get_action(self, state: torch.Tensor, skill: torch.Tensor):
-        mean, std = self(state, skill)
-        std = std.exp()
-        distribution = Normal(mean, std)
-        raw_action = distribution.rsample()
-        action = torch.tanh(raw_action)
-        corrected_probabilities = torch.log(1.0 - action.pow(2) + self.epsilon)
-        probabilities = distribution.log_prob(raw_action) - corrected_probabilities
-        probabilities = probabilities.sum(dim=-1, keepdim=True)
-        return action, probabilities

@@ -1,4 +1,5 @@
 import torch
+from torch.distributions import Normal
 from .modules import ContinuousActorModule
 from ...core.concerns import MovesNetworkToDevice
 
@@ -25,6 +26,17 @@ class Actor(MovesNetworkToDevice):
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = False
+
+    def action(self, state: torch.Tensor, skill: torch.Tensor):
+        mean, std = self.network(state, skill)
+        std = std.exp()
+        distribution = Normal(mean, std)
+        raw_action = distribution.rsample()
+        action = torch.tanh(raw_action)
+        corrected_probabilities = torch.log(1.0 - action.pow(2) + self.epsilon)
+        probabilities = distribution.log_prob(raw_action) - corrected_probabilities
+        probabilities = probabilities.sum(dim=-1, keepdim=True)
+        return action, probabilities
 
     def train(self):
         pass

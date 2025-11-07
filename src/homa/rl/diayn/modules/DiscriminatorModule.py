@@ -19,13 +19,3 @@ class DiscriminatorModule(torch.nn.Module):
 
     def forward(self, state: torch.Tensor) -> torch.Tensor:
         return self.mu(state)
-
-    @torch.no_grad()
-    def get_reward(self, state: torch.Tensor, skill_z_index: int):
-        logits = self.forward(state)
-        log_probabilities = torch.nn.functional.log_softmax(logits, dim=-1)
-        entropy_log = numpy.log(1.0 / self.num_skills)
-        if skill_z_index.dim() == 1:
-            skill_z_index = skill_z_index.unsqueeze(-1)
-        intrinsic_reward = log_probabilities.gather(1, skill_z_index) - entropy_log
-        return intrinsic_reward.squeeze(-1)
