@@ -7,16 +7,16 @@ class Critic(MovesNetworkToDevice):
     def __init__(
         self,
         state_dimension: int,
-        num_skills: int,
         hidden_dimension: int,
+        num_skills: int,
         lr: float,
         decay: float,
         gamma: float,
     ):
         self.network = CriticModule(
             state_dimension=state_dimension,
-            num_skills=num_skills,
             hidden_dimension=hidden_dimension,
+            num_skills=num_skills,
         )
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=decay

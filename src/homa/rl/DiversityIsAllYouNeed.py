@@ -38,9 +38,10 @@ class DiversityIsAllYouNeed:
             max_std=max_std,
         )
         self.critic = Critic(
-            lr=critic_lr,
-            num_skills=num_skills,
+            state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
+            num_skills=num_skills,
+            lr=critic_lr,
             decay=critic_decay,
             gamma=gamma,
         )
@@ -52,7 +53,7 @@ class DiversityIsAllYouNeed:
             decay=discriminator_decay,
         )
 
-    def one_hot(indices, max_index) -> torch.Tensor:
+    def one_hot(self, indices, max_index) -> torch.Tensor:
         one_hot = torch.zeros(indices.size(0), max_index)
         one_hot.scatter_(1, indices.unsqueeze(1), 1)
         return one_hot
@@ -81,7 +82,7 @@ class DiversityIsAllYouNeed:
         return rewards + update - values
 
     def train(self, skill: torch.Tensor):
-        states, actions, rewards, next_states, terminations, log_probabilities = (
+        states, actions, rewards, next_states, terminations, probabilities = (
             self.buffer.all_tensor()
         )
 
