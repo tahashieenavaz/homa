@@ -7,3 +7,4 @@ from .ReportsEnsembleKappa import ReportsEnsembleKappa
 from .ReportsLogits import ReportsLogits
 from .ReportsEnsembleSize import ReportsEnsembleSize
 from .StoresModels import StoresModels
+from .SavesEnsembleModels import SavesEnsembleModels

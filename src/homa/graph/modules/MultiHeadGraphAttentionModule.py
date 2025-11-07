@@ -2,7 +2,7 @@ import torch
 from .GraphAttentionHeadModule import GraphAttentionHeadModule
 
 
-class GraphAttentionModule(torch.nn.Module):
+class MultiHeadGraphAttentionModule(torch.nn.Module):
     def __init__(self, num_heads: int, in_features: int, out_features: int, alpha=0.2):
         super().__init__()
         self.num_heads = num_heads

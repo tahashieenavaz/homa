@@ -1,5 +1,5 @@
 import torch
-from typing import List
+from typing import List, Type
 from collections import OrderedDict
 from ...vision import Model
 
@@ -7,7 +7,7 @@ from ...vision import Model
 class StoresModels:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.factories: List[torch.nn.Module] = []
+        self.factories: List[Type[torch.nn.Module]] = []
         self.weights: List[OrderedDict] = []
 
     def record(self, model: Model | torch.nn.Module):

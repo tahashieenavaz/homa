@@ -3,6 +3,7 @@ from .concerns import (
     StoresModels,
     ReportsClassificationMetrics,
     PredictsProbabilities,
+    SavesEnsembleModels,
 )
 
 
@@ -11,6 +12,7 @@ class Ensemble(
     ReportsClassificationMetrics,
     PredictsProbabilities,
     StoresModels,
+    SavesEnsembleModels,
 ):
     def __init__(self):
         super().__init__()
