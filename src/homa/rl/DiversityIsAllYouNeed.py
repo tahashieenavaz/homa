@@ -74,11 +74,8 @@ class DiversityIsAllYouNeed:
     ) -> torch.Tensor:
         values = self.critic.values(states=states, skills=skills)
         termination_mask = 1 - terminations
-        update = (
-            self.gamma
-            * self.critic.values_(states=next_states, skills=skills)
-            * termination_mask
-        )
+        next_values = self.critic.values_(states=next_states, skills=skills)
+        update = self.gamma * next_values * termination_mask
         return rewards + update - values
 
     def train(self, skill: torch.Tensor):
