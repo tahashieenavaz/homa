@@ -12,8 +12,10 @@ class DiversityIsAllYouNeed:
         num_skills: int = 10,
         critic_decay: float = 0.0,
         actor_decay: float = 0.0,
+        discriminator_decay: float = 0.0,
         actor_lr: float = 0.0001,
         critic_lr: float = 0.001,
+        discriminator_lr=0.001,
     ):
         self.actor = Actor(
             state_dimension=state_dimension,
@@ -29,4 +31,10 @@ class DiversityIsAllYouNeed:
             hidden_dimension=hidden_dimension,
             decay=critic_decay,
         )
-        self.discriminator = None
+        self.discriminator = Discriminator(
+            state_dimension=state_dimension,
+            hidden_dimension=hidden_dimension,
+            num_skills=num_skills,
+            lr=discriminator_lr,
+            decay=discriminator_decay,
+        )
