@@ -14,6 +14,8 @@ class Actor(MovesNetworkToDevice):
         lr: float,
         decay: float,
         epsilon: float,
+        min_std: float,
+        max_std: float,
     ):
         self.network = ContinuousActorModule(
             state_dimension=state_dimension,
@@ -21,6 +23,8 @@ class Actor(MovesNetworkToDevice):
             hidden_dimension=hidden_dimension,
             num_skills=num_skills,
             epsilon=epsilon,
+            min_std=min_std,
+            max_std=max_std,
         )
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=decay
@@ -38,5 +42,14 @@ class Actor(MovesNetworkToDevice):
         probabilities = probabilities.sum(dim=-1, keepdim=True)
         return action, probabilities
 
-    def train(self):
-        pass
+    def train(self, advantages: torch.Tensor, probabilities: torch.Tensor) -> float:
+        self.optimizer.zero_grad()
+        loss = self.loss(advantages=advantages, probabilities=probabilities)
+        loss.backward()
+        self.optimizer.step()
+        return loss.item()
+
+    def loss(
+        self, advantages: torch.Tensor, probabilities: torch.Tensor
+    ) -> torch.Tensor:
+        return -(probabilities * advantages.detach()).mean()

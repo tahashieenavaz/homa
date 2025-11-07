@@ -24,35 +24,18 @@ class Critic(MovesNetworkToDevice):
         self.criterion = torch.nn.SmoothL1Loss()
         self.gamma: float = gamma
 
+    def train(self, advantages: torch.Tensor):
+        self.optimizer.zero_grad()
+        loss = self.loss(advantages=advantages)
+        loss.backward()
+        self.optimizer.step()
+
+    def loss(self, advantages: torch.Tensor):
+        return advantages.pow(2).mean()
+
     def values(self, states: torch.Tensor, skills: torch.Tensor):
         return self.network(states, skills)
 
     @torch.no_grad()
     def values_(self, *args, **kwargs):
         return self.values(*args, **kwargs)
-
-    def advantages(
-        self,
-        states: torch.Tensor,
-        skills: torch.Tensor,
-        rewards: torch.Tensor,
-        terminations: torch.Tensor,
-        next_states: torch.Tensor,
-    ):
-        values = self.values(states=states, skills=skills)
-        termination_mask = 1 - terminations
-        update = (
-            self.gamma
-            * self.values_(states=next_states, skills=skills)
-            * termination_mask
-        )
-        return rewards + update - values
-
-    def loss(self):
-        return self.advantages().pow(2).mean()
-
-    def train(self):
-        self.optimizer.zero_grad()
-        loss = self.loss()
-        loss.backward()
-        self.optimizer.step()

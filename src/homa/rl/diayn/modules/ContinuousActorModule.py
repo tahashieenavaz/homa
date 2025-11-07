@@ -1,5 +1,4 @@
 import torch
-from torch.distributions import Normal
 
 
 class ContinuousActorModule(torch.nn.Module):
@@ -10,6 +9,8 @@ class ContinuousActorModule(torch.nn.Module):
         hidden_dimension: int,
         num_skills: int,
         epsilon: float,
+        min_std: float,
+        max_std: float,
     ):
         super().__init__()
         self.state_dimension: int = state_dimension
@@ -17,7 +18,9 @@ class ContinuousActorModule(torch.nn.Module):
         self.num_skills: int = num_skills
         self.hidden_dimension: int = hidden_dimension
         self.epsilon: float = epsilon
-        self.input_dimension = self.state_dimension + self.num_skills
+        self.input_dimension: int = self.state_dimension + self.num_skills
+        self.min_std: float = min_std
+        self.max_std: float = max_std
 
         self.phi = torch.nn.Sequential(
             torch.nn.Linear(self.input_dimension, self.hidden_dimension),
@@ -34,5 +37,5 @@ class ContinuousActorModule(torch.nn.Module):
         psi = torch.cat([state, skill], dim=-1)
         features = self.phi(psi)
         mean = self.mu(features)
-        std = self.xi(features).clamp(-20, 2)
+        std = self.xi(features).clamp(self.min_std, self.max_std)
         return mean, std

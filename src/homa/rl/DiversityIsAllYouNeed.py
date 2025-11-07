@@ -21,6 +21,8 @@ class DiversityIsAllYouNeed:
         buffer_capacity: int = 1_000_000,
         actor_epsilon: float = 1e-6,
         gamma: float = 0.99,
+        min_std: float = -20.0,
+        max_std: float = 2.0,
     ):
         self.buffer: Buffer = DiversityIsAllYouNeedBuffer(capacity=buffer_capacity)
         self.num_skills: int = num_skills
@@ -32,6 +34,8 @@ class DiversityIsAllYouNeed:
             lr=actor_lr,
             decay=actor_decay,
             epsilon=actor_epsilon,
+            min_std=min_std,
+            max_std=max_std,
         )
         self.critic = Critic(
             lr=critic_lr,
@@ -48,7 +52,7 @@ class DiversityIsAllYouNeed:
             decay=discriminator_decay,
         )
 
-    def one_hot(indices, max_index):
+    def one_hot(indices, max_index) -> torch.Tensor:
         one_hot = torch.zeros(indices.size(0), max_index)
         one_hot.scatter_(1, indices.unsqueeze(1), 1)
         return one_hot
@@ -56,8 +60,25 @@ class DiversityIsAllYouNeed:
     def skill_index(self) -> torch.Tensor:
         return torch.randint(0, self.num_skills, (1,))
 
-    def skill(self):
+    def skill(self) -> torch.Tensor:
         return self.one_hot(self.skill_index(), self.num_skills)
+
+    def advantages(
+        self,
+        states: torch.Tensor,
+        skills: torch.Tensor,
+        rewards: torch.Tensor,
+        terminations: torch.Tensor,
+        next_states: torch.Tensor,
+    ) -> torch.Tensor:
+        values = self.critic.values(states=states, skills=skills)
+        termination_mask = 1 - terminations
+        update = (
+            self.gamma
+            * self.critic.values_(states=next_states, skills=skills)
+            * termination_mask
+        )
+        return rewards + update - values
 
     def train(self, skill: torch.Tensor):
         states, actions, rewards, next_states, terminations, log_probabilities = (
@@ -65,5 +86,12 @@ class DiversityIsAllYouNeed:
         )
 
         self.discriminator.train(states=states)
-        self.critic.train()
-        self.actor.train()
+        advantages = self.advantages(
+            states=states,
+            skills=skills,
+            rewards=rewards,
+            terminations=terminations,
+            next_states=next_states,
+        )
+        self.critic.train(advantages=advantages)
+        self.actor.train(advantages=advantages)
