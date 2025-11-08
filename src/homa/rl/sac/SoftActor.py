@@ -1,4 +1,5 @@
 import torch
+import numpy
 from .modules import SoftActorModule
 
 
@@ -41,8 +42,19 @@ class SoftActor:
         q = torch.min(q_alpha, q_beta)
         return (self.alpha * probabilities - q).mean()
 
-    def sample(self, state: torch.Tensor):
+    def process_state(self, state: numpy.ndarray) -> torch.Tensor:
+        state = torch.from_numpy(state)
+        if state.ndim < 2:
+            state = state.unsqueeze(0)
+        return state
+
+    def sample(self, state: numpy.ndarray):
+        state = self.process_state(state)
+
         mean, std = self.network(state)
+        # following line prevents standard deviations to be negative
+        std = std.exp()
+
         distribution = torch.distributions.Normal(mean, std)
 
         pre_tanh = distribution.rsample()

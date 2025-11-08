@@ -1,7 +1,7 @@
-from .concerns import ResetsCollection, SamplesItems
+from .concerns import ResetsCollection, HasRecordAlternatives
 
 
-class Buffer(ResetsCollection, SamplesItems):
+class Buffer(ResetsCollection, HasRecordAlternatives):
     def __init__(self, capacity: int):
         self.capacity: int = capacity
         self.reset()

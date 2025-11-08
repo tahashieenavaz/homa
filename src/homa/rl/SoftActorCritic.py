@@ -39,11 +39,12 @@ class SoftActorCritic:
             lr=critic_lr,
             weight_decay=critic_decay,
             tau=tau,
+            gamma=gamma,
         )
         self.buffer = ActorCriticBuffer(capacity=buffer_capacity)
 
     def train(self):
-        data = self.buffer.sample(self.batch_size)
+        data = self.buffer.sample_torch(self.batch_size)
         self.critic.train(
             states=data.states,
             actions=data.actions,

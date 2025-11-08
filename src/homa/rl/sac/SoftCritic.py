@@ -13,8 +13,10 @@ class SoftCritic:
         lr: float,
         weight_decay: float,
         tau: float,
+        gamma: float,
     ):
-        self.tau = tau
+        self.tau: float = tau
+        self.gamma: float = gamma
 
         self.network = DualSoftCriticModule(
             state_dimension=state_dimension,
