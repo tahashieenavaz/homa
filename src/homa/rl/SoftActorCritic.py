@@ -61,3 +61,4 @@ class SoftActorCritic:
             actor=self.actor,
         )
         self.actor.train(states=data.states, critic_network=self.critic.network)
+        self.critic.update()
