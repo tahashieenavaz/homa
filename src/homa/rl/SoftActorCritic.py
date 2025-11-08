@@ -1,5 +1,5 @@
 from .sac import SoftActor, SoftCritic
-from .buffers import ActorCriticBuffer
+from .buffers import SoftActorCriticBuffer
 
 
 class SoftActorCritic:
@@ -41,7 +41,7 @@ class SoftActorCritic:
             tau=tau,
             gamma=gamma,
         )
-        self.buffer = ActorCriticBuffer(capacity=buffer_capacity)
+        self.buffer = SoftActorCriticBuffer(capacity=buffer_capacity)
 
     def train(self):
         data = self.buffer.sample_torch(self.batch_size)
