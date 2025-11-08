@@ -10,7 +10,10 @@ class SoftActor:
         action_dimension: int,
         lr: float,
         weight_decay: float,
+        alpha: float,
     ):
+        self.alpha: float = alpha
+
         self.network = SoftActorModule(
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
