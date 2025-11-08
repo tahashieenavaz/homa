@@ -27,7 +27,7 @@ class ContinuousActorModule(torch.nn.Module):
             torch.nn.ReLU(),
             torch.nn.Linear(self.hidden_dimension, self.hidden_dimension),
             torch.nn.ReLU(),
-            torch.nn.Linear(self.hidden_dimension, self.action_dimension),
+            torch.nn.Linear(self.hidden_dimension, self.hidden_dimension),
         )
 
         self.mu = torch.nn.Linear(self.hidden_dimension, self.action_dimension)
