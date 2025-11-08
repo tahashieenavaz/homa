@@ -8,4 +8,4 @@ class Buffer(ResetsCollection, HasRecordAlternatives):
 
     @property
     def size(self):
-        return len(self.capacity)
+        return len(self.collection)
