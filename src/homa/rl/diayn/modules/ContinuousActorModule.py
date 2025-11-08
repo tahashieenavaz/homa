@@ -32,6 +32,9 @@ class ContinuousActorModule(torch.nn.Module):
         self.xi = torch.nn.Linear(self.hidden_dimension, self.action_dimension)
 
     def forward(self, state: torch.Tensor, skill: torch.Tensor) -> torch.Tensor:
+        # fix the size to be one state per batch
+        state = state.view(state.size(0), -1)
+
         psi = torch.cat([state, skill], dim=-1)
         features = self.phi(psi)
         mean = self.mu(features)
