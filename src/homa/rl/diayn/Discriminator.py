@@ -35,7 +35,12 @@ class Discriminator(MovesNetworkToDevice):
         entropy = numpy.log(1.0 / self.num_skills)
         if skill_index.dim() == 1:
             skill_index = skill_index.unsqueeze(-1)
-        reward = probabilities.gather(1, skill_index.long()) - entropy
+        try:
+            reward = probabilities.gather(1, skill_index.long()) - entropy
+            print(reward.shape, probabilities.shape, skill_index.shape)
+        except:
+            print(probabilities.shape, skill_index.shape)
+            exit(1)
         return reward.squeeze(-1)
 
     def train(self, states: torch.Tensor, skills_indices: torch.Tensor):

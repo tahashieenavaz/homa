@@ -80,7 +80,11 @@ class DiversityIsAllYouNeed:
 
     def train(self, skill: torch.Tensor):
         data = self.buffer.all_tensor()
-        self.discriminator.train(states=data.states)
+        skill_indices = skill.repeat(data.states.size(0), 1).long()
+        skills_indices_one_hot = self.one_hot(skill_indices, self.num_skills)
+        self.discriminator.train(
+            states=data.states, skills_indices=skills_indices_one_hot
+        )
         advantages = self.advantages(
             states=data.states,
             rewards=data.rewards,

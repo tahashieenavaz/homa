@@ -18,12 +18,12 @@ class DiversityIsAllYouNeedBuffer(Buffer, HasRecordAlternatives):
         )
 
         if tensor:
-            states = torch.cat(states)
-            actions = torch.cat(actions)
-            rewards = torch.cat(rewards)
-            next_states = torch.cat(next_states)
-            terminations = torch.cat(terminations)
-            probabilities = torch.cat(probabilities)
+            states = torch.from_numpy(numpy.array(states))
+            actions = torch.from_numpy(numpy.array(actions))
+            rewards = torch.from_numpy(numpy.array(rewards))
+            next_states = torch.from_numpy(numpy.array(next_states))
+            terminations = torch.from_numpy(numpy.array(terminations))
+            probabilities = torch.from_numpy(numpy.array(probabilities))
 
         return SimpleNamespace(
             **{
