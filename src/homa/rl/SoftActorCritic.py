@@ -15,8 +15,8 @@ class SoftActorCritic:
         actor_decay: float = 0.0,
         critic_decay: float = 0.0,
         tau: float = 0.005,
-        gamma: float = 0.99,
         alpha: float = 0.2,
+        gamma: float = 0.99,
     ):
         self.batch_size: int = batch_size
 
@@ -26,6 +26,7 @@ class SoftActorCritic:
             hidden_dimension=hidden_dimension,
             lr=actor_lr,
             weight_decay=actor_decay,
+            alpha=alpha,
         )
         self.critic = SoftCritic(
             state_dimension=state_dimension,
@@ -33,10 +34,18 @@ class SoftActorCritic:
             hidden_dimension=hidden_dimension,
             lr=critic_lr,
             weight_decay=critic_decay,
+            tau=tau,
         )
         self.buffer = ActorCriticBuffer(capacity=buffer_capacity)
 
     def train(self):
         data = self.buffer.sample(self.batch_size)
-        self.critic.train()
-        self.actor.train()
+        self.critic.train(
+            states=data.states,
+            actions=data.actions,
+            rewards=data.rewards,
+            terminations=data.terminations,
+            next_states=data.next_states,
+            actor=self.actor.network,
+        )
+        self.actor.train(states=data.states, critic_network=self.critic.network)

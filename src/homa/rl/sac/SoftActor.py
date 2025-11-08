@@ -20,14 +20,19 @@ class SoftActor:
             self.network.parameters(), lr=lr, weight_decay=weight_decay
         )
 
-    def train(self):
+    def train(self, states: torch.Tensor, critic_network: torch.nn.Module):
         self.optimizer.zero_grad()
-        loss = self.loss()
+        loss = self.loss(states=states, critic_network=critic_network)
         loss.backward()
         self.optimizer.step()
 
-    def loss(self):
-        pass
+    def loss(
+        self, states: torch.Tensor, critic_network: torch.nn.Module
+    ) -> torch.Tensor:
+        actions, probabilities = self.sample(states=states)
+        q_alpha, q_beta = critic_network(states, actions)
+        q = torch.min(q_alpha, q_beta)
+        return (self.alpha * probabilities - q).mean()
 
     def sample(self, state: torch.Tensor):
         mean, std = self.network(state)
