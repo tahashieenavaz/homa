@@ -11,6 +11,8 @@ class SoftActor:
         lr: float,
         weight_decay: float,
         alpha: float,
+        min_std: float,
+        max_std: float,
     ):
         self.alpha: float = alpha
 
@@ -18,6 +20,8 @@ class SoftActor:
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
             action_dimension=action_dimension,
+            min_std=min_std,
+            max_std=max_std,
         )
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=weight_decay

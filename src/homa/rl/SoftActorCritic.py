@@ -17,6 +17,8 @@ class SoftActorCritic:
         tau: float = 0.005,
         alpha: float = 0.2,
         gamma: float = 0.99,
+        min_std: float = -20,
+        max_std: float = 2,
     ):
         self.batch_size: int = batch_size
 
@@ -27,6 +29,8 @@ class SoftActorCritic:
             lr=actor_lr,
             weight_decay=actor_decay,
             alpha=alpha,
+            min_std=min_std,
+            max_std=max_std,
         )
         self.critic = SoftCritic(
             state_dimension=state_dimension,
