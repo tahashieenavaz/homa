@@ -4,7 +4,7 @@ import torch
 from .Buffer import Buffer
 
 
-class ActorCriticBuffer(Buffer):
+class SoftActorCriticBuffer(Buffer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -21,7 +21,7 @@ class ActorCriticBuffer(Buffer):
             (state, action, reward, next_state, termination, probability)
         )
 
-    def sample(self, k: int, tensor: bool = False):
+    def sample(self, k: int, as_tensor: bool = False):
         batch = random.choice(self.collection, k=k)
         states, actions, rewards, next_states, terminations, probabilities = zip(*batch)
 
@@ -32,7 +32,7 @@ class ActorCriticBuffer(Buffer):
         terminations = numpy.array(terminations)
         probabilities = numpy.array(probabilities)
 
-        if tensor:
+        if as_tensor:
             states = torch.from_numpy(states).float()
             actions = torch.from_numpy(actions).long()
             rewards = torch.from_numpy(rewards).float()
@@ -43,4 +43,4 @@ class ActorCriticBuffer(Buffer):
         return states, actions, rewards, next_states, terminations, probabilities
 
     def sample_torch(self, k: int):
-        return self.sample(k=k, torch=True)
+        return self.sample(k=k, as_tensor=True)
