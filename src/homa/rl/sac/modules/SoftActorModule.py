@@ -1,7 +1,7 @@
 import torch
 
 
-class SoftActorModule(torch.nn.Moudle):
+class SoftActorModule(torch.nn.Module):
     def __init__(
         self,
         state_dimension: int,

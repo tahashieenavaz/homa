@@ -1,7 +1,7 @@
 import torch
 
 
-class SoftCriticModule(torch.nn.Moudle):
+class SoftCriticModule(torch.nn.Module):
     def __init__(
         self,
         state_dimension: int,
