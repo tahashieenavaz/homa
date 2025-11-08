@@ -23,7 +23,6 @@ class Actor(MovesNetworkToDevice):
             action_dimension=action_dimension,
             hidden_dimension=hidden_dimension,
             num_skills=num_skills,
-            epsilon=epsilon,
             min_std=min_std,
             max_std=max_std,
         )
