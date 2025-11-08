@@ -16,6 +16,11 @@ class SoftCritic:
             hidden_dimension=hidden_dimension,
             action_dimension=action_dimension,
         )
+        self.target = DualSoftCriticModule(
+            state_dimension=state_dimension,
+            hidden_dimension=hidden_dimension,
+            action_dimension=action_dimension,
+        )
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=weight_decay
         )
