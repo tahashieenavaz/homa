@@ -22,7 +22,7 @@ class SoftActorCriticBuffer(Buffer):
         )
 
     def sample(self, k: int, as_tensor: bool = False):
-        batch = random.choice(self.collection, k=k)
+        batch = random.choice(self.collection, k)
         states, actions, rewards, next_states, terminations, probabilities = zip(*batch)
 
         states = numpy.array(states)
