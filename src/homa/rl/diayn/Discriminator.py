@@ -13,6 +13,7 @@ class Discriminator(MovesNetworkToDevice):
         decay: float,
         lr: float,
     ):
+        self.num_skills: int = num_skills
         self.network = DiscriminatorModule(
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
