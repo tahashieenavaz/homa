@@ -1,7 +1,8 @@
 import torch
 from torch.nn.functional import mse_loss as mse
-from .modules import DualSoftCriticModule
 from typing import Type
+from .modules import DualSoftCriticModule
+from .SoftActor import SoftActor
 
 
 class SoftCritic:
@@ -14,9 +15,11 @@ class SoftCritic:
         weight_decay: float,
         tau: float,
         gamma: float,
+        alpha: float,
     ):
         self.tau: float = tau
         self.gamma: float = gamma
+        self.alpha: float = alpha
 
         self.network = DualSoftCriticModule(
             state_dimension=state_dimension,
@@ -77,7 +80,7 @@ class SoftCritic:
         rewards: torch.Tensor,
         terminations: torch.Tensor,
         next_states: torch.Tensor,
-        actor: torch.nn.Module,
+        actor: SoftActor,
     ):
         next_actions, next_probabilities = actor.sample(next_states)
         q_alpha, q_beta = self.target(next_states, next_actions)

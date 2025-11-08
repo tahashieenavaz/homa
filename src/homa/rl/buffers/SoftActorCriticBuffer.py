@@ -1,6 +1,7 @@
 import numpy
 import random
 import torch
+from types import SimpleNamespace
 from .Buffer import Buffer
 
 
@@ -26,6 +27,7 @@ class SoftActorCriticBuffer(Buffer):
         states, actions, rewards, next_states, terminations, probabilities = zip(*batch)
 
         states = numpy.array(states)
+        print(actions, type(actions))
         actions = numpy.array(actions)
         rewards = numpy.array(rewards)
         next_states = numpy.array(next_states)
@@ -40,7 +42,16 @@ class SoftActorCriticBuffer(Buffer):
             terminations = torch.from_numpy(terminations).float()
             probabilities = torch.from_numpy(probabilities).float()
 
-        return states, actions, rewards, next_states, terminations, probabilities
+        return SimpleNamespace(
+            **{
+                "states": states,
+                "actions": actions,
+                "rewards": rewards,
+                "next_states": next_states,
+                "terminations": terminations,
+                "probabilities": probabilities,
+            }
+        )
 
     def sample_torch(self, k: int):
         return self.sample(k=k, as_tensor=True)

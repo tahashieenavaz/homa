@@ -42,6 +42,7 @@ class SoftActorCritic:
             weight_decay=critic_decay,
             tau=tau,
             gamma=gamma,
+            alpha=alpha,
         )
         self.buffer = SoftActorCriticBuffer(capacity=buffer_capacity)
 
@@ -57,6 +58,6 @@ class SoftActorCritic:
             rewards=data.rewards,
             terminations=data.terminations,
             next_states=data.next_states,
-            actor=self.actor.network,
+            actor=self.actor,
         )
         self.actor.train(states=data.states, critic_network=self.critic.network)

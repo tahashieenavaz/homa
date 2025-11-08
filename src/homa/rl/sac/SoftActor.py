@@ -37,18 +37,21 @@ class SoftActor:
     def loss(
         self, states: torch.Tensor, critic_network: torch.nn.Module
     ) -> torch.Tensor:
-        actions, probabilities = self.sample(states=states)
+        actions, probabilities = self.sample(states)
         q_alpha, q_beta = critic_network(states, actions)
         q = torch.min(q_alpha, q_beta)
         return (self.alpha * probabilities - q).mean()
 
-    def process_state(self, state: numpy.ndarray) -> torch.Tensor:
-        state = torch.from_numpy(state)
+    def process_state(self, state: numpy.ndarray | torch.Tensor) -> torch.Tensor:
+        if isinstance(state, numpy.ndarray):
+            state = torch.from_numpy(state)
+
         if state.ndim < 2:
             state = state.unsqueeze(0)
+
         return state
 
-    def sample(self, state: numpy.ndarray):
+    def sample(self, state: numpy.ndarray | torch.Tensor):
         state = self.process_state(state)
 
         mean, std = self.network(state)
