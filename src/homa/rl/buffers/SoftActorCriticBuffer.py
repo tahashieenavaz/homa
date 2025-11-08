@@ -27,7 +27,6 @@ class SoftActorCriticBuffer(Buffer):
         states, actions, rewards, next_states, terminations, probabilities = zip(*batch)
 
         states = numpy.array(states)
-        print(actions, type(actions))
         actions = numpy.array(actions)
         rewards = numpy.array(rewards)
         next_states = numpy.array(next_states)
