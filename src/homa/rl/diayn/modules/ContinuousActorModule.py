@@ -8,7 +8,6 @@ class ContinuousActorModule(torch.nn.Module):
         action_dimension: int,
         hidden_dimension: int,
         num_skills: int,
-        epsilon: float,
         min_std: float,
         max_std: float,
     ):
@@ -17,7 +16,6 @@ class ContinuousActorModule(torch.nn.Module):
         self.action_dimension: int = action_dimension
         self.num_skills: int = num_skills
         self.hidden_dimension: int = hidden_dimension
-        self.epsilon: float = epsilon
         self.input_dimension: int = self.state_dimension + self.num_skills
         self.min_std: float = min_std
         self.max_std: float = max_std

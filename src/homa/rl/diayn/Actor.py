@@ -17,6 +17,7 @@ class Actor(MovesNetworkToDevice):
         min_std: float,
         max_std: float,
     ):
+        self.epsilon: float = epsilon
         self.network = ContinuousActorModule(
             state_dimension=state_dimension,
             action_dimension=action_dimension,
@@ -29,7 +30,6 @@ class Actor(MovesNetworkToDevice):
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=decay
         )
-        self.criterion = False
 
     def action(self, state: torch.Tensor, skill: torch.Tensor):
         mean, std = self.network(state, skill)
