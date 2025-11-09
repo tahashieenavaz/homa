@@ -29,6 +29,7 @@ class SoftActor:
         )
 
     def train(self, states: torch.Tensor, critic_network: torch.nn.Module):
+        self.network.train()
         self.optimizer.zero_grad()
         loss = self.loss(states=states, critic_network=critic_network)
         loss.backward()

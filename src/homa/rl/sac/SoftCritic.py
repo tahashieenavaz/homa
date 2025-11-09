@@ -48,6 +48,7 @@ class SoftCritic:
         next_states: torch.Tensor,
         actor: SoftActor,
     ):
+        self.network.train()
         self.optimizer.zero_grad()
         loss = self.loss(
             states=states,
