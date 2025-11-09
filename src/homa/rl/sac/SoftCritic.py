@@ -2,6 +2,7 @@ import torch
 from torch.nn.functional import mse_loss as mse
 from .modules import DualSoftCriticModule
 from .SoftActor import SoftActor
+from ..utils import soft_update
 
 
 class SoftCritic:
@@ -92,11 +93,6 @@ class SoftCritic:
         entropy_q = q - self.alpha * next_probabilities
         return rewards + self.gamma * termination_mask * entropy_q
 
-    @torch.no_grad()
-    def soft_update(self, network: torch.nn.Module, target: torch.nn.Module):
-        for s, t in zip(network.parameters(), target.parameters()):
-            t.data.copy_(self.tau * s.data + (1 - self.tau) * t.data)
-
     def update(self):
-        self.soft_update(self.network.alpha, self.target.alpha)
-        self.soft_update(self.network.beta, self.target.beta)
+        soft_update(network=self.network.alpha, target=self.target.alpha)
+        soft_update(network=self.network.beta, target=self.target.beta)
