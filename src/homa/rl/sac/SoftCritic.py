@@ -31,6 +31,10 @@ class SoftCritic:
             hidden_dimension=hidden_dimension,
             action_dimension=action_dimension,
         )
+
+        # copy source to target when initiated
+        self.target.load_state_dict(self.network.state_dict())
+
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=weight_decay
         )
@@ -82,10 +86,10 @@ class SoftCritic:
         next_states: torch.Tensor,
         actor: SoftActor,
     ):
+        termination_mask = 1 - terminations
         next_actions, next_probabilities = actor.sample(next_states)
         q_alpha, q_beta = self.target(next_states, next_actions)
         q = torch.min(q_alpha, q_beta)
-        termination_mask = 1 - terminations
         entropy_q = q - self.alpha * next_probabilities * termination_mask
         return rewards + self.gamma * entropy_q
 
