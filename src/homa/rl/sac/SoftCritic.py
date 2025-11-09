@@ -13,11 +13,9 @@ class SoftCritic:
         action_dimension: int,
         lr: float,
         weight_decay: float,
-        tau: float,
         gamma: float,
         alpha: float,
     ):
-        self.tau: float = tau
         self.gamma: float = gamma
         self.alpha: float = alpha
 
@@ -94,6 +92,6 @@ class SoftCritic:
         entropy_q = q - self.alpha * next_probabilities
         return rewards + self.gamma * termination_mask * entropy_q
 
-    def update(self):
-        soft_update(network=self.network.alpha, target=self.target.alpha, tau=self.tau)
-        soft_update(network=self.network.beta, target=self.target.beta, tau=self.tau)
+    def update(self, tau: float):
+        soft_update(network=self.network.alpha, target=self.target.alpha, tau=tau)
+        soft_update(network=self.network.beta, target=self.target.beta, tau=tau)

@@ -23,6 +23,7 @@ class SoftActorCritic:
     ):
         self.batch_size: int = batch_size
         self.warmup: int = warmup
+        self.tau: float = tau
 
         self.actor = SoftActor(
             state_dimension=state_dimension,
@@ -61,4 +62,4 @@ class SoftActorCritic:
             actor=self.actor,
         )
         self.actor.train(states=data.states, critic_network=self.critic.network)
-        self.critic.update()
+        self.critic.update(tau=self.tau)
