@@ -35,7 +35,7 @@ class SoftActorCriticBuffer(Buffer):
 
         if as_tensor:
             states = torch.from_numpy(states).float()
-            actions = torch.from_numpy(actions).long()
+            actions = torch.from_numpy(actions).float()
             rewards = torch.from_numpy(rewards).float()
             next_states = torch.from_numpy(next_states).float()
             terminations = torch.from_numpy(terminations).float()
