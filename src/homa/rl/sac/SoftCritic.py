@@ -1,6 +1,5 @@
 import torch
 from torch.nn.functional import mse_loss as mse
-from typing import Type
 from .modules import DualSoftCriticModule
 from .SoftActor import SoftActor
 
