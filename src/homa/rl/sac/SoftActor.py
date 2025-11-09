@@ -65,6 +65,6 @@ class SoftActor:
         action = torch.tanh(pre_tanh)
 
         probabilities = distribution.log_prob(pre_tanh).sum(dim=1, keepdim=True)
-        correction = torch.log(1 - action.pow(2) + 1e-6).sum(dim=1, keepdim=True)
+        probabilities -= torch.log(1 - action.pow(2) + 1e-6).sum(dim=1, keepdim=True)
 
-        return action, probabilities - correction
+        return action, probabilities
