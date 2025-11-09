@@ -94,5 +94,5 @@ class SoftCritic:
         return rewards + self.gamma * termination_mask * entropy_q
 
     def update(self):
-        soft_update(network=self.network.alpha, target=self.target.alpha)
-        soft_update(network=self.network.beta, target=self.target.beta)
+        soft_update(network=self.network.alpha, target=self.target.alpha, tau=self.tau)
+        soft_update(network=self.network.beta, target=self.target.beta, tau=self.tau)
