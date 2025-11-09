@@ -19,7 +19,7 @@ class SoftActorCritic:
         gamma: float = 0.99,
         min_std: float = -20,
         max_std: float = 2,
-        warmup: int = 10_000,
+        warmup: int = 20_000,
     ):
         self.batch_size: int = batch_size
         self.warmup: int = warmup
