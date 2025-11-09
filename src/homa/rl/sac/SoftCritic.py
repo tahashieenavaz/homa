@@ -45,7 +45,7 @@ class SoftCritic:
         rewards: torch.Tensor,
         terminations: torch.Tensor,
         next_states: torch.Tensor,
-        actor: torch.nn.Module,
+        actor: SoftActor,
     ):
         self.optimizer.zero_grad()
         loss = self.loss(
@@ -89,8 +89,8 @@ class SoftCritic:
         next_actions, next_probabilities = actor.sample(next_states)
         q_alpha, q_beta = self.target(next_states, next_actions)
         q = torch.min(q_alpha, q_beta)
-        entropy_q = q - self.alpha * next_probabilities * termination_mask
-        return rewards + self.gamma * entropy_q
+        entropy_q = q - self.alpha * next_probabilities
+        return rewards + self.gamma * termination_mask * entropy_q
 
     @torch.no_grad()
     def soft_update(self, network: torch.nn.Module, target: torch.nn.Module):
