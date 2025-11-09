@@ -68,7 +68,7 @@ class SoftCritic:
         next_states: torch.Tensor,
         actor: torch.nn.Module,
     ):
-        q_alpha, q_beta = self.target(states, actions)
+        q_alpha, q_beta = self.network(states, actions)
         target = self.calculate_target(
             rewards=rewards,
             terminations=terminations,
