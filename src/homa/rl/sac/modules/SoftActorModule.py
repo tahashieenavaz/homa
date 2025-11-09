@@ -30,6 +30,6 @@ class SoftActorModule(torch.nn.Module):
     def forward(self, state: torch.Tensor):
         features = self.phi(state)
         mean = self.mu(features)
-        std = self.mu(features)
+        std = self.xi(features)
         std = std.clamp(self.min_std, self.max_std)
         return mean, std
