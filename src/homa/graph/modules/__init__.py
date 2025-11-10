@@ -1,2 +1,0 @@
-from .GraphAttentionHeadModule import GraphAttentionHeadModule
-from .MultiHeadGraphAttentionModule import MultiHeadGraphAttentionModule

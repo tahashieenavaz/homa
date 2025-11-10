@@ -1,22 +1,33 @@
 import torch
-from .GraphAttentionHeadModule import GraphAttentionHeadModule
+from .GraphAttentionHeadModule import GraphAttentionHead
 
 
 class MultiHeadGraphAttentionModule(torch.nn.Module):
-    def __init__(self, num_heads: int, in_features: int, out_features: int, alpha=0.2):
+    def __init__(
+        self,
+        input_dimension: int,
+        output_dimension: int,
+        num_heads: int,
+        dropout: float,
+        alpha: float,
+        concat: bool,
+    ):
         super().__init__()
-        self.num_heads = num_heads
-        self.head_out_features = out_features
         self.heads = torch.nn.ModuleList(
             [
-                GraphAttentionHeadModule(in_features, out_features, alpha=alpha)
+                GraphAttentionHead(input_dimension, output_dimension, dropout, alpha)
                 for _ in range(num_heads)
             ]
         )
+        self.concat: bool = concat
 
-    def forward(
-        self, node_features: torch.Tensor, adj_matrix: torch.Tensor
-    ) -> torch.Tensor:
-        outputs = [head(node_features, adj_matrix) for head in self.heads]
-        h_new_concat = torch.cat(outputs, dim=1)
-        return h_new_concat
+    def forward(self, features: torch.Tensor, adjacency_matrix: torch.Tensor):
+        features = [head(features, adjacency_matrix) for head in self.heads]
+
+        # aggregate
+        if self.concat:
+            features = torch.cat(features, dim=1)
+        else:
+            features = torch.mean(torch.stack(features), dim=0)
+
+        return features
