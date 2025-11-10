@@ -10,4 +10,5 @@ class ReportsClassificationMetrics(
     ReportsEnsembleF1,
     ReportsEnsembleKappa,
 ):
-    pass
+    def __init__(self):
+        super().__init__()
