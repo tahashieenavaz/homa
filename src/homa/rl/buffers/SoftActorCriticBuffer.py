@@ -33,6 +33,10 @@ class SoftActorCriticBuffer(Buffer):
         terminations = numpy.array(terminations)
         probabilities = numpy.array(probabilities)
 
+        # add one dimension to both rewards and terminations
+        rewards = numpy.expand_dims(rewards, axis=-1)
+        terminations = numpy.expand_dims(terminations, axis=-1)
+
         if as_tensor:
             states = torch.from_numpy(states).float()
             actions = torch.from_numpy(actions).float()
