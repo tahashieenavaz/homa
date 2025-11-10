@@ -1,4 +1,4 @@
-from .module import QuantileCriticModule
+from .modules import QuantileCriticModule
 
 
 class QuantileCritic:
