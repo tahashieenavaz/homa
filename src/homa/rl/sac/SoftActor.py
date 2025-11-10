@@ -45,7 +45,7 @@ class SoftActor:
 
     def process_state(self, state: numpy.ndarray | torch.Tensor) -> torch.Tensor:
         if isinstance(state, numpy.ndarray):
-            state = torch.from_numpy(state)
+            state = torch.from_numpy(state).float()
 
         if state.ndim < 2:
             state = state.unsqueeze(0)
