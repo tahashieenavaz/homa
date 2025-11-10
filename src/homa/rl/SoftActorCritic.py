@@ -1,8 +1,9 @@
 from .sac import SoftActor, SoftCritic
 from .buffers import SoftActorCriticBuffer
+from ..core.concerns import TracksTime
 
 
-class SoftActorCritic:
+class SoftActorCritic(TracksTime):
     def __init__(
         self,
         state_dimension: int,
@@ -21,6 +22,8 @@ class SoftActorCritic:
         max_std: float = 2,
         warmup: int = 20_000,
     ):
+        super().__init__()
+
         self.batch_size: int = batch_size
         self.warmup: int = warmup
         self.tau: float = tau
