@@ -6,7 +6,7 @@ class ReportsLogits:
         super().__init__()
 
     def logits(self, x: torch.Tensor) -> torch.Tensor:
-        batch_size = x.shape[0]
+        batch_size = x.size(0)
         logits = torch.zeros((batch_size, self.num_classes))
         for factory, weight in zip(self.factories, self.weights):
             model = factory(num_classes=self.num_classes)
