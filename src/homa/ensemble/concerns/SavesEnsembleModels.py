@@ -1,6 +1,6 @@
 class SavesEnsembleModels:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__()
 
     def save(self):
         self.save_factories()
