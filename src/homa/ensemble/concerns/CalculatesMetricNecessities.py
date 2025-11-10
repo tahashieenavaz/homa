@@ -3,8 +3,8 @@ from ...device import get_device
 
 
 class CalculatesMetricNecessities:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__()
 
     @torch.no_grad()
     def metric_necessities(self, dataloader):
