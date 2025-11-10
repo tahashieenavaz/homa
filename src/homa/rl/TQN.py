@@ -1,0 +1,2 @@
+class TQN:
+    pass
