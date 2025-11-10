@@ -5,6 +5,7 @@ import torch
 from typing import TYPE_CHECKING
 from .modules import SoftActorModule
 from ...core.concerns import MovesModulesToDevice
+from ...device import get_device
 
 if TYPE_CHECKING:
     from .SoftCritic import SoftCritic
@@ -51,12 +52,17 @@ class SoftActor(MovesModulesToDevice):
         q = torch.min(q_zeta, q_eta)
         return (self.alpha * probabilities - q).mean()
 
-    def process_state(self, state: numpy.ndarray | torch.Tensor) -> torch.Tensor:
+    def process_state(
+        self, state: numpy.ndarray | torch.Tensor, move_to_device: bool = True
+    ) -> torch.Tensor:
         if isinstance(state, numpy.ndarray):
             state = torch.from_numpy(state).float()
 
         if state.ndim < 2:
             state = state.unsqueeze(0)
+
+        if move_to_device:
+            state = state.to(get_device())
 
         return state
 

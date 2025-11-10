@@ -3,7 +3,7 @@ import random
 import torch
 from types import SimpleNamespace
 from .Buffer import Buffer
-from ...device import move
+from ...device import get_device
 
 
 class SoftActorCriticBuffer(Buffer):
@@ -47,7 +47,13 @@ class SoftActorCriticBuffer(Buffer):
             probabilities = torch.from_numpy(probabilities).float()
 
         if as_tensor and move_to_device:
-            move(states, actions, rewards, next_states, terminations, probabilities)
+            _device = get_device()
+            states = states.to(_device)
+            actions = actions.to(_device)
+            rewards = rewards.to(_device)
+            next_states = next_states.to(_device)
+            terminations = terminations.to(_device)
+            probabilities = probabilities.to(_device)
 
         return SimpleNamespace(
             **{
