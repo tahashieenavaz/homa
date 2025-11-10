@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import numpy
 import torch
-from __future__ import annotations
 from typing import TYPE_CHECKING
 from .modules import SoftActorModule
 from ...core.concerns import MovesNetworkToDevice

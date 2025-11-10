@@ -1,5 +1,6 @@
-import torch
 from __future__ import annotations
+
+import torch
 from typing import TYPE_CHECKING
 from torch.nn.functional import mse_loss as mse
 from .modules import DualSoftCriticModule
