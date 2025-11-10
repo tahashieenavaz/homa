@@ -69,5 +69,5 @@ class SoftActor(MovesNetworkToDevice):
         z = distribution.rsample()
         action = torch.tanh(z)
         log_probability = distribution.log_prob(z) - torch.log(1 - action.pow(2) + 1e-6)
-        log_probability.sum(dim=1, keepdim=True)
+        log_probability = log_probability.sum(dim=1, keepdim=True)
         return action, log_probability
