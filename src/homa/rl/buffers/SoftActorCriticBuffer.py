@@ -46,8 +46,8 @@ class SoftActorCriticBuffer(Buffer):
             terminations = torch.from_numpy(terminations).float()
             probabilities = torch.from_numpy(probabilities).float()
 
-            if move_to_device:
-                move(states, actions, rewards, next_states, terminations, probabilities)
+        if as_tensor and move_to_device:
+            move(states, actions, rewards, next_states, terminations, probabilities)
 
         return SimpleNamespace(
             **{
