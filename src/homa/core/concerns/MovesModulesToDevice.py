@@ -13,4 +13,4 @@ class MovesModulesToDevice:
 
             attribute = getattr(self, module)
             if isinstance(attribute, torch.nn.Module):
-                move(self.network)
+                move(attribute)
