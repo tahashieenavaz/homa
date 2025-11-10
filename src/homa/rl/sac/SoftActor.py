@@ -2,9 +2,10 @@ import torch
 import numpy
 from .SoftCritic import SoftCritic
 from .modules import SoftActorModule
+from ...core.concerns import MovesNetworkToDevice
 
 
-class SoftActor:
+class SoftActor(MovesNetworkToDevice):
     def __init__(
         self,
         state_dimension: int,

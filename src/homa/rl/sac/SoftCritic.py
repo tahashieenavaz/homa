@@ -3,9 +3,10 @@ from torch.nn.functional import mse_loss as mse
 from .modules import DualSoftCriticModule
 from .SoftActor import SoftActor
 from ..utils import soft_update
+from ...core.concerns import MovesNetworkToDevice
 
 
-class SoftCritic:
+class SoftCritic(MovesNetworkToDevice):
     def __init__(
         self,
         state_dimension: int,
