@@ -25,5 +25,6 @@ def device():
     return get_device()
 
 
-def move(module: torch.nn.Module):
-    module.to(get_device())
+def move(*modules):
+    for module in modules:
+        module.to(get_device())

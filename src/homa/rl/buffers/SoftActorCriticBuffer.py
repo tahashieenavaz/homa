@@ -3,6 +3,7 @@ import random
 import torch
 from types import SimpleNamespace
 from .Buffer import Buffer
+from ...device import move
 
 
 class SoftActorCriticBuffer(Buffer):
@@ -22,7 +23,7 @@ class SoftActorCriticBuffer(Buffer):
             (state, action, reward, next_state, termination, probability)
         )
 
-    def sample(self, k: int, as_tensor: bool = False):
+    def sample(self, k: int, as_tensor: bool = False, move_to_device: bool = True):
         batch = random.sample(self.collection, k)
         states, actions, rewards, next_states, terminations, probabilities = zip(*batch)
 
@@ -44,6 +45,9 @@ class SoftActorCriticBuffer(Buffer):
             next_states = torch.from_numpy(next_states).float()
             terminations = torch.from_numpy(terminations).float()
             probabilities = torch.from_numpy(probabilities).float()
+
+            if move_to_device:
+                move(states, actions, rewards, next_states, terminations, probabilities)
 
         return SimpleNamespace(
             **{
