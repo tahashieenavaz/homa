@@ -41,7 +41,6 @@ class SoftActorCritic:
             hidden_dimension=hidden_dimension,
             lr=critic_lr,
             weight_decay=critic_decay,
-            tau=tau,
             gamma=gamma,
             alpha=alpha,
         )
