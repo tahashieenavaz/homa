@@ -1,2 +1,2 @@
-from .MovesNetworkToDevice import MovesNetworkToDevice
+from .MovesModulesToDevice import MovesModulesToDevice
 from .TracksTime import TracksTime

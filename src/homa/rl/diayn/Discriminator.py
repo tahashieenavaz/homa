@@ -1,10 +1,10 @@
 import torch
 import numpy
 from .modules import DiscriminatorModule
-from ...core.concerns import MovesNetworkToDevice
+from ...core.concerns import MovesModulesToDevice
 
 
-class Discriminator(MovesNetworkToDevice):
+class Discriminator(MovesModulesToDevice):
     def __init__(
         self,
         state_dimension: int,
@@ -14,6 +14,7 @@ class Discriminator(MovesNetworkToDevice):
         lr: float,
     ):
         self.num_skills: int = num_skills
+
         self.network = DiscriminatorModule(
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
@@ -23,6 +24,7 @@ class Discriminator(MovesNetworkToDevice):
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = torch.nn.CrossEntropyLoss()
+        self.move_modules()
 
     def loss(self, states: torch.Tensor, skills_indices: torch.Tensor):
         logits = self.network(states)

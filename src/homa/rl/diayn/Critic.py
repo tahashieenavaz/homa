@@ -1,9 +1,9 @@
 import torch
 from .modules import CriticModule
-from ...core.concerns import MovesNetworkToDevice
+from ...core.concerns import MovesModulesToDevice
 
 
-class Critic(MovesNetworkToDevice):
+class Critic(MovesModulesToDevice):
     def __init__(
         self,
         state_dimension: int,
@@ -13,6 +13,8 @@ class Critic(MovesNetworkToDevice):
         decay: float,
         gamma: float,
     ):
+        self.gamma: float = gamma
+
         self.network = CriticModule(
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
@@ -22,7 +24,7 @@ class Critic(MovesNetworkToDevice):
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = torch.nn.SmoothL1Loss()
-        self.gamma: float = gamma
+        self.move_modules()
 
     def train(self, advantages: torch.Tensor):
         self.optimizer.zero_grad()

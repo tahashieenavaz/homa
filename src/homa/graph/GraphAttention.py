@@ -1,9 +1,9 @@
 import torch
 from .modules import GraphAttentionModule
-from ..core.concerns import MovesNetworkToDevice
+from ..core.concerns import MovesModulesToDevice
 
 
-class GraphAttention(MovesNetworkToDevice):
+class GraphAttention(MovesModulesToDevice):
     def __init__(
         self,
         input_dimension: int,
@@ -31,3 +31,4 @@ class GraphAttention(MovesNetworkToDevice):
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = torch.nn.CrossEntropyLoss()
+        self.move_modules()

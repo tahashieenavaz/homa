@@ -1,10 +1,10 @@
 import torch
 from torch.distributions import Normal
 from .modules import ContinuousActorModule
-from ...core.concerns import MovesNetworkToDevice
+from ...core.concerns import MovesModulesToDevice
 
 
-class Actor(MovesNetworkToDevice):
+class Actor(MovesModulesToDevice):
     def __init__(
         self,
         state_dimension: int,
@@ -29,6 +29,7 @@ class Actor(MovesNetworkToDevice):
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=decay
         )
+        self.move_modules()
 
     def action(self, state: torch.Tensor, skill: torch.Tensor):
         mean, std = self.network(state, skill)

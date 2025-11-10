@@ -4,13 +4,13 @@ import numpy
 import torch
 from typing import TYPE_CHECKING
 from .modules import SoftActorModule
-from ...core.concerns import MovesNetworkToDevice
+from ...core.concerns import MovesModulesToDevice
 
 if TYPE_CHECKING:
     from .SoftCritic import SoftCritic
 
 
-class SoftActor(MovesNetworkToDevice):
+class SoftActor(MovesModulesToDevice):
     def __init__(
         self,
         state_dimension: int,
@@ -35,6 +35,8 @@ class SoftActor(MovesNetworkToDevice):
             self.network.parameters(), lr=lr, weight_decay=weight_decay
         )
 
+        self.move_modules()
+
     def train(self, states: torch.Tensor, critic: SoftCritic):
         self.network.train()
         self.optimizer.zero_grad()
@@ -44,8 +46,9 @@ class SoftActor(MovesNetworkToDevice):
 
     def loss(self, states: torch.Tensor, critic: SoftCritic) -> torch.Tensor:
         actions, probabilities = self.sample(states)
-        q_alpha, q_beta = critic.network(states, actions)
-        q = torch.min(q_alpha, q_beta)
+        q_zeta = critic.zeta(states, actions)
+        q_eta = critic.eta(states, actions)
+        q = torch.min(q_zeta, q_eta)
         return (self.alpha * probabilities - q).mean()
 
     def process_state(self, state: numpy.ndarray | torch.Tensor) -> torch.Tensor:

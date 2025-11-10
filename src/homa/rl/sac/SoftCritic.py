@@ -3,15 +3,15 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 from torch.nn.functional import mse_loss as mse
-from .modules import DualSoftCriticModule
+from .modules import SoftCriticModule
 from ..utils import soft_update
-from ...core.concerns import MovesNetworkToDevice
+from ...core.concerns import MovesModulesToDevice
 
 if TYPE_CHECKING:
     from .SoftActor import SoftActor
 
 
-class SoftCritic(MovesNetworkToDevice):
+class SoftCritic(MovesModulesToDevice):
     def __init__(
         self,
         state_dimension: int,
@@ -25,22 +25,37 @@ class SoftCritic(MovesNetworkToDevice):
         self.gamma: float = gamma
         self.alpha: float = alpha
 
-        self.network = DualSoftCriticModule(
+        self.zeta = SoftCriticModule(
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
             action_dimension=action_dimension,
         )
-        self.target = DualSoftCriticModule(
+        self.eta = SoftCriticModule(
+            state_dimension=state_dimension,
+            hidden_dimension=hidden_dimension,
+            action_dimension=action_dimension,
+        )
+        self.zeta_target = SoftCriticModule(
+            state_dimension=state_dimension,
+            hidden_dimension=hidden_dimension,
+            action_dimension=action_dimension,
+        )
+        self.eta_target = SoftCriticModule(
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
             action_dimension=action_dimension,
         )
 
         # copy source to target when initiated
-        self.target.load_state_dict(self.network.state_dict())
+        self.zeta_target.load_state_dict(self.zeta.state_dict())
+        self.eta_target.load_state_dict(self.eta.state_dict())
+
+        self.move_modules()
 
         self.optimizer = torch.optim.AdamW(
-            self.network.parameters(), lr=lr, weight_decay=weight_decay
+            list(self.zeta.parameters()) + list(self.eta.parameters()),
+            lr=lr,
+            weight_decay=weight_decay,
         )
 
     def train(
@@ -52,7 +67,9 @@ class SoftCritic(MovesNetworkToDevice):
         next_states: torch.Tensor,
         actor: SoftActor,
     ):
-        self.network.train()
+        self.zeta.train()
+        self.eta.train()
+
         self.optimizer.zero_grad()
         loss = self.loss(
             states=states,
@@ -74,14 +91,15 @@ class SoftCritic(MovesNetworkToDevice):
         next_states: torch.Tensor,
         actor: torch.nn.Module,
     ):
-        q_alpha, q_beta = self.network(states, actions)
+        q_zeta = self.zeta(states, actions)
+        q_eta = self.eta(states, actions)
         target = self.calculate_target(
             rewards=rewards,
             terminations=terminations,
             next_states=next_states,
             actor=actor,
         )
-        return mse(q_alpha, target) + mse(q_beta, target)
+        return mse(q_zeta, target) + mse(q_eta, target)
 
     @torch.no_grad()
     def calculate_target(
@@ -93,11 +111,12 @@ class SoftCritic(MovesNetworkToDevice):
     ):
         termination_mask = 1 - terminations
         next_actions, next_probabilities = actor.sample(next_states)
-        q_alpha, q_beta = self.target(next_states, next_actions)
-        q = torch.min(q_alpha, q_beta)
-        entropy_q = q - self.alpha * next_probabilities
+        q_zeta_target = self.zeta_target(next_states, next_actions)
+        q_eta_target = self.eta_target(next_states, next_actions)
+        q_target = torch.min(q_zeta_target, q_eta_target)
+        entropy_q = q_target - self.alpha * next_probabilities
         return rewards + self.gamma * termination_mask * entropy_q
 
     def update(self, tau: float):
-        soft_update(network=self.network.alpha, target=self.target.alpha, tau=tau)
-        soft_update(network=self.network.beta, target=self.target.beta, tau=tau)
+        soft_update(network=self.zeta, target=self.zeta_target, tau=tau)
+        soft_update(network=self.eta, target=self.eta_target, tau=tau)

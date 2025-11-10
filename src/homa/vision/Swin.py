@@ -2,10 +2,10 @@ import torch
 from .Classifier import Classifier
 from .concerns import Trainable, ReportsMetrics
 from .modules import SwinModule
-from ..core.concerns import MovesNetworkToDevice
+from ..core.concerns import MovesModulesToDevice
 
 
-class Swin(Classifier, Trainable, ReportsMetrics, MovesNetworkToDevice):
+class Swin(Classifier, Trainable, ReportsMetrics, MovesModulesToDevice):
     def __init__(
         self,
         num_classes: int,
@@ -15,7 +15,9 @@ class Swin(Classifier, Trainable, ReportsMetrics, MovesNetworkToDevice):
         weights="DEFAULT",
     ):
         super().__init__()
+
         self.num_classes = num_classes
+
         self.network = SwinModule(
             num_classes=self.num_classes, variant=variant, weights=weights
         )
@@ -23,3 +25,4 @@ class Swin(Classifier, Trainable, ReportsMetrics, MovesNetworkToDevice):
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = torch.nn.CrossEntropyLoss()
+        self.move_modules()
