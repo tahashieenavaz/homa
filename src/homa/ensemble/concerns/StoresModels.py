@@ -5,8 +5,8 @@ from ...vision import Model
 
 
 class StoresModels:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__()
         self.factories: List[Type[torch.nn.Module]] = []
         self.weights: List[OrderedDict] = []
 
