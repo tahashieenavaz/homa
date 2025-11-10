@@ -61,15 +61,13 @@ class SoftActor(MovesNetworkToDevice):
         state = self.process_state(state)
 
         mean, std = self.network(state)
+
         # following line prevents standard deviations to be negative
         std = std.exp()
 
         distribution = torch.distributions.Normal(mean, std)
-
-        pre_tanh = distribution.rsample()
-        action = torch.tanh(pre_tanh)
-
-        probabilities = distribution.log_prob(pre_tanh).sum(dim=1, keepdim=True)
-        probabilities -= torch.log(1 - action.pow(2) + 1e-6).sum(dim=1, keepdim=True)
-
-        return action, probabilities
+        z = distribution.rsample()
+        action = torch.tanh(z)
+        log_probability = distribution.log_prob(z) - torch.log(1 - action.pow(2) + 1e-6)
+        log_probability.sum(dim=1, keepdim=True)
+        return action, log_probability
