@@ -1,9 +1,13 @@
 import torch
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from torch.nn.functional import mse_loss as mse
 from .modules import DualSoftCriticModule
-from .SoftActor import SoftActor
 from ..utils import soft_update
 from ...core.concerns import MovesNetworkToDevice
+
+if TYPE_CHECKING:
+    from .SoftActor import SoftActor
 
 
 class SoftCritic(MovesNetworkToDevice):
