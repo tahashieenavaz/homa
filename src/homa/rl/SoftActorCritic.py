@@ -9,7 +9,7 @@ class SoftActorCritic(TracksTime):
         state_dimension: int,
         action_dimension: int,
         hidden_dimension: int = 256,
-        buffer_capacity: int = 100_000,
+        buffer_capacity: int = 1_000_000,
         batch_size: int = 256,
         actor_lr: float = 0.0002,
         critic_lr: float = 0.0003,
