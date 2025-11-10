@@ -20,12 +20,10 @@ class SoftActorCritic(TracksTime):
         gamma: float = 0.99,
         min_std: float = -20,
         max_std: float = 2,
-        warmup: int = 20_000,
     ):
         super().__init__()
 
         self.batch_size: int = batch_size
-        self.warmup: int = warmup
         self.tau: float = tau
 
         self.actor = SoftActor(
@@ -50,8 +48,8 @@ class SoftActorCritic(TracksTime):
         self.buffer = SoftActorCriticBuffer(capacity=buffer_capacity)
 
     def train(self):
-        # don't train before warmup
-        if self.buffer.size < self.warmup:
+        # don't train without sufficient samples
+        if self.buffer.size < self.batch_size:
             return
 
         data = self.buffer.sample_torch(self.batch_size)
