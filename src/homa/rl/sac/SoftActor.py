@@ -1,5 +1,6 @@
 import torch
 import numpy
+from .SoftCritic import SoftCritic
 from .modules import SoftActorModule
 
 
@@ -28,18 +29,16 @@ class SoftActor:
             self.network.parameters(), lr=lr, weight_decay=weight_decay
         )
 
-    def train(self, states: torch.Tensor, critic_network: torch.nn.Module):
+    def train(self, states: torch.Tensor, critic: SoftCritic):
         self.network.train()
         self.optimizer.zero_grad()
-        loss = self.loss(states=states, critic_network=critic_network)
+        loss = self.loss(states=states, critic=critic)
         loss.backward()
         self.optimizer.step()
 
-    def loss(
-        self, states: torch.Tensor, critic_network: torch.nn.Module
-    ) -> torch.Tensor:
+    def loss(self, states: torch.Tensor, critic: SoftCritic) -> torch.Tensor:
         actions, probabilities = self.sample(states)
-        q_alpha, q_beta = critic_network(states, actions)
+        q_alpha, q_beta = critic.network(states, actions)
         q = torch.min(q_alpha, q_beta)
         return (self.alpha * probabilities - q).mean()
 
