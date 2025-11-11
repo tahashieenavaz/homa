@@ -61,5 +61,5 @@ class SoftActorCritic(TracksTime):
             next_states=data.next_states,
             actor=self.actor,
         )
-        self.actor.train(states=data.states, critic=self.critic)
         self.critic.update(tau=self.tau)
+        self.actor.train(states=data.states, critic=self.critic)
