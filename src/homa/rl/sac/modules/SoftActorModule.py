@@ -18,6 +18,7 @@ class SoftActorModule(torch.nn.Module):
         self.action_dimension: int = action_dimension
         self.min_std: float = float(min_std)
         self.max_std: float = float(max_std)
+        self.std_difference: float = self.max_std - self.min_std
 
         self.phi = EncoderModule(
             input_dimension=state_dimension, hidden_dimension=hidden_dimension
@@ -34,5 +35,6 @@ class SoftActorModule(torch.nn.Module):
     def forward(self, state: torch.Tensor):
         features = self.phi(state)
         mean = self.mu(features)
-        std = self.xi(features).clamp(self.min_std, self.max_std)
-        return mean, std
+        log_std = self.xi(features)
+        log_std = self.min_std + (log_std + 1) * 0.5 * self.std_difference
+        return mean, log_std

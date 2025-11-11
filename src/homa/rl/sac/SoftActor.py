@@ -69,8 +69,8 @@ class SoftActor(MovesModulesToDevice):
     def sample(self, state: numpy.ndarray | torch.Tensor):
         state = self.process_state(state)
 
-        mean, std = self.network(state)
-        std = std.exp()
+        mean, log_std = self.network(state)
+        std = log_std.exp()
 
         distribution = torch.distributions.Normal(mean, std)
         z = distribution.rsample()
