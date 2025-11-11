@@ -12,7 +12,7 @@ class SoftCriticModule(torch.nn.Module):
         super().__init__()
 
         self.embedding = FeedForwardModule(
-            state_dimension=state_dimension, hidden_dimension=hidden_dimension
+            input_dimension=state_dimension, hidden_dimension=hidden_dimension
         )
         self.phi = torch.nn.Linear(
             action_dimension + hidden_dimension, hidden_dimension
