@@ -13,7 +13,7 @@ class SoftActorCriticBuffer(Buffer):
     def record(
         self,
         state: numpy.ndarray,
-        action: int,
+        action: numpy.ndarray,
         reward: float,
         next_state: numpy.ndarray,
         termination: float,
@@ -24,11 +24,11 @@ class SoftActorCriticBuffer(Buffer):
         batch = random.sample(self.collection, k)
         states, actions, rewards, next_states, terminations = zip(*batch)
 
-        states = numpy.array(states)
-        actions = numpy.array(actions)
-        rewards = numpy.array(rewards)
-        next_states = numpy.array(next_states)
-        terminations = numpy.array(terminations)
+        states = numpy.array(states, dtype=numpy.float32)
+        actions = numpy.array(actions, dtype=numpy.float32)
+        rewards = numpy.array(rewards, dtype=numpy.float32)
+        next_states = numpy.array(next_states, dtype=numpy.float32)
+        terminations = numpy.array(terminations, dtype=numpy.float32)
 
         # add one dimension to both rewards and terminations
         rewards = numpy.expand_dims(rewards, axis=-1)
