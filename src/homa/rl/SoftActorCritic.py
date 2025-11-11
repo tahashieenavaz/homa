@@ -1,6 +1,7 @@
-from .sac import SoftActor, SoftCritic
+from .sac import SoftActor, SoftCritic, SoftActorCriticTemperature
 from .buffers import SoftActorCriticBuffer
 from ..core.concerns import TracksTime
+from ..device import get_device
 
 
 class SoftActorCritic(TracksTime):
@@ -13,14 +14,16 @@ class SoftActorCritic(TracksTime):
         batch_size: int = 256,
         actor_lr: float = 0.0003,
         critic_lr: float = 0.0003,
+        temperature_lr: float = 0.0003,
         actor_decay: float = 0.0,
         critic_decay: float = 0.0,
+        temperature_decay: float = 0,
         tau: float = 0.005,
-        alpha: float = 0.2,
         gamma: float = 0.99,
         min_std: float = -20.0,
         max_std: float = 2.0,
         warmup: int = 20_000,
+        device: None | str = None,
     ):
         super().__init__()
 
@@ -28,13 +31,15 @@ class SoftActorCritic(TracksTime):
         self.tau: float = tau
         self.warmup: int = warmup
 
+        if device is None:
+            device = get_device()
+
         self.actor = SoftActor(
             state_dimension=state_dimension,
             action_dimension=action_dimension,
             hidden_dimension=hidden_dimension,
             lr=actor_lr,
             weight_decay=actor_decay,
-            alpha=alpha,
             min_std=min_std,
             max_std=max_std,
         )
@@ -45,7 +50,12 @@ class SoftActorCritic(TracksTime):
             lr=critic_lr,
             weight_decay=critic_decay,
             gamma=gamma,
-            alpha=alpha,
+        )
+        self.temperature = SoftActorCriticTemperature(
+            lr=temperature_lr,
+            weight_decay=temperature_decay,
+            action_dimension=action_dimension,
+            device=device,
         )
         self.buffer = SoftActorCriticBuffer(capacity=buffer_capacity)
 
@@ -58,6 +68,8 @@ class SoftActorCritic(TracksTime):
             return
 
         data = self.buffer.sample_torch(self.batch_size)
+        alpha = self.temperature.alpha
+        print(alpha)
         self.critic.train(
             states=data.states,
             actions=data.actions,
@@ -65,6 +77,8 @@ class SoftActorCritic(TracksTime):
             terminations=data.terminations,
             next_states=data.next_states,
             actor=self.actor,
+            alpha=alpha,
         )
         self.critic.update(tau=self.tau)
-        self.actor.train(states=data.states, critic=self.critic)
+        self.actor.train(states=data.states, critic=self.critic, alpha=alpha)
+        self.temperature.train()

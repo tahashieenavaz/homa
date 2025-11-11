@@ -1,5 +1,5 @@
 import torch
-from ...device import move
+from ...device import get_device
 
 
 class MovesModulesToDevice:
@@ -12,5 +12,15 @@ class MovesModulesToDevice:
                 continue
 
             attribute = getattr(self, module)
-            if isinstance(attribute, torch.nn.Module):
-                move(attribute)
+            _device = get_device()
+            if (
+                isinstance(attribute, torch.nn.Module)
+                or isinstance(attribute, torch.nn.Parameter)
+                or isinstance(attribute, torch.Tensor)
+            ):
+                if hasattr(attribute, "to"):
+                    try:
+                        setattr(self, module, attribute.to(_device))
+                    except (AttributeError, TypeError):
+                        # it passes properties
+                        pass

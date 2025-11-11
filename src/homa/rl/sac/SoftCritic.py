@@ -20,10 +20,8 @@ class SoftCritic(MovesModulesToDevice):
         lr: float,
         weight_decay: float,
         gamma: float,
-        alpha: float,
     ):
         self.gamma: float = gamma
-        self.alpha: float = alpha
 
         self.zeta = SoftCriticModule(
             state_dimension=state_dimension,
@@ -66,6 +64,7 @@ class SoftCritic(MovesModulesToDevice):
         terminations: torch.Tensor,
         next_states: torch.Tensor,
         actor: SoftActor,
+        alpha: float,
     ):
         self.zeta.train()
         self.eta.train()
@@ -78,6 +77,7 @@ class SoftCritic(MovesModulesToDevice):
             terminations=terminations,
             next_states=next_states,
             actor=actor,
+            alpha=alpha,
         )
         loss.backward()
         self.optimizer.step()
@@ -90,6 +90,7 @@ class SoftCritic(MovesModulesToDevice):
         terminations: torch.Tensor,
         next_states: torch.Tensor,
         actor: torch.nn.Module,
+        alpha: float,
     ):
         q_zeta = self.zeta(states, actions)
         q_eta = self.eta(states, actions)
@@ -98,6 +99,7 @@ class SoftCritic(MovesModulesToDevice):
             terminations=terminations,
             next_states=next_states,
             actor=actor,
+            alpha=alpha,
         )
         return mse(q_zeta, target) + mse(q_eta, target)
 
@@ -108,13 +110,14 @@ class SoftCritic(MovesModulesToDevice):
         terminations: torch.Tensor,
         next_states: torch.Tensor,
         actor: SoftActor,
+        alpha: float,
     ):
         termination_mask = 1 - terminations
         next_actions, next_probabilities = actor.sample(next_states)
         q_zeta_target = self.zeta_target(next_states, next_actions)
         q_eta_target = self.eta_target(next_states, next_actions)
         q_target = torch.min(q_zeta_target, q_eta_target)
-        entropy_q = q_target - self.alpha * next_probabilities
+        entropy_q = q_target - alpha * next_probabilities
         return rewards + self.gamma * termination_mask * entropy_q
 
     def update(self, tau: float):

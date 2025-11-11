@@ -4,6 +4,7 @@ import numpy
 import torch
 from typing import TYPE_CHECKING
 from .modules import SoftActorModule
+from .SoftActorCriticRepository import SoftActorCriticRepository
 from ...core.concerns import MovesModulesToDevice
 from ...device import get_device
 
@@ -19,12 +20,10 @@ class SoftActor(MovesModulesToDevice):
         action_dimension: int,
         lr: float,
         weight_decay: float,
-        alpha: float,
         min_std: float,
         max_std: float,
+        device: torch.device,
     ):
-        self.alpha: float = alpha
-
         self.network = SoftActorModule(
             state_dimension=state_dimension,
             hidden_dimension=hidden_dimension,
@@ -32,25 +31,31 @@ class SoftActor(MovesModulesToDevice):
             min_std=min_std,
             max_std=max_std,
         )
+        self.move_modules()
+
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=weight_decay
         )
 
-        self.move_modules()
-
-    def train(self, states: torch.Tensor, critic: SoftCritic):
+    def train(self, states: torch.Tensor, critic: SoftCritic, alpha: float):
         self.network.train()
         self.optimizer.zero_grad()
-        loss = self.loss(states=states, critic=critic)
+        loss = self.loss(states=states, critic=critic, alpha=alpha)
         loss.backward()
         self.optimizer.step()
 
-    def loss(self, states: torch.Tensor, critic: SoftCritic) -> torch.Tensor:
-        actions, probabilities = self.sample(states)
+    def loss(
+        self, states: torch.Tensor, critic: SoftCritic, alpha: float
+    ) -> torch.Tensor:
+        actions, log_probability = self.sample(states)
+
+        # used to train temperature
+        SoftActorCriticRepository.log_probability = log_probability
+
         q_zeta = critic.zeta(states, actions)
         q_eta = critic.eta(states, actions)
         q = torch.min(q_zeta, q_eta)
-        return (self.alpha * probabilities - q).mean()
+        return (alpha * log_probability - q).mean()
 
     def process_state(
         self, state: numpy.ndarray | torch.Tensor, move_to_device: bool = True
