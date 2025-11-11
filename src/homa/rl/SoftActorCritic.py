@@ -18,8 +18,8 @@ class SoftActorCritic(TracksTime):
         tau: float = 0.005,
         alpha: float = 0.2,
         gamma: float = 0.99,
-        min_std: float = -20,
-        max_std: float = 2,
+        min_std: float = -20.0,
+        max_std: float = 2.0,
     ):
         super().__init__()
 
