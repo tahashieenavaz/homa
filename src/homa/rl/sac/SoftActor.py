@@ -47,10 +47,9 @@ class SoftActor(MovesModulesToDevice):
 
     def loss(self, states: torch.Tensor, critic: SoftCritic) -> torch.Tensor:
         actions, probabilities = self.sample(states)
-        with torch.no_grad():
-            q_zeta = critic.zeta(states, actions)
-            q_eta = critic.eta(states, actions)
-            q = torch.min(q_zeta, q_eta)
+        q_zeta = critic.zeta(states, actions)
+        q_eta = critic.eta(states, actions)
+        q = torch.min(q_zeta, q_eta)
         return (self.alpha * probabilities - q).mean()
 
     def process_state(
@@ -71,6 +70,7 @@ class SoftActor(MovesModulesToDevice):
         state = self.process_state(state)
 
         mean, std = self.network(state)
+        std = std.exp()
 
         distribution = torch.distributions.Normal(mean, std)
         z = distribution.rsample()
