@@ -24,8 +24,14 @@ class SoftActorModule(torch.nn.Module):
             torch.nn.Linear(self.hidden_dimension, self.hidden_dimension),
             torch.nn.ReLU(),
         )
+
         self.mu = torch.nn.Linear(self.hidden_dimension, self.action_dimension)
+        torch.nn.init.uniform_(self.mu.weight, -3e-3, 3e-3)
+        torch.nn.init.constant_(self.mu.bias, 0.0)
+
         self.xi = torch.nn.Linear(self.hidden_dimension, self.action_dimension)
+        torch.nn.init.constant_(self.xi.weight, 0.0)
+        torch.nn.init.constant_(self.xi.bias, -0.5)
 
     def forward(self, state: torch.Tensor):
         features = self.phi(state)
