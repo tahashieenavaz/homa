@@ -6,8 +6,8 @@ class FeedForwardModule(torch.nn.Module):
         super().__init__()
         self.feedforward_dimension: int = int(hidden_dimension * 1.618)
         self.embedding = torch.nn.Linear(input_dimension, hidden_dimension)
-        torch.nn.init.xavier_uniform_(self.embed.weight)
-        torch.nn.init.zeros_(self.embed.bias)
+        torch.nn.init.xavier_uniform_(self.embedding.weight)
+        torch.nn.init.zeros_(self.embedding.bias)
 
         self.block = torch.nn.Sequential(
             torch.nn.LayerNorm(hidden_dimension),
