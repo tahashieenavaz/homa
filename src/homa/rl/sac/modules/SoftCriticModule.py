@@ -23,5 +23,4 @@ class SoftCriticModule(torch.nn.Module):
         state = self.embedding(state)
         features = torch.cat([state, action], dim=1)
         features = self.phi(features)
-        features = torch.tanh(features)
         return self.fc(features)
