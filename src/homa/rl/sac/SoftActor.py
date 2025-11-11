@@ -71,9 +71,6 @@ class SoftActor(MovesModulesToDevice):
 
         mean, std = self.network(state)
 
-        # following line prevents standard deviations to be negative
-        std = std.exp()
-
         distribution = torch.distributions.Normal(mean, std)
         z = distribution.rsample()
         action = torch.tanh(z)
