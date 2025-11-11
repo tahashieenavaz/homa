@@ -21,4 +21,4 @@ class EncoderModule(torch.nn.Module):
         )
 
     def forward(self, x):
-        return x + self.stream(x)
+        return self.stream(x)
