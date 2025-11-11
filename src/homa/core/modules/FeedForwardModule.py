@@ -6,6 +6,9 @@ class FeedForwardModule(torch.nn.Module):
         super().__init__()
         intermediate_dimension: int = int(hidden_dimension * 1.618)
         self.embedding = torch.nn.Linear(input_dimension, hidden_dimension)
+        torch.nn.init.xavier_uniform_(self.embedding.weight)
+        torch.nn.init.zeros_(self.embedding.bias)
+
         self.stream = torch.nn.Sequential(
             torch.nn.LayerNorm(hidden_dimension),
             torch.nn.Linear(hidden_dimension, intermediate_dimension),
