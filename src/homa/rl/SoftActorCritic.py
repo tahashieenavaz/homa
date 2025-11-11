@@ -69,7 +69,6 @@ class SoftActorCritic(TracksTime):
 
         data = self.buffer.sample_torch(self.batch_size)
         alpha = self.temperature.alpha
-        print(alpha)
         self.critic.train(
             states=data.states,
             actions=data.actions,
