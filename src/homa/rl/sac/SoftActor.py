@@ -22,7 +22,6 @@ class SoftActor(MovesModulesToDevice):
         weight_decay: float,
         min_std: float,
         max_std: float,
-        device: torch.device,
     ):
         self.network = SoftActorModule(
             state_dimension=state_dimension,
