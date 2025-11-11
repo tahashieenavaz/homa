@@ -9,9 +9,9 @@ class SoftActorCritic(TracksTime):
         state_dimension: int,
         action_dimension: int,
         hidden_dimension: int = 256,
-        buffer_capacity: int = 1_000_000,
+        buffer_capacity: int = 500_000,
         batch_size: int = 256,
-        actor_lr: float = 0.0002,
+        actor_lr: float = 0.0003,
         critic_lr: float = 0.0003,
         actor_decay: float = 0.0,
         critic_decay: float = 0.0,
@@ -20,7 +20,7 @@ class SoftActorCritic(TracksTime):
         gamma: float = 0.99,
         min_std: float = -20.0,
         max_std: float = 2.0,
-        warmup: int = 10_000,
+        warmup: int = 20_000,
     ):
         super().__init__()
 
