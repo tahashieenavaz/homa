@@ -1,1 +1,1 @@
-from .FeedForwardModule import FeedForwardModule
+from .EncoderModule import EncoderModule

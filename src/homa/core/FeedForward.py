@@ -1,6 +1,6 @@
 import torch
 from .concerns import MovesModulesToDevice
-from .modules import FeedForwardModule
+from .modules import EncoderModule
 
 
 class FeedForward(MovesModulesToDevice):
@@ -11,7 +11,7 @@ class FeedForward(MovesModulesToDevice):
         hidden_dimension: int,
         input_dimension: int,
     ):
-        self.network = FeedForwardModule(
+        self.network = EncoderModule(
             input_dimension=input_dimension, hidden_dimension=hidden_dimension
         )
         self.optimizer = torch.optim.AdamW(

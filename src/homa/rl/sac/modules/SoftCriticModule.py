@@ -1,5 +1,5 @@
 import torch
-from ....core.modules import FeedForwardModule
+from ....core.modules import EncoderModule
 
 
 class SoftCriticModule(torch.nn.Module):
@@ -11,16 +11,17 @@ class SoftCriticModule(torch.nn.Module):
     ):
         super().__init__()
 
-        self.embedding = FeedForwardModule(
+        self.phi = EncoderModule(
             input_dimension=state_dimension, hidden_dimension=hidden_dimension
         )
-        self.phi = torch.nn.Linear(
-            action_dimension + hidden_dimension, hidden_dimension
+        self.chi = EncoderModule(
+            input_dimension=action_dimension + hidden_dimension,
+            hidden_dimension=hidden_dimension,
         )
         self.fc = torch.nn.Linear(hidden_dimension, 1)
 
     def forward(self, state: torch.Tensor, action: torch.Tensor):
-        state = self.embedding(state)
+        state = self.phi(state)
         features = torch.cat([state, action], dim=1)
-        features = self.phi(features)
+        features = self.chi(features)
         return self.fc(features)

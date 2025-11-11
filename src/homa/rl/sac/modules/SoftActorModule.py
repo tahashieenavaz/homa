@@ -1,4 +1,5 @@
 import torch
+from ....core.modules import EncoderModule
 
 
 class SoftActorModule(torch.nn.Module):
@@ -18,11 +19,8 @@ class SoftActorModule(torch.nn.Module):
         self.min_std: float = float(min_std)
         self.max_std: float = float(max_std)
 
-        self.phi = torch.nn.Sequential(
-            torch.nn.Linear(self.state_dimension, self.hidden_dimension),
-            torch.nn.ReLU(),
-            torch.nn.Linear(self.hidden_dimension, self.hidden_dimension),
-            torch.nn.ReLU(),
+        self.phi = EncoderModule(
+            input_dimension=state_dimension, hidden_dimension=hidden_dimension
         )
 
         self.mu = torch.nn.Linear(self.hidden_dimension, self.action_dimension)
