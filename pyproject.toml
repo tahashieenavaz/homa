@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "homa"
-version = "0.3.293"
+version = "0.3.294"
 description = "A curated list of machine learning and deep learning helpers."
 authors = [
   { name="Taha Shieenavaz", email="tahashieenavaz@gmail.com" },
