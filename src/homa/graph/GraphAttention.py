@@ -63,8 +63,8 @@ class GraphAttention(MovesModulesToDevice):
         return self.criterion(masked_predictions, masked_labels)
 
     @torch.no_grad()
-    def accuracy(self, idx):
+    def accuracy(self, mask: torch.tensor):
         self.network.eval()
-        masked_predictions = self._predictions[idx].argmax(dim=1)
-        masked_labels = self.labels[idx]
+        masked_predictions = self._predictions[mask].argmax(dim=1)
+        masked_labels = self.labels[mask]
         return (masked_predictions == masked_labels).float().mean()
