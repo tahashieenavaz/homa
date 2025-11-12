@@ -45,13 +45,31 @@ class MediaNamespace(Namespace):
     def _convert_to_gif(self, input_filename: str):
         if not self._validate_input(input_filename):
             return
+
         output_filename = self._get_output_filename(input_filename, "gif")
-        self._run_ffmpeg(
-            input_filename,
-            output_filename,
-            vf="fps=10,scale=320:-1:flags=lanczos",  # adjust FPS/scale as needed
-            loop=0,
-        )
+        palette_path = self._get_output_filename(input_filename, "png")
+
+        try:
+            ffmpeg.input(input_filename).output(
+                palette_path,
+                vf="fps=10,scale=320:-1:flags=lanczos,palettegen",
+            ).run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
+            ffmpeg.input(input_filename).output(
+                output_filename,
+                vf=f"fps=10,scale=320:-1:flags=lanczos [x]; [x][1:v] paletteuse",
+                loop=0,
+                **{"i": palette_path},
+            ).run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
+
+            print(f"✅ Successfully converted and saved to {output_filename}")
+            if os.path.exists(palette_path):
+                os.remove(palette_path)
+
+        except ffmpeg.Error as e:
+            print("FFmpeg Error:", file=sys.stderr)
+            print(e.stderr.decode(), file=sys.stderr)
+        except Exception as e:
+            print(f"Unexpected error: {e}", file=sys.stderr)
 
     def convert(self, target_format: str, *input_files):
         convert_map = {
