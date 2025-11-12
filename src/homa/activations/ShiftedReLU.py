@@ -7,4 +7,4 @@ class ShiftedReLU(ActivationFunction):
         super().__init__()
 
     def forward(self, x: torch.Tensor):
-        return torch.max(-1, x)
+        return x.clamp(min=-1)

@@ -14,7 +14,6 @@ from .LogSigmoid import LogSigmoid
 from .SlopedReLU import SlopedReLU
 from .MinSin import MinSin
 from .LaLU import LaLU
-from .APLU import APLU
 from .ERF import ERF
 from .TangentBipolarSigmoidReLU import TangentBipolarSigmoidReLU
 from .BaseDLReLU import BaseDLReLU
@@ -23,7 +22,6 @@ from .TripleStateSwish import TripleStateSwish
 from .ExponentialSwish import ExponentialSwish
 from .TeLU import TeLU
 from .Elliot import Elliot
-from .GaussianReLU import GaussianReLU
 from .ActivationFunction import ActivationFunction
 from .RReLU import RReLU
 from .Suish import Suish
@@ -32,7 +30,6 @@ from .Gish import Gish
 from .NReLU import NReLU
 from .LogLogish import LogLogish
 from .SGELU import SGELU
-from .GaLU import GaLU
 from .TSReLU import TSReLU
 from .SineReLU import SineReLU
 from .DLReLU import DLReLU
