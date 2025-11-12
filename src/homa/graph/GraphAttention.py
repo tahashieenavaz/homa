@@ -29,7 +29,7 @@ class GraphAttention(MovesModulesToDevice):
         )
         self.move_modules()
 
-        self.optimizer = torch.nn.AdamW(
+        self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = torch.nn.CrossEntropyLoss()
