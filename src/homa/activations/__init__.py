@@ -9,14 +9,11 @@ from .ExponentialDLReLU import ExponentialDLReLU
 from .SReLU import SReLU
 from .TangentSigmoidReLU import TangentSigmoidReLU
 from .Phish import Phish
-from .WideMeLU import WideMeLU
 from .SelfArctan import SelfArctan
 from .LogSigmoid import LogSigmoid
 from .SlopedReLU import SlopedReLU
-from .SmallGaLU import SmallGaLU
 from .MinSin import MinSin
 from .LaLU import LaLU
-from .MexicanReLU import MexicanReLU
 from .APLU import APLU
 from .ERF import ERF
 from .TangentBipolarSigmoidReLU import TangentBipolarSigmoidReLU
@@ -26,7 +23,6 @@ from .TripleStateSwish import TripleStateSwish
 from .ExponentialSwish import ExponentialSwish
 from .TeLU import TeLU
 from .Elliot import Elliot
-from .MeLU import MeLU
 from .GaussianReLU import GaussianReLU
 from .ActivationFunction import ActivationFunction
 from .RReLU import RReLU
