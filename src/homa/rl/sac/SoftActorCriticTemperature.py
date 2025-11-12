@@ -4,7 +4,13 @@ from ...common.concerns import MovesModulesToDevice
 
 
 class SoftActorCriticTemperature(MovesModulesToDevice):
-    def __init__(self, lr: float, weight_decay: float, action_dimension: int, device):
+    def __init__(
+        self,
+        lr: float,
+        weight_decay: float,
+        action_dimension: int,
+        device: torch.device,
+    ):
         self.log_alpha = torch.nn.Parameter(torch.zeros(1, device=device))
         self.optimizer = torch.optim.Adam(
             [self.log_alpha], lr=lr, weight_decay=weight_decay
