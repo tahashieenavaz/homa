@@ -1,5 +1,5 @@
 import torch
-from .GraphAttentionHeadModule import GraphAttentionHead
+from .GraphAttentionHeadModule import GraphAttentionHeadModule
 
 
 class MultiHeadGraphAttentionModule(torch.nn.Module):
@@ -15,7 +15,9 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
         super().__init__()
         self.heads = torch.nn.ModuleList(
             [
-                GraphAttentionHead(input_dimension, output_dimension, dropout, alpha)
+                GraphAttentionHeadModule(
+                    input_dimension, output_dimension, dropout, alpha
+                )
                 for _ in range(num_heads)
             ]
         )
