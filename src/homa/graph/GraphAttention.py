@@ -43,28 +43,23 @@ class GraphAttention(MovesModulesToDevice):
         # this is used because model outputs log-probability distribution
         self.criterion = torch.nn.NLLLoss()
 
-        # this will be used to share data between loss and accuracy methods
-        self._predictions = None
-
-    def train(self, idx: torch.Tensor):
+    def train(self, mask: torch.Tensor):
         self.network.train()
         self.optimizer.zero_grad()
-        loss = self.loss(idx=idx)
+        loss = self.loss(mask=mask)
         loss.backward()
         self.optimizer.step()
 
-    def loss(
-        self,
-        idx,
-    ):
-        self._predictions = self.network(self.features, self.adjacency_matrix)
-        masked_predictions = self._predictions[idx]
-        masked_labels = self.labels[idx]
+    def loss(self, mask: torch.Tensor):
+        predictions = self.network(self.features, self.adjacency_matrix)
+        masked_predictions = predictions[mask]
+        masked_labels = self.labels[mask]
         return self.criterion(masked_predictions, masked_labels)
 
     @torch.no_grad()
     def accuracy(self, mask: torch.tensor):
         self.network.eval()
-        masked_predictions = self._predictions[mask].argmax(dim=1)
+        predictions = self.network(self.features, self.adjacency_matrix)
+        masked_predictions = predictions[mask].argmax(dim=1)
         masked_labels = self.labels[mask]
         return (masked_predictions == masked_labels).float().mean()
