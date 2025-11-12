@@ -15,22 +15,32 @@ class MediaNamespace(Namespace):
             print(f"Error: Input file not found at {input_filename}", file=sys.stderr)
             return
 
-        output_filename = self._change_extension(input_filename)
+        output_filename = self._change_extension(input_filename, "webm")
         try:
-            ffmpeg.input(input_filename).output(
-                output_filename, vcodec="libvpx", acodec="libopus"
-            ).run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
+            (
+                ffmpeg.input(input_filename)
+                .output(
+                    output_filename,
+                    vcodec="libvpx-vp9",
+                    crf=32,
+                    acodec="libopus",
+                    audio_bitrate="96k",
+                )
+                .run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
+            )
             print(f"Successfully converted file and saved to {output_filename}")
+
         except ffmpeg.Error as e:
             print("FFmpeg Error:", file=sys.stderr)
             print(e.stderr.decode(), file=sys.stderr)
         except Exception as e:
             print(f"An unexpected error occurred: {e}", file=sys.stderr)
 
-    def convert(self, target_format: str, input_file: str):
+    def convert(self, target_format: str, *input_files):
         convert_map = {
             "web": self._convert_to_webm,
             "webm": self._convert_to_webm,
         }
         handler = convert_map.get(target_format)
-        handler(input_file)
+        for input_file in input_files:
+            handler(input_file)
