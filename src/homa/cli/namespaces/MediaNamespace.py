@@ -47,7 +47,6 @@ class MediaNamespace(Namespace):
             return
         output_filename = self._get_output_filename(input_filename, "gif")
 
-        # --- TUNABLE PARAMETERS ---
         fps = 10
         scale_width = 320
         max_colors = 256
