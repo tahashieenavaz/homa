@@ -1,7 +1,8 @@
 from pathlib import Path
+from .Namespace import Namespace
 
 
-class MakeNamespace:
+class MakeNamespace(Namespace):
     def trait(self, name: str):
         class_name = name.split(".")[-1]
         file = name.replace(".", "/") + ".py"

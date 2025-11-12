@@ -15,7 +15,8 @@ requires-python = ">=3.7"
 dependencies = [
   "numpy",
   "torch",
-  "fire"
+  "fire",
+  "ffmpeg"
 ]
 
 [project.scripts]

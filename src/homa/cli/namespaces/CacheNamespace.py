@@ -1,9 +1,10 @@
 import shutil
 import sys
 from pathlib import Path
+from .Namespace import Namespace
 
 
-class CacheNamespace:
+class CacheNamespace(Namespace):
     def clear(self):
         root = Path.cwd()
         removed = 0
