@@ -6,7 +6,6 @@ from .GeneralizedSwish import GeneralizedSwish
 from .TBSReLU import TBSReLU
 from .NoisyReLU import NoisyReLU
 from .ExponentialDLReLU import ExponentialDLReLU
-from .SReLU import SReLU
 from .TangentSigmoidReLU import TangentSigmoidReLU
 from .Phish import Phish
 from .SelfArctan import SelfArctan
