@@ -1,6 +1,6 @@
 import torch
-from ..AdaptiveActivationFunction import AdaptiveActivationFunction
-from .concerns import ChannelBased
+from ...AdaptiveActivationFunction import AdaptiveActivationFunction
+from ...concerns import ChannelBased
 
 
 class PiLU(AdaptiveActivationFunction, ChannelBased):

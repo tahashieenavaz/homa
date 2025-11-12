@@ -1,9 +1,9 @@
 import torch
-from ..ActivationFunction import ActivationFunction
-from .concerns import ChannelBased
+from ...AdaptiveActivationFunction import AdaptiveActivationFunction
+from ...concerns import ChannelBased
 
 
-class ShiLU(ActivationFunction, ChannelBased):
+class ShiLU(AdaptiveActivationFunction, ChannelBased):
     def __init__(self):
         super().__init__()
         self.a = None
