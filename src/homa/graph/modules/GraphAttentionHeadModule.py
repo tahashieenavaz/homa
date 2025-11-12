@@ -3,7 +3,13 @@ import torch
 
 class GraphAttentionHeadModule(torch.nn.Module):
     def __init__(
-        self, input_dimension: int, output_dimension: int, dropout: float, alpha: float
+        self,
+        input_dimension: int,
+        output_dimension: int,
+        dropout: float,
+        alpha: float,
+        activation: torch.nn.Module,
+        final_activation: torch.nn.Module,
     ):
         super().__init__()
         # feature transform
@@ -15,7 +21,15 @@ class GraphAttentionHeadModule(torch.nn.Module):
         # attention for target
         self.xi = torch.nn.Linear(output_dimension, 1, bias=False)
 
-        self.leakyrelu = torch.nn.LeakyReLU(alpha)
+        if activation == torch.nn.LeakyReLU:
+            self.activation = torch.nn.LeakyReLU(alpha)
+        else:
+            self.activation = activation()
+
+        self.final_activation = final_activation()
+
+        print(self.activation, self.final_activation)
+
         self.dropout = torch.nn.Dropout(dropout)
 
     def forward(self, features: torch.Tensor, adjacency_matrix: torch.Tensor):
@@ -24,7 +38,7 @@ class GraphAttentionHeadModule(torch.nn.Module):
 
         # compute pairwise scores
         e = self.mu(h) + self.xi(h).T
-        e = self.leakyrelu(e)
+        e = self.activation(e)
         # masks non-edges
         e = torch.where(adjacency_matrix > 0, e, torch.full_like(e, -9e15))
 
@@ -33,4 +47,4 @@ class GraphAttentionHeadModule(torch.nn.Module):
         a = self.dropout(a)
 
         # aggregate neighbors
-        return torch.nn.functional.elu(a @ h)
+        return self.final_activation(a @ h)

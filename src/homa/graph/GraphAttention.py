@@ -1,4 +1,6 @@
 import torch
+from sklearn.metrics import f1_score, cohen_kappa_score
+from types import SimpleNamespace
 from .modules import GraphAttentionModule
 from ..common.concerns import MovesModulesToDevice
 
@@ -18,6 +20,8 @@ class GraphAttention(MovesModulesToDevice):
         decay: float = 0.0005,
         dropout: float = 0.6,
         concat: bool = True,
+        activation: torch.nn.Module = torch.nn.LeakyReLU,
+        final_activation: torch.nn.Module = torch.nn.ELU,
     ):
         super().__init__()
 
@@ -33,6 +37,8 @@ class GraphAttention(MovesModulesToDevice):
             dropout=dropout,
             alpha=alpha,
             concat=concat,
+            activation=activation,
+            final_activation=final_activation,
         )
         self.move_modules()
 
@@ -57,9 +63,21 @@ class GraphAttention(MovesModulesToDevice):
         return self.criterion(masked_predictions, masked_labels)
 
     @torch.no_grad()
-    def accuracy(self, mask: torch.tensor):
+    def metrics(self, mask: torch.Tensor):
         self.network.eval()
+
         predictions = self.network(self.features, self.adjacency_matrix)
-        masked_predictions = predictions[mask].argmax(dim=1)
-        masked_labels = self.labels[mask]
-        return (masked_predictions == masked_labels).float().mean()
+        masked_predictions = predictions[mask].argmax(dim=1).cpu()
+        masked_labels = self.labels[mask].cpu()
+
+        accuracy = (masked_predictions == masked_labels).float().mean().item()
+        f1_macro = f1_score(masked_labels, masked_predictions, average="macro")
+        kappa = cohen_kappa_score(masked_labels, masked_predictions)
+
+        return SimpleNamespace(
+            **{
+                "accuracy": accuracy,
+                "f1": f1_macro,
+                "kappa": kappa,
+            }
+        )

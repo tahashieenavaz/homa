@@ -11,12 +11,19 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
         dropout: float,
         alpha: float,
         concat: bool,
+        activation: torch.nn.Module,
+        final_activation: torch.nn.Module,
     ):
         super().__init__()
         self.heads = torch.nn.ModuleList(
             [
                 GraphAttentionHeadModule(
-                    input_dimension, output_dimension, dropout, alpha
+                    input_dimension=input_dimension,
+                    output_dimension=output_dimension,
+                    dropout=dropout,
+                    alpha=alpha,
+                    activation=activation,
+                    final_activation=final_activation,
                 )
                 for _ in range(num_heads)
             ]
