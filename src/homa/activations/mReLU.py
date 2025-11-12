@@ -8,6 +8,6 @@ class mReLU(ActivationFunction):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return torch.min(
-            torch.nn.functional.relu(x - 1),
-            torch.nn.functional.relu(x + 1),
+            torch.nn.functional.relu(1 - x),
+            torch.nn.functional.relu(1 + x),
         )
