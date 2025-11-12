@@ -45,31 +45,21 @@ class MediaNamespace(Namespace):
     def _convert_to_gif(self, input_filename: str):
         if not self._validate_input(input_filename):
             return
-
         output_filename = self._get_output_filename(input_filename, "gif")
-        palette_path = self._get_output_filename(input_filename, "png")
 
-        try:
-            ffmpeg.input(input_filename).output(
-                palette_path,
-                vf="fps=10,scale=320:-1:flags=lanczos,palettegen",
-            ).run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
-            ffmpeg.input(input_filename).output(
-                output_filename,
-                vf=f"fps=10,scale=320:-1:flags=lanczos [x]; [x][1:v] paletteuse",
-                loop=0,
-                **{"i": palette_path},
-            ).run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
+        # This complex filter graph first applies your original filters (fps, scale)
+        # then 'split's the video stream. One split ('[a]') generates an optimal
+        # palette ('[p]'). The other split ('[b]') waits, then gets combined
+        # with the palette ('[p]') using 'paletteuse' for a high-quality, non-checkered output.
+        complex_filter = "fps=10,scale=320:-1:flags=lanczos,split [a][b]; [a] palettegen [p]; [b][p] paletteuse"
 
-            print(f"✅ Successfully converted and saved to {output_filename}")
-            if os.path.exists(palette_path):
-                os.remove(palette_path)
-
-        except ffmpeg.Error as e:
-            print("FFmpeg Error:", file=sys.stderr)
-            print(e.stderr.decode(), file=sys.stderr)
-        except Exception as e:
-            print(f"Unexpected error: {e}", file=sys.stderr)
+        self._run_ffmpeg(
+            input_filename,
+            output_filename,
+            # We replace the simple 'vf' (video filter) with 'filter_complex'
+            filter_complex=complex_filter,
+            loop=0,
+        )
 
     def convert(self, target_format: str, *input_files):
         convert_map = {
