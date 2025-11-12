@@ -1,6 +1,6 @@
 import torch
 from .SoftActorCriticRepository import SoftActorCriticRepository
-from ...core.concerns import MovesModulesToDevice
+from ...common.concerns import MovesModulesToDevice
 
 
 class SoftActorCriticTemperature(MovesModulesToDevice):

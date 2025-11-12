@@ -1,6 +1,6 @@
 from .sac import SoftActor, SoftCritic, SoftActorCriticTemperature
 from .buffers import SoftActorCriticBuffer
-from ..core.concerns import TracksTime
+from ..common.concerns import TracksTime
 from ..device import get_device
 
 

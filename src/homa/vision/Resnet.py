@@ -2,7 +2,7 @@ import torch
 from .modules import ResnetModule
 from .Classifier import Classifier
 from .concerns import Trainable, ReportsMetrics
-from ..core.concerns import MovesModulesToDevice
+from ..common.concerns import MovesModulesToDevice
 
 
 class Resnet(Classifier, Trainable, ReportsMetrics, MovesModulesToDevice):

@@ -5,7 +5,7 @@ import torch
 from typing import TYPE_CHECKING
 from .modules import SoftActorModule
 from .SoftActorCriticRepository import SoftActorCriticRepository
-from ...core.concerns import MovesModulesToDevice
+from ...common.concerns import MovesModulesToDevice
 from ...device import get_device
 
 if TYPE_CHECKING:

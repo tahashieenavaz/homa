@@ -2,7 +2,7 @@ import torch
 from .Classifier import Classifier
 from .concerns import Trainable, ReportsMetrics
 from .modules import SwinModule
-from ..core.concerns import MovesModulesToDevice
+from ..common.concerns import MovesModulesToDevice
 
 
 class Swin(Classifier, Trainable, ReportsMetrics, MovesModulesToDevice):

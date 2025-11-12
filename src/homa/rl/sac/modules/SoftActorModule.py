@@ -1,5 +1,5 @@
 import torch
-from ....core.modules import EncoderModule
+from ....common.modules import EncoderModule
 
 
 class SoftActorModule(torch.nn.Module):

@@ -1,7 +1,7 @@
 import torch
 import numpy
 from .modules import DiscriminatorModule
-from ...core.concerns import MovesModulesToDevice
+from ...common.concerns import MovesModulesToDevice
 
 
 class Discriminator(MovesModulesToDevice):

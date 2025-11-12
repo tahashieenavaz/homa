@@ -1,6 +1,6 @@
 import torch
 from .modules import GraphAttentionModule
-from ..core.concerns import MovesModulesToDevice
+from ..common.concerns import MovesModulesToDevice
 
 
 class GraphAttention(MovesModulesToDevice):

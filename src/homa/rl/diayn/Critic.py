@@ -1,6 +1,6 @@
 import torch
 from .modules import CriticModule
-from ...core.concerns import MovesModulesToDevice
+from ...common.concerns import MovesModulesToDevice
 
 
 class Critic(MovesModulesToDevice):

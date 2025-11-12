@@ -1,7 +1,7 @@
 import torch
 from torch.distributions import Normal
 from .modules import ContinuousActorModule
-from ...core.concerns import MovesModulesToDevice
+from ...common.concerns import MovesModulesToDevice
 
 
 class Actor(MovesModulesToDevice):

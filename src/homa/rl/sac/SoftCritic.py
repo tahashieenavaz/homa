@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from torch.nn.functional import mse_loss as mse
 from .modules import SoftCriticModule
 from ..utils import soft_update
-from ...core.concerns import MovesModulesToDevice
+from ...common.concerns import MovesModulesToDevice
 
 if TYPE_CHECKING:
     from .SoftActor import SoftActor
