@@ -12,7 +12,4 @@ class PoLU(ActivationFunction):
 
     def forward(self, x: torch.Tensor):
         delta = 1 - x
-        return torch.where(
-            x >= 0,
-            delta.pow(-self.alpha) - 1,
-        )
+        return torch.where(x >= 0, x, delta.pow(-self.alpha) - 1)

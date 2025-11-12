@@ -25,11 +25,7 @@ class GraphAttentionHeadModule(torch.nn.Module):
             self.activation = torch.nn.LeakyReLU(alpha)
         else:
             self.activation = activation()
-
         self.final_activation = final_activation()
-
-        print(self.activation, self.final_activation)
-
         self.dropout = torch.nn.Dropout(dropout)
 
     def forward(self, features: torch.Tensor, adjacency_matrix: torch.Tensor):

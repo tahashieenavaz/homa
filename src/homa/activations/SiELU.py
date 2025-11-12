@@ -8,5 +8,5 @@ class SiELU(ActivationFunction):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         chi = x + 0.044715 * x.pow(3)
-        delta = 2 * torch.sqrt(2 / torch.pi) * chi
+        delta = 2 * torch.sqrt(torch.tensor(2) / torch.pi) * chi
         return x * torch.sigmoid(delta)
