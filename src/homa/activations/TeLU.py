@@ -1,7 +1,8 @@
 import torch
+from .ActivationFunction import ActivationFunction
 
 
-class TeLU(torch.nn.Module):
+class TeLU(ActivationFunction):
     def __init__(self):
         super().__init__()
 

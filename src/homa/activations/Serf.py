@@ -2,9 +2,9 @@ import torch
 from .ActivationFunction import ActivationFunction
 
 
-class Smish(ActivationFunction):
+class Serf(ActivationFunction):
     def __init__(self):
         super().__init__()
 
     def forward(self, x: torch.Tensor):
-        return x * torch.tanh(torch.log1p(torch.sigmoid(x)))
+        return x * torch.erf(torch.log(1 + torch.exp(x)))
