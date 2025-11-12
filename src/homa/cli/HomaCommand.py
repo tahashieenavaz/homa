@@ -1,6 +1,6 @@
 import fire
-from .Namespaces import MakeNamespace, CacheNamespace, MediaNamespace
-from .Commands import InitCommand
+from .namespaces import MakeNamespace, CacheNamespace, MediaNamespace
+from .commands import InitCommand
 
 
 class HomaCommand:
