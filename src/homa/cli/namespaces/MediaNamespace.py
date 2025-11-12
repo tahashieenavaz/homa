@@ -47,16 +47,21 @@ class MediaNamespace(Namespace):
             return
         output_filename = self._get_output_filename(input_filename, "gif")
 
-        # This complex filter graph first applies your original filters (fps, scale)
-        # then 'split's the video stream. One split ('[a]') generates an optimal
-        # palette ('[p]'). The other split ('[b]') waits, then gets combined
-        # with the palette ('[p]') using 'paletteuse' for a high-quality, non-checkered output.
-        complex_filter = "fps=10,scale=320:-1:flags=lanczos,split [a][b]; [a] palettegen [p]; [b][p] paletteuse"
+        # --- TUNABLE PARAMETERS ---
+        fps = 10
+        scale_width = 320
+        max_colors = 256
+        dither_mode = "bayer"
+
+        complex_filter = (
+            f"fps={fps},scale={scale_width}:-1:flags=lanczos,split [a][b]; "
+            f"[a] palettegen=stats_mode=diff:max_colors={max_colors} [p]; "
+            f"[b][p] paletteuse=dither={dither_mode}:diff_mode=rectangle"
+        )
 
         self._run_ffmpeg(
             input_filename,
             output_filename,
-            # We replace the simple 'vf' (video filter) with 'filter_complex'
             filter_complex=complex_filter,
             loop=0,
         )
