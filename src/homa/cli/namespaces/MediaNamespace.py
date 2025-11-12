@@ -48,8 +48,8 @@ class MediaNamespace(Namespace):
         output_filename = self._get_output_filename(input_filename, "gif")
 
         fps = 10
-        scale_width = 320
-        max_colors = 256
+        scale_width = 400
+        max_colors = 64
         dither_mode = "bayer"
 
         complex_filter = (
