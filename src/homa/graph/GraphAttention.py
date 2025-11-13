@@ -25,8 +25,15 @@ class GraphAttention(MovesModulesToDevice):
         final_activation: torch.nn.Module = torch.nn.ELU,
         middle_activation_function: torch.nn.Module = torch.nn.GELU,
         middle_activation: bool = False,
-        amplify: bool = False,
+        head_amplification: bool = False,
+        middle_amplification: bool = False,
+        middle_amplification_location: str = "after",
     ):
+        if middle_amplification_location not in ["after", "before"]:
+            raise ValueError(
+                f"middle_amplification_location must be in [after, before]. Got {middle_amplification_location}."
+            )
+
         super().__init__()
 
         self.features = features
@@ -43,9 +50,11 @@ class GraphAttention(MovesModulesToDevice):
             concat=concat,
             activation=activation,
             final_activation=final_activation,
-            amplify=amplify,
+            head_amplification=head_amplification,
+            middle_amplification=middle_amplification,
             middle_activation=middle_activation,
             middle_activation_function=middle_activation_function,
+            middle_amplification_location=middle_amplification_location,
         )
         self.move_modules()
 
