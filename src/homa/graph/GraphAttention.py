@@ -1,6 +1,7 @@
 import torch
 from sklearn.metrics import f1_score, cohen_kappa_score
 from types import SimpleNamespace
+from typing import Type
 from .modules import GraphAttentionModule
 from ..common.concerns import MovesModulesToDevice
 
@@ -63,7 +64,7 @@ class GraphAttention(MovesModulesToDevice):
         return self.criterion(masked_predictions, masked_labels)
 
     @torch.no_grad()
-    def metrics(self, mask: torch.Tensor):
+    def metrics(self, mask: torch.Tensor) -> Type[SimpleNamespace]:
         self.network.eval()
 
         predictions = self.network(self.features, self.adjacency_matrix)
