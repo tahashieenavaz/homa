@@ -17,10 +17,10 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
     ):
         super().__init__()
 
-        self.head_amplification: bool = head_amplification
-        self.concat: bool = concat
         self.num_heads: int = num_heads
         self.output_dimension: int = output_dimension
+        self.head_amplification: bool = head_amplification
+        self.concat: bool = concat
 
         if head_amplification:
             self.coefficients = torch.nn.Parameter(
