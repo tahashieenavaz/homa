@@ -13,8 +13,17 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
         concat: bool,
         activation: torch.nn.Module,
         final_activation: torch.nn.Module,
+        amplify: bool,
     ):
         super().__init__()
+
+        self.amplify: bool = amplify
+
+        if amplify:
+            self.coefficients = torch.nn.Parameter(
+                torch.zeros(1, num_heads * output_dimension, requires_grad=True)
+            )
+
         self.heads = torch.nn.ModuleList(
             [
                 GraphAttentionHeadModule(
@@ -33,10 +42,13 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
     def forward(self, features: torch.Tensor, adjacency_matrix: torch.Tensor):
         features = [head(features, adjacency_matrix) for head in self.heads]
 
-        # aggregate
+        # aggregate results either by concatenating them or averaging over
         if self.concat:
             features = torch.cat(features, dim=1)
         else:
             features = torch.mean(torch.stack(features), dim=0)
+
+        if self.amplify:
+            features *= self.coefficients.exp()
 
         return features
