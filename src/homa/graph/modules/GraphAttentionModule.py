@@ -20,7 +20,7 @@ class GraphAttentionModule(torch.nn.Module):
     ):
         super().__init__()
         self.middle_activation: bool = middle_activation
-        self.middle_activation_function = middle_activation_function
+        self.middle_activation_function = middle_activation_function()
 
         self.theta = MultiHeadGraphAttentionModule(
             input_dimension=input_dimension,

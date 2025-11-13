@@ -24,6 +24,7 @@ class GraphAttention(MovesModulesToDevice):
         activation: torch.nn.Module = torch.nn.LeakyReLU,
         final_activation: torch.nn.Module = torch.nn.ELU,
         middle_activation_function: torch.nn.Module = torch.nn.GELU,
+        middle_activation: bool = False,
         amplify: bool = False,
     ):
         super().__init__()
@@ -43,6 +44,7 @@ class GraphAttention(MovesModulesToDevice):
             activation=activation,
             final_activation=final_activation,
             amplify=amplify,
+            middle_activation=middle_activation,
             middle_activation_function=middle_activation_function,
         )
         self.move_modules()
