@@ -4,7 +4,6 @@ from types import SimpleNamespace
 from typing import Type
 from .modules import GraphAttentionModule
 from ..common.concerns import MovesModulesToDevice
-from ..transformers.modules import SelfAttentionModule
 
 
 class GraphAttention(MovesModulesToDevice):
@@ -25,6 +24,7 @@ class GraphAttention(MovesModulesToDevice):
         activation: torch.nn.Module = torch.nn.LeakyReLU,
         final_activation: torch.nn.Module = torch.nn.ELU,
         amplify: bool = False,
+        self_attention: bool = True,
     ):
         super().__init__()
 
@@ -43,6 +43,7 @@ class GraphAttention(MovesModulesToDevice):
             activation=activation,
             final_activation=final_activation,
             amplify=amplify,
+            self_attention=self_attention,
         )
         self.move_modules()
 

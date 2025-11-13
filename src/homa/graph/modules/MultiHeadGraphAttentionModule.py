@@ -1,5 +1,6 @@
 import torch
 from .GraphAttentionHeadModule import GraphAttentionHeadModule
+from ...transformers.modules import SelfAttentionModule
 
 
 class MultiHeadGraphAttentionModule(torch.nn.Module):
@@ -14,15 +15,20 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
         activation: torch.nn.Module,
         final_activation: torch.nn.Module,
         amplify: bool,
+        self_attention: bool,
     ):
         super().__init__()
 
         self.amplify: bool = amplify
+        self.self_attention: bool = self_attention
 
         if amplify:
             self.coefficients = torch.nn.Parameter(
                 torch.zeros(1, num_heads * output_dimension, requires_grad=True)
             )
+
+        if self_attention:
+            self.attention = SelfAttentionModule(num_heads * output_dimension)
 
         self.heads = torch.nn.ModuleList(
             [
@@ -50,5 +56,8 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
 
         if self.amplify:
             features *= self.coefficients.exp()
+
+        if self.self_attention:
+            features = self.attention(features)
 
         return features
