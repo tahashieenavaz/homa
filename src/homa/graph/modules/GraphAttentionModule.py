@@ -14,10 +14,14 @@ class GraphAttentionModule(torch.nn.Module):
         concat: bool,
         activation: torch.nn.Module,
         final_activation: torch.nn.Module,
+        middle_activation_function: torch.nn.Module,
         amplify: bool,
-        self_attention: bool,
+        middle_activation: bool,
     ):
         super().__init__()
+        self.middle_activation: bool = middle_activation
+        self.middle_activation_function = middle_activation_function
+
         self.theta = MultiHeadGraphAttentionModule(
             input_dimension=input_dimension,
             output_dimension=hidden_dimension,
@@ -28,7 +32,6 @@ class GraphAttentionModule(torch.nn.Module):
             activation=activation,
             final_activation=final_activation,
             amplify=amplify,
-            self_attention=self_attention,
         )
         self.sigma = MultiHeadGraphAttentionModule(
             input_dimension=hidden_dimension * num_heads,
@@ -40,7 +43,6 @@ class GraphAttentionModule(torch.nn.Module):
             activation=activation,
             final_activation=final_activation,
             amplify=amplify,
-            self_attention=self_attention,
         )
         self.dropout = torch.nn.Dropout(dropout)
 
@@ -48,5 +50,9 @@ class GraphAttentionModule(torch.nn.Module):
         features = self.dropout(features)
         features = self.theta(features, adjacency_matrix)
         features = self.dropout(features)
+
+        if self.middle_activation:
+            features = self.middle_activation_function(features)
+
         features = self.sigma(features, adjacency_matrix)
         return torch.nn.functional.log_softmax(features, dim=1)
