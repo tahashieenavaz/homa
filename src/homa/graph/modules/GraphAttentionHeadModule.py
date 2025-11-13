@@ -21,10 +21,12 @@ class GraphAttentionHeadModule(torch.nn.Module):
         # attention for target
         self.xi = torch.nn.Linear(output_dimension, 1, bias=False)
 
+        # use alpha only if the activation function is leaky relu to replicate the original paper
         if activation == torch.nn.LeakyReLU:
             self.activation = torch.nn.LeakyReLU(alpha)
         else:
             self.activation = activation()
+
         self.final_activation = final_activation()
         self.dropout = torch.nn.Dropout(dropout)
 
