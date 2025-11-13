@@ -50,7 +50,7 @@ class GraphAttention(MovesModulesToDevice):
         # this is used because model outputs log-probability distribution
         self.criterion = torch.nn.NLLLoss()
 
-    def train(self, mask: torch.Tensor):
+    def train(self, mask: torch.Tensor) -> None:
         self.network.train()
         self.optimizer.zero_grad()
         loss = self.loss(mask=mask)
