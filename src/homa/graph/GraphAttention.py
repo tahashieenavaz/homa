@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from typing import Type
 from .modules import GraphAttentionModule
 from ..common.concerns import MovesModulesToDevice
+from ..transformers.modules import SelfAttentionModule
 
 
 class GraphAttention(MovesModulesToDevice):
