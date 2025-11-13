@@ -56,7 +56,7 @@ class GraphAttention(MovesModulesToDevice):
         loss.backward()
         self.optimizer.step()
 
-    def loss(self, mask: torch.Tensor):
+    def loss(self, mask: torch.Tensor) -> torch.Tensor:
         predictions = self.network(self.features, self.adjacency_matrix)
         masked_predictions = predictions[mask]
         masked_labels = self.labels[mask]
