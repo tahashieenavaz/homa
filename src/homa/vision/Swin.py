@@ -21,8 +21,9 @@ class Swin(Classifier, Trainable, ReportsMetrics, MovesModulesToDevice):
         self.network = SwinModule(
             num_classes=self.num_classes, variant=variant, weights=weights
         )
+        self.move_modules()
+
         self.optimizer = torch.optim.AdamW(
             self.network.parameters(), lr=lr, weight_decay=decay
         )
         self.criterion = torch.nn.CrossEntropyLoss()
-        self.move_modules()
