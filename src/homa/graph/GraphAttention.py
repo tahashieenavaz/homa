@@ -1,7 +1,7 @@
 import torch
 from sklearn.metrics import f1_score, cohen_kappa_score
 from types import SimpleNamespace
-from typing import Type
+from typing import Type, OrderedDict
 from .modules import GraphAttentionModule
 from ..common.concerns import MovesModulesToDevice
 
@@ -23,17 +23,8 @@ class GraphAttention(MovesModulesToDevice):
         concat: bool = True,
         activation: torch.nn.Module = torch.nn.LeakyReLU,
         final_activation: torch.nn.Module = torch.nn.ELU,
-        middle_activation_function: torch.nn.Module = torch.nn.GELU,
-        middle_activation: bool = False,
-        head_amplification: bool = False,
-        middle_amplification: bool = False,
-        middle_amplification_location: str = "after",
+        v2: bool = False,
     ):
-        if middle_amplification_location not in ["after", "before"]:
-            raise ValueError(
-                f"middle_amplification_location must be in [after, before]. Got {middle_amplification_location}."
-            )
-
         super().__init__()
 
         self.features = features
@@ -50,6 +41,7 @@ class GraphAttention(MovesModulesToDevice):
             concat=concat,
             activation=activation,
             final_activation=final_activation,
+            v2=v2,
         )
         self.move_modules()
 
@@ -72,6 +64,12 @@ class GraphAttention(MovesModulesToDevice):
         masked_predictions = predictions[mask]
         masked_labels = self.labels[mask]
         return self.criterion(masked_predictions, masked_labels)
+
+    def state_dict(self):
+        return self.network.state_dict()
+
+    def load_state_dict(self, state_dict: OrderedDict):
+        self.network.load_state_dict(state_dict)
 
     @torch.no_grad()
     def metrics(self, mask: torch.Tensor) -> Type[SimpleNamespace]:

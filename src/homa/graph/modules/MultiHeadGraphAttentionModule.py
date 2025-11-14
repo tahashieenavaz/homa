@@ -13,6 +13,7 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
         concat: bool,
         activation: torch.nn.Module,
         final_activation: torch.nn.Module,
+        v2: bool,
     ):
         super().__init__()
 
@@ -29,6 +30,7 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
                     alpha=alpha,
                     activation=activation,
                     final_activation=final_activation,
+                    v2=v2,
                 )
                 for _ in range(num_heads)
             ]

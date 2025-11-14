@@ -14,9 +14,9 @@ class GraphAttentionModule(torch.nn.Module):
         concat: bool,
         activation: torch.nn.Module,
         final_activation: torch.nn.Module,
+        v2: bool,
     ):
         super().__init__()
-
         self.theta = MultiHeadGraphAttentionModule(
             input_dimension=input_dimension,
             output_dimension=hidden_dimension,
@@ -26,6 +26,7 @@ class GraphAttentionModule(torch.nn.Module):
             concat=concat,
             activation=activation,
             final_activation=final_activation,
+            v2=v2,
         )
         self.sigma = MultiHeadGraphAttentionModule(
             input_dimension=hidden_dimension * num_heads,
@@ -36,6 +37,7 @@ class GraphAttentionModule(torch.nn.Module):
             concat=concat,
             activation=activation,
             final_activation=final_activation,
+            v2=v2,
         )
         self.dropout = torch.nn.Dropout(dropout)
 
