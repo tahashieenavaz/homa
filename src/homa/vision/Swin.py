@@ -16,7 +16,7 @@ class Swin(Classifier, Trainable, ReportsMetrics, MovesModulesToDevice):
     ):
         super().__init__()
 
-        self.num_classes = num_classes
+        self.num_classes: int = num_classes
 
         self.network = SwinModule(
             num_classes=self.num_classes, variant=variant, weights=weights
