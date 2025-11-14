@@ -50,11 +50,6 @@ class GraphAttention(MovesModulesToDevice):
             concat=concat,
             activation=activation,
             final_activation=final_activation,
-            head_amplification=head_amplification,
-            middle_amplification=middle_amplification,
-            middle_activation=middle_activation,
-            middle_activation_function=middle_activation_function,
-            middle_amplification_location=middle_amplification_location,
         )
         self.move_modules()
 

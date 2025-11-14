@@ -12,17 +12,15 @@ class GraphAttentionHeadModule(torch.nn.Module):
         final_activation: torch.nn.Module,
     ):
         super().__init__()
-        # feature transform
         self.phi = torch.nn.Linear(input_dimension, output_dimension, bias=True)
 
-        # attention for source
+        # separate source, target attentions
         self.mu = torch.nn.Linear(output_dimension, 1, bias=True)
-
-        # attention for target
         self.xi = torch.nn.Linear(output_dimension, 1, bias=True)
 
-        # use alpha only if the activation function is leaky relu to replicate the original paper
-        if activation == torch.nn.LeakyReLU:
+        # LeakyReLU is a special case because in the original paper, they have explicitly defined
+        # alpha = 0.2
+        if activation is torch.nn.LeakyReLU:
             self.activation = torch.nn.LeakyReLU(alpha)
         else:
             self.activation = activation()
@@ -30,15 +28,15 @@ class GraphAttentionHeadModule(torch.nn.Module):
         self.final_activation = final_activation()
         self.dropout = torch.nn.Dropout(dropout)
 
-    def forward(self, features: torch.Tensor, adjacency_matrix: torch.Tensor):
+    def forward(self, features: torch.Tensor, adj: torch.Tensor):
+        # computes features
         h = self.phi(features)
 
+        # computes attention coefficients
         e = self.mu(h) + self.xi(h).T
         e = self.activation(e)
-        # masks non-edges
-        e = torch.where(adjacency_matrix > 0, e, torch.full_like(e, -9e15))
+        e = e.masked_fill(adj == 0, float("-inf"))
 
         a = torch.nn.functional.softmax(e, dim=1)
         a = self.dropout(a)
-
         return self.final_activation(a @ h)
