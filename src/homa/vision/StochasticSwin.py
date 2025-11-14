@@ -1,7 +1,7 @@
 import torch
 from .Swin import Swin
 from .StochasticClassifier import StochasticClassifier
-from .utils import replace_modules
+from ..common.utils import replace_modules
 
 
 class StochasticSwin(Swin, StochasticClassifier):

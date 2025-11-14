@@ -1,5 +1,5 @@
-from .Model import Model
+from .VisionModel import VisionModel
 
 
-class Classifier(Model):
+class Classifier(VisionModel):
     pass
