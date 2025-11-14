@@ -1,8 +1,10 @@
 import torch
+import torch.nn as nn
+
 from .GraphAttentionHeadModule import GraphAttentionHeadModule
 
 
-class MultiHeadGraphAttentionModule(torch.nn.Module):
+class MultiHeadGraphAttentionModule(nn.Module):
     def __init__(
         self,
         input_dimension: int,
@@ -11,17 +13,16 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
         dropout: float,
         alpha: float,
         concat: bool,
-        activation: torch.nn.Module,
-        final_activation: torch.nn.Module,
+        activation: nn.Module,
+        final_activation: nn.Module,
         v2: bool,
+        use_layernorm: bool,
     ):
         super().__init__()
 
-        self.num_heads: int = num_heads
-        self.output_dimension: int = output_dimension
-        self.concat: bool = concat
+        self.concat = concat
 
-        self.heads = torch.nn.ModuleList(
+        self.heads = nn.ModuleList(
             [
                 GraphAttentionHeadModule(
                     input_dimension=input_dimension,
@@ -31,18 +32,16 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
                     activation=activation,
                     final_activation=final_activation,
                     v2=v2,
+                    use_layernorm=use_layernorm,
                 )
                 for _ in range(num_heads)
             ]
         )
 
     def forward(self, features: torch.Tensor, adjacency_matrix: torch.Tensor):
-        features = [head(features, adjacency_matrix) for head in self.heads]
+        outputs = [head(features, adjacency_matrix) for head in self.heads]
 
-        # aggregate results either by concatenating them or averaging over
         if self.concat:
-            features = torch.cat(features, dim=1)
+            return torch.cat(outputs, dim=1)
         else:
-            features = torch.mean(torch.stack(features), dim=0)
-
-        return features
+            return torch.mean(torch.stack(outputs, dim=0), dim=0)

@@ -1,53 +1,52 @@
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 
-class GraphAttentionHeadModule(torch.nn.Module):
+class GraphAttentionHeadModule(nn.Module):
     def __init__(
         self,
         input_dimension: int,
         output_dimension: int,
         dropout: float,
         alpha: float,
-        activation: torch.nn.Module,
-        final_activation: torch.nn.Module,
+        activation: nn.Module,
+        final_activation: nn.Module,
         v2: bool,
+        use_layernorm: bool,
     ):
         super().__init__()
         self.v2: bool = v2
 
-        self.phi = torch.nn.Linear(input_dimension, output_dimension, bias=True)
+        self.phi = nn.Linear(input_dimension, output_dimension, bias=True)
+        self.mu = nn.Linear(output_dimension, 1, bias=False)
+        self.xi = nn.Linear(output_dimension, 1, bias=False)
 
-        # separate source, target attentions
-        self.mu = torch.nn.Linear(output_dimension, 1, bias=True)
-        self.xi = torch.nn.Linear(output_dimension, 1, bias=True)
-
-        # LeakyReLU is a special case because in the original paper, they have explicitly defined
-        # alpha = 0.2
-        if activation is torch.nn.LeakyReLU:
-            self.activation = torch.nn.LeakyReLU(alpha)
+        if activation is nn.LeakyReLU:
+            self.att_activation = nn.LeakyReLU(alpha)
         else:
-            self.activation = activation()
+            self.att_activation = nn.LeakyReLU(alpha)  # for e_{ij}
 
         self.final_activation = final_activation()
-        self.dropout = torch.nn.Dropout(dropout)
-        self.norm = torch.nn.LayerNorm(output_dimension)
+        self.dropout = nn.Dropout(dropout)
+        self.norm = nn.LayerNorm(output_dimension) if use_layernorm else nn.Identity()
 
     def forward(self, features: torch.Tensor, adj: torch.Tensor):
-        # computes features
-        h = self.phi(features)
+        h = self.phi(features)  # [N, out]
         h = self.norm(h)
 
-        # computes attention coefficients
         if not self.v2:
             e = self.mu(h) + self.xi(h).T
-            e = self.activation(e)
         else:
-            scores = h.unsqueeze(1) + h.unsqueeze(0)
-            e = self.mu(scores).squeeze(-1)
+            scores = h.unsqueeze(1) + h.unsqueeze(0)  # [N, N, out]
+            e = self.mu(scores).squeeze(-1)  # [N, N]
 
-        e = self.activation(e)
+        e = self.att_activation(e)
         e = e.masked_fill(adj == 0, float("-inf"))
 
-        a = torch.nn.functional.softmax(e, dim=1)
+        a = F.softmax(e, dim=1)
         a = self.dropout(a)
-        return self.final_activation(a @ h)
+
+        h_out = a @ h  # [N, out]
+
+        return self.final_activation(h_out)
