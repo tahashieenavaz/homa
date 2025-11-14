@@ -87,7 +87,7 @@ class GraphAttention(MovesModulesToDevice):
         masked_labels = self.labels[mask].cpu()
 
         accuracy = (masked_predictions == masked_labels).float().mean().item()
-        f1_macro = f1_score(masked_labels, masked_predictions, average="macro")
+        f1_macro = f1_score(masked_labels, masked_predictions, average="micro")
         kappa = cohen_kappa_score(masked_labels, masked_predictions)
 
         return SimpleNamespace(
