@@ -13,19 +13,12 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
         concat: bool,
         activation: torch.nn.Module,
         final_activation: torch.nn.Module,
-        head_amplification: bool,
     ):
         super().__init__()
 
         self.num_heads: int = num_heads
         self.output_dimension: int = output_dimension
-        self.head_amplification: bool = head_amplification
         self.concat: bool = concat
-
-        if head_amplification:
-            self.coefficients = torch.nn.Parameter(
-                torch.zeros(1, num_heads * output_dimension, requires_grad=True)
-            )
 
         self.heads = torch.nn.ModuleList(
             [
@@ -49,8 +42,5 @@ class MultiHeadGraphAttentionModule(torch.nn.Module):
             features = torch.cat(features, dim=1)
         else:
             features = torch.mean(torch.stack(features), dim=0)
-
-        if self.head_amplification:
-            features *= self.coefficients.exp()
 
         return features
