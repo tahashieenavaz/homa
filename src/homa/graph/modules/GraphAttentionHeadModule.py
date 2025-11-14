@@ -29,7 +29,7 @@ class GraphAttentionHeadModule(torch.nn.Module):
             self.activation = activation()
 
         self.final_activation = final_activation()
-        self.dropout = torch.nn.AlphaDropout(dropout)
+        self.dropout = torch.nn.Dropout(dropout)
         self.norm = torch.nn.LayerNorm(output_dimension)
 
     def forward(self, features: torch.Tensor, adj: torch.Tensor):
@@ -44,8 +44,8 @@ class GraphAttentionHeadModule(torch.nn.Module):
         else:
             scores = h.unsqueeze(1) + h.unsqueeze(0)
             e = self.mu(scores).squeeze(-1)
-            e = self.activation(e)
 
+        e = self.activation(e)
         e = e.masked_fill(adj == 0, float("-inf"))
 
         a = torch.nn.functional.softmax(e, dim=1)
