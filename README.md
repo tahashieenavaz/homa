@@ -23,8 +23,6 @@ torch.tensor([1, 2, 3, 4, 5]).to(get_device())
 
 This design mirrors common best practices in deep learning workflows, promoting device‑agnostic code.
 
----
-
 ## Loading Settings
 
 `homa.settings` allows you to attach a `settings.json` file to your project and access its values directly in your code. This is useful for hyperparameters, configuration management, or experiment logging.
@@ -48,8 +46,6 @@ for epoch in range(settings("epochs")):
 ```
 
 The helper reads and caches the JSON content, providing dictionary‑like access without requiring boilerplate file‑loading logic.
-
----
 
 # Vision
 
@@ -79,8 +75,6 @@ for epoch in range(10):
 ```
 
 This interface is influenced by modern PyTorch training utilities and mirrors patterns seen in high‑level frameworks while keeping full transparency over the training loop.
-
----
 
 # Loss Functions
 
