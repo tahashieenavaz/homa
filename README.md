@@ -81,7 +81,7 @@ The table below lists every module that subclasses `ActivationFunction`, summari
     <tr><td>3</td><td>AReLU</td><td>f(x) = (1 + σ(b)) * max(0, x) + clamp(a, 0.01, 0.99) * min(0, x)</td></tr>
     <tr><td>4</td><td>ASiLU</td><td>f(x) = arctan(x * σ(x))</td></tr>
     <tr><td>5</td><td>AbsLU</td><td>f(x) = x if x ≥ 0, else α * |x|</td></tr>
-    <tr><td>6</td><td>BaseDLReLU</td><td>f(z) = z if z ≥ 0, else a * bₜ * z</td></tr>
+    <tr><td>6</td><td>BaseDLReLU</td><td>f(x) = x if x ≥ 0, else a * bₜ * x</td></tr>
     <tr><td>7</td><td>CaLU</td><td>f(x) = x * (arctan(x) / π + 0.5)</td></tr>
     <tr><td>8</td><td>DLReLU</td><td>Inherits BaseDLReLU</td></tr>
     <tr><td>9</td><td>DLU</td><td>f(x) = x if x ≥ 0, else x / (1 − x)</td></tr>
