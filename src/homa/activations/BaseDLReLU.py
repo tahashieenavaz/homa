@@ -21,14 +21,14 @@ class BaseDLReLU(ActivationFunction):
     def update_from_loss(self, loss_tensor: torch.Tensor):
         self.set_prev_mse(loss_tensor)
 
-    def forward(self, z: torch.Tensor, mse_prev: torch.Tensor | float | None = None):
+    def forward(self, x: torch.Tensor, mse_prev: torch.Tensor | float | None = None):
         b_t = (
             self.prev_mse
             if mse_prev is None
-            else (torch.as_tensor(mse_prev, device=z.device, dtype=z.dtype))
+            else (torch.as_tensor(mse_prev, device=x.device, dtype=x.dtype))
         )
         if self.mode == "linear":
             slope = self.a * b_t
         else:
             slope = self.a * torch.exp(-b_t)
-        return torch.where(z >= 0, z, slope * z)
+        return torch.where(x >= 0, x, slope * x)
