@@ -2,20 +2,34 @@
 
 ## Device Management
 
+This section demonstrates how to easily select computation devices when using PyTorch. The `homa` helpers provide consistent interfaces for CPU, CUDA-enabled GPUs, and Apple Silicon MPS.
+
+- `cpu()`: Forces tensors or models onto the CPU.
+- `cuda()`: Moves tensors or models onto a CUDA GPU (if available). Commonly used in high‑performance training.
+- `mps()`: Uses Apple's Metal Performance Shaders backend on macOS.
+- `get_device()`: Automatically infers the best available device in the order: CUDA → MPS → CPU.
+
 ```py
 from homa import cpu, mps, cuda, get_device
 
+# explicitly selecting devices
 torch.tensor([1, 2, 3, 4, 5]).to(cpu())
 torch.tensor([1, 2, 3, 4, 5]).to(cuda())
 torch.tensor([1, 2, 3, 4, 5]).to(mps())
 
-# to infer automatically
+# automatic device selection
 torch.tensor([1, 2, 3, 4, 5]).to(get_device())
 ```
 
+This design mirrors common best practices in deep learning workflows, promoting device‑agnostic code.
+
+---
+
 ## Loading Settings
 
-You can define the settings for your script or code in `settings.json` file and load the content effortlessly using settings helper.
+`homa.settings` allows you to attach a `settings.json` file to your project and access its values directly in your code. This is useful for hyperparameters, configuration management, or experiment logging.
+
+Example `settings.json`:
 
 ```json
 {
@@ -24,7 +38,7 @@ You can define the settings for your script or code in `settings.json` file and 
 }
 ```
 
-Then in the code you could access the settings as follows.
+Loading settings in Python:
 
 ```py
 from homa import settings
@@ -33,13 +47,17 @@ for epoch in range(settings("epochs")):
     pass
 ```
 
+The helper reads and caches the JSON content, providing dictionary‑like access without requiring boilerplate file‑loading logic.
+
+---
+
 # Vision
 
 ## Resnet
 
-This is the standard ResNet50 module.
+`homa.vision.Resnet` implements a standard **ResNet‑50** architecture, commonly used in image classification tasks. This class bundles the model, optimizer, and training loop helpers for fast prototyping.
 
-You can train the model with a `DataLoader` object.
+You can train the model directly using a PyTorch `DataLoader`:
 
 ```py
 from homa.vision import Resnet
@@ -49,7 +67,7 @@ for epoch in range(10):
     model.train(train_dataloader)
 ```
 
-Similarly you can manually take care of decomposition of data from the `DataLoader`.
+Alternatively, you may manually unpack the DataLoader and pass data batches yourself:
 
 ```py
 from homa.vision import Resnet
@@ -59,6 +77,30 @@ for epoch in range(10):
     for x, y in train_dataloader:
         model.train(x, y)
 ```
+
+This interface is influenced by modern PyTorch training utilities and mirrors patterns seen in high‑level frameworks while keeping full transparency over the training loop.
+
+---
+
+# Loss Functions
+
+## Logit Normalization
+
+**LogitNorm** is a modified cross‑entropy‑style loss that normalizes logits before computing the loss. This technique was introduced to improve calibration, robustness, and especially performance in **ensembling** scenarios where varied model outputs can lead to instability.
+
+Typical benefits of LogitNorm include:
+
+- more stable gradients
+- improved probabilistic calibration
+- robustness to logit scaling differences across models
+
+```py
+from homa.loss import LogitNorm
+
+criterion = LogitNorm()
+```
+
+Logit normalization is related to works studying the effect of logit scaling on generalization and calibration in deep networks.
 
 # Activation Functions
 
