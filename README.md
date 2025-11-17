@@ -67,83 +67,92 @@ for epoch in range(10):
 
 The table below lists every module that subclasses `ActivationFunction`, summarizing the computation performed in `forward`, linking to the implementation, and indicating whether the module exposes learnable parameters.
 
-| Activation                 | Formula                                                                                                       | Notes                                            |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------- | ------------- | -------- | --- | --- | --- | ------------------ | ------------- |
-| ADA                        | \( f(x) = \begin{cases} x & x \ge 0 \\ x e^x & x < 0 \end{cases} \)                                           | Learnable: ❌                                    |
-| AOAF                       | \( f(x) = \max(0, x - b \cdot a) + c \cdot a \)                                                               | Learnable: ✅ (channel-wise adaptive parameters) |
-| AReLU                      | \( f(x) = (1 + \sigma(b)) \cdot \max(0, x) + \text{clamp}(a, 0.01, 0.99) \cdot \min(0, x) \)                  | Learnable: ✅ (global adaptive parameters)       |
-| ASiLU                      | \( f(x) = \arctan\Big(x \cdot \sigma(x)\Big) \)                                                               | Learnable: ❌                                    |
-| AbsLU                      | \( f(x) = \begin{cases} x & x \ge 0 \\ \alpha                                                                 | x                                                | & x < 0 \end{cases} \)                                     | Learnable: ❌ |
-| AdaptiveActivationFunction | —                                                                                                             | Base class, no forward                           | Learnable: ❌                                              |
-| BaseDLReLU                 | \( f(z) = \begin{cases} z & z \ge 0 \\ a \cdot b_t \cdot z & z < 0 \end{cases} \)                             | Learnable: ❌                                    |
-| CaLU                       | \( f(x) = x \left( \frac{\arctan(x)}{\pi} + 0.5 \right) \)                                                    | Learnable: ❌                                    |
-| DLReLU                     | Inherits BaseDLReLU                                                                                           | Learnable: ❌                                    |
-| DLU                        | \( f(x) = \begin{cases} x & x \ge 0 \\ \frac{x}{1 - x} & x < 0 \end{cases} \)                                 | Learnable: ❌                                    |
-| DPReLU                     | \( f(x) = \begin{cases} a x & x \ge 0 \\ b x & x < 0 \end{cases} \)                                           | Learnable: ✅ (channel-wise adaptive parameters) |
-| DRLU                       | \( f(x) = \max(0, x - \alpha) \)                                                                              | Learnable: ❌                                    |
-| DerivativeSiLU             | \( f(x) = \sigma(x) \big( 1 + x (1 - \sigma(x)) \big) \)                                                      | Learnable: ❌                                    |
-| DiffELU                    | \( f(x) = \begin{cases} x & x \ge 0 \\ a (x e^x - b e^{b x}) & x < 0 \end{cases} \)                           | Learnable: ❌                                    |
-| DoubleSiLU                 | \( f(x) = \frac{x}{1 + \exp(-(-x/(1 + e^{-x}))) } \)                                                          | Learnable: ❌                                    |
-| DualLine                   | \( f(x) = \begin{cases} a x + m & x \ge 0 \\ b x + m & x < 0 \end{cases} \)                                   | Learnable: ✅ (channel-wise adaptive parameters) |
-| EANAF                      | \( f(x) = x \cdot g(h(x)) \)                                                                                  | Learnable: ❌                                    |
-| Elliot                     | \( f(x) = 0.5 + \frac{0.5 x}{1 +                                                                              | x                                                | } \)                                                       | Learnable: ❌ |
-| ExponentialDLReLU          | Inherits BaseDLReLU                                                                                           | Learnable: ❌                                    |
-| ExponentialSwish           | \( f(x) = e^{-x} \cdot \sigma(x) \)                                                                           | Learnable: ❌                                    |
-| FReLU                      | \( f(x) = \begin{cases} x + b & x \ge 0 \\ b & x < 0 \end{cases} \)                                           | Learnable: ✅ (channel-wise adaptive parameters) |
-| FlattedTSwish              | \( f(x) = \max(0, x) \cdot \sigma(x) + t \)                                                                   | Learnable: ❌                                    |
-| GeneralizedSwish           | \( f(x) = x \cdot \sigma(e^{-x}) \)                                                                           | Learnable: ❌                                    |
-| Gish                       | \( f(x) = x \cdot \ln\big( 2 - e^{-e^x} \big) \)                                                              | Learnable: ❌                                    |
-| IpLU                       | \( f(x) = \begin{cases} x & x \ge 0 \\ \frac{x}{1 +                                                           | x                                                | ^\alpha} & x < 0 \end{cases} \)                            | Learnable: ❌ |
-| LaLU                       | \( f(x) = x \cdot \begin{cases} 1 - 0.5 e^{-x} & x \ge 0 \\ 0.5 e^x & x < 0 \end{cases} \)                    | Learnable: ❌                                    |
-| LeLeLU                     | \( f(x) = \begin{cases} a x & x \ge 0 \\ 0.01 a x & x < 0 \end{cases} \)                                      | Learnable: ✅ (channel-wise adaptive parameters) |
-| LogSigmoid                 | \( f(x) = \ln(\sigma(x)) \)                                                                                   | Learnable: ❌                                    |
-| Logish                     | \( f(x) = x \cdot \ln(1 + \sigma(x)) \)                                                                       | Learnable: ❌                                    |
-| MSiLU                      | \( f(x) = x \sigma(x) + \frac{1}{4} e^{-x^2 - 1} \)                                                           | Learnable: ❌                                    |
-| MaxSig                     | \( f(x) = \max(x, \sigma(x)) \)                                                                               | Learnable: ❌                                    |
-| MinSin                     | \( f(x) = \min(x, \sin(x)) \)                                                                                 | Learnable: ❌                                    |
-| NLReLU                     | \( f(x) = \ln(1 + \beta \cdot \max(0, x)) \)                                                                  | Learnable: ❌                                    |
-| NReLU                      | \( f(x) = \begin{cases} x + a & x \ge 0 \\ 0 & x < 0 \end{cases} \)                                           | Learnable: ❌                                    |
-| NoisyReLU                  | Inherits NReLU                                                                                                | Learnable: ❌                                    |
-| OAF                        | \( f(x) = \max(0, x) + x \cdot \sigma(x) \)                                                                   | Learnable: ❌                                    |
-| PERU                       | \( f(x) = \begin{cases} a x & x \ge 0 \\ a x e^{b x} & x < 0 \end{cases} \)                                   | Learnable: ✅ (channel-wise adaptive parameters) |
-| PFLU                       | \( f(x) = x \cdot 0.5 \left( 1 + \frac{x}{\sqrt{1 + x^2}} \right) \)                                          | Learnable: ❌                                    |
-| PLAF                       | \( f(x) = \begin{cases} x - \delta & x \ge 1 \\ -x - \delta & x < -1 \\                                       | x                                                | ^d / d & -1 \le x < 1 \end{cases} \), \(\delta = 1 - 1/d\) | Learnable: ❌ |
-| Phish                      | \( f(x) = x \cdot \tanh(\text{GELU}(x)) \)                                                                    | Learnable: ❌                                    |
-| PiLU                       | \( f(x) = \begin{cases} a x + c (1 - a) & x \ge c \\ b x + c (1 - b) & x < c \end{cases} \)                   | Learnable: ✅ (channel-wise adaptive parameters) |
-| PoLU                       | \( f(x) = \begin{cases} x & x \ge 0 \\ (1 - x)^{-\alpha} - 1 & x < 0 \end{cases} \)                           | Learnable: ❌                                    |
-| PolyLU                     | \( f(x) = \begin{cases} x & x \ge 0 \\ \frac{1}{1 - x} - 1 & x < 0 \end{cases} \)                             | Learnable: ❌                                    |
-| REU                        | \( f(x) = \begin{cases} x & x \ge 0 \\ x e^x & x < 0 \end{cases} \)                                           | Learnable: ❌                                    |
-| RReLU                      | \( f(x) = \begin{cases} x & x \ge 0 \\ x / a & x < 0 \end{cases} \), \(a \in [\text{lower}, \text{upper}]\)   | Learnable: ❌                                    |
-| RandomizedSlopedReLU       | Inherits SlopedReLU                                                                                           | Learnable: ❌                                    |
-| ReCU                       | Inherits RePU                                                                                                 | Learnable: ❌                                    |
-| RePU                       | \( f(x) = \max(0, x^\alpha) \)                                                                                | Learnable: ❌                                    |
-| ReQU                       | Inherits RePU                                                                                                 | Learnable: ❌                                    |
-| ReSP                       | \( f(x) = \begin{cases} \alpha x + \ln 2 & x \ge 0 \\ \ln(1 + e^x) & x < 0 \end{cases} \)                     | Learnable: ❌                                    |
-| ReSech                     | \( f(x) = x \cdot \text{sech}(x) \)                                                                           | Learnable: ❌                                    |
-| SGELU                      | \( f(x) = \alpha x \cdot \text{erf}\left(\frac{x}{\sqrt{2}}\right) \)                                         | Learnable: ❌                                    |
-| SaRa                       | \( f(x) = \begin{cases} x & x \ge 0 \\ x / (1 + \alpha e^{-\beta x}) & x < 0 \end{cases} \)                   | Learnable: ❌                                    |
-| Serf                       | \( f(x) = x \cdot \text{erf}(\ln(1 + e^x)) \)                                                                 | Learnable: ❌                                    |
-| ShiLU                      | \( f(x) = a \cdot \max(0, x) + b \)                                                                           | Learnable: ✅ (channel-wise adaptive parameters) |
-| ShiftedReLU                | \( f(x) = \max(x, -1) \)                                                                                      | Learnable: ❌                                    |
-| SiELU                      | \( f(x) = x \cdot \sigma(2 \sqrt{2 / \pi} \cdot (x + 0.044715 x^3)) \)                                        | Learnable: ❌                                    |
-| SigLU                      | \( f(x) = \begin{cases} x & x \ge 0 \\ \frac{1 - e^{-2x}}{1 + e^{-2x}} & x < 0 \end{cases} \)                 | Learnable: ❌                                    |
-| SigmoidDerivative          | \( f(x) = e^{-x} \cdot \sigma(x)^2 \)                                                                         | Learnable: ❌                                    |
-| SinSig                     | \( f(x) = x \cdot \sin\left(\frac{\pi}{2} \sigma(x)\right) \)                                                 | Learnable: ❌                                    |
-| SineReLU                   | \( f(x) = \begin{cases} x & x \ge 0 \\ \epsilon (\sin x - \cos x) & x < 0 \end{cases} \)                      | Learnable: ❌                                    |
-| SlopedReLU                 | \( f(x) = \begin{cases} \alpha x & x \ge 0 \\ 0 & x < 0 \end{cases} \)                                        | Learnable: ❌                                    |
-| Smish                      | \( f(x) = x \cdot \tanh(\ln(1 + \sigma(x))) \)                                                                | Learnable: ❌                                    |
-| SoftModulusQ               | \( f(x) = \begin{cases} x^2 (2 -                                                                              | x                                                | ) &                                                        | x             | \le 1 \\ | x   | &   | x   | > 1 \end{cases} \) | Learnable: ❌ |
-| SoftModulusT               | \( f(x) = x \cdot \tanh(x / \alpha) \)                                                                        | Learnable: ❌                                    |
-| SoftsignRReLU              | \( f(x) = \begin{cases} \frac{1}{(1 + x)^2} + x & x \ge 0 \\ \frac{1}{(1 + x)^2} + a x & x < 0 \end{cases} \) | Learnable: ❌                                    |
-| StarReLU                   | \( f(x) = a (\max(0, x))^2 + b \)                                                                             | Learnable: ✅ (channel-wise adaptive parameters) |
-| Suish                      | \( f(x) = \max(x, x e^{-                                                                                      | x                                                | }) \)                                                      | Learnable: ❌ |
-| TBSReLU                    | \( f(x) = x \cdot \tanh\left(\frac{1 - e^{-x}}{1 + e^{-x}}\right) \)                                          | Learnable: ❌                                    |
-| TSReLU                     | \( f(x) = x \cdot \tanh(\sigma(x)) \)                                                                         | Learnable: ❌                                    |
-| TSiLU                      | \( f(x) = \frac{e^\alpha - e^{-\alpha}}{e^\alpha + e^\alpha}, \ \alpha = \frac{x}{1 + e^{-x}} \)              | Learnable: ❌                                    |
-| TangentBipolarSigmoidReLU  | Inherits TBSReLU                                                                                              | Learnable: ❌                                    |
-| TangentSigmoidReLU         | Inherits TSReLU                                                                                               | Learnable: ❌                                    |
-| TanhExp                    | \( f(x) = x \cdot \tanh(e^x) \)                                                                               | Learnable: ❌                                    |
-| TeLU                       | \( f(x) = x \cdot \tanh(e^x) \)                                                                               | Learnable: ❌                                    |
-| ThLU                       | \( f(x) = \begin{cases} x & x \ge 0 \\ \tanh(x/2) & x < 0 \end{cases} \)                                      | Learnable: ❌                                    |
-| TripleStateSwish           | \( f(x) = x \cdot a \cdot (a + b + c),\ a = \sigma(x),\ b = \sigma(x - \alpha),\ c = \sigma(x - \beta) \)     | Learnable: ❌                                    |
-| mReLU                      | \( f(x) = \min(\max(0, 1 - x), \max(0, 1 + x)) \)                                                             | Learnable: ❌                                    |
+<table>
+  <thead>
+    <tr>
+      <th>Activation</th>
+      <th>Formula</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>ADA</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ x e^x & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>AOAF</td><td>\( f(x) = \max(0, x - b \cdot a) + c \cdot a \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>AReLU</td><td>\( f(x) = (1 + \sigma(b)) \cdot \max(0, x) + \text{clamp}(a, 0.01, 0.99) \cdot \min(0, x) \)</td><td>Learnable: ✅ (global adaptive parameters)</td></tr>
+    <tr><td>ASiLU</td><td>\( f(x) = \arctan(x \cdot \sigma(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>AbsLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ \alpha |x| & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>AdaptiveActivationFunction</td><td>—</td><td>Base class, no forward | Learnable: ❌</td></tr>
+    <tr><td>BaseDLReLU</td><td>\( f(z) = \begin{cases} z & z \ge 0 \\ a \cdot b_t \cdot z & z < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>CaLU</td><td>\( f(x) = x \left( \frac{\arctan(x)}{\pi} + 0.5 \right) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>DLReLU</td><td>Inherits BaseDLReLU</td><td>Learnable: ❌</td></tr>
+    <tr><td>DLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ \frac{x}{1 - x} & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>DPReLU</td><td>\( f(x) = \begin{cases} a x & x \ge 0 \\ b x & x < 0 \end{cases} \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>DRLU</td><td>\( f(x) = \max(0, x - \alpha) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>DerivativeSiLU</td><td>\( f(x) = \sigma(x) \big( 1 + x (1 - \sigma(x)) \big) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>DiffELU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ a (x e^x - b e^{b x}) & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>DoubleSiLU</td><td>\( f(x) = \frac{x}{1 + \exp(-(-x/(1 + e^{-x}))) } \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>DualLine</td><td>\( f(x) = \begin{cases} a x + m & x \ge 0 \\ b x + m & x < 0 \end{cases} \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>EANAF</td><td>\( f(x) = x \cdot g(h(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>Elliot</td><td>\( f(x) = 0.5 + \frac{0.5 x}{1 + |x|} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>ExponentialDLReLU</td><td>Inherits BaseDLReLU</td><td>Learnable: ❌</td></tr>
+    <tr><td>ExponentialSwish</td><td>\( f(x) = e^{-x} \cdot \sigma(x) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>FReLU</td><td>\( f(x) = \begin{cases} x + b & x \ge 0 \\ b & x < 0 \end{cases} \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>FlattedTSwish</td><td>\( f(x) = \max(0, x) \cdot \sigma(x) + t \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>GeneralizedSwish</td><td>\( f(x) = x \cdot \sigma(e^{-x}) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>Gish</td><td>\( f(x) = x \cdot \ln(2 - e^{-e^x}) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>IpLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ \frac{x}{1 + |x|^\alpha} & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>LaLU</td><td>\( f(x) = x \cdot \begin{cases} 1 - 0.5 e^{-x} & x \ge 0 \\ 0.5 e^x & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>LeLeLU</td><td>\( f(x) = \begin{cases} a x & x \ge 0 \\ 0.01 a x & x < 0 \end{cases} \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>LogSigmoid</td><td>\( f(x) = \ln(\sigma(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>Logish</td><td>\( f(x) = x \cdot \ln(1 + \sigma(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>MSiLU</td><td>\( f(x) = x \sigma(x) + \frac{1}{4} e^{-x^2 - 1} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>MaxSig</td><td>\( f(x) = \max(x, \sigma(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>MinSin</td><td>\( f(x) = \min(x, \sin(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>NLReLU</td><td>\( f(x) = \ln(1 + \beta \cdot \max(0, x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>NReLU</td><td>\( f(x) = \begin{cases} x + a & x \ge 0 \\ 0 & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>NoisyReLU</td><td>Inherits NReLU</td><td>Learnable: ❌</td></tr>
+    <tr><td>OAF</td><td>\( f(x) = \max(0, x) + x \cdot \sigma(x) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>PERU</td><td>\( f(x) = \begin{cases} a x & x \ge 0 \\ a x e^{b x} & x < 0 \end{cases} \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>PFLU</td><td>\( f(x) = x \cdot 0.5 \left( 1 + \frac{x}{\sqrt{1 + x^2}} \right) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>PLAF</td><td>\( f(x) = \begin{cases} x - \delta & x \ge 1 \\ -x - \delta & x < -1 \\ |x|^d / d & -1 \le x < 1 \end{cases} \), \(\delta = 1 - 1/d\)</td><td>Learnable: ❌</td></tr>
+    <tr><td>Phish</td><td>\( f(x) = x \cdot \tanh(\text{GELU}(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>PiLU</td><td>\( f(x) = \begin{cases} a x + c (1 - a) & x \ge c \\ b x + c (1 - b) & x < c \end{cases} \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>PoLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ (1 - x)^{-\alpha} - 1 & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>PolyLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ \frac{1}{1 - x} - 1 & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>REU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ x e^x & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>RReLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ x / a & x < 0 \end{cases} \), \(a \in [\text{lower}, \text{upper}]\)</td><td>Learnable: ❌</td></tr>
+    <tr><td>RandomizedSlopedReLU</td><td>Inherits SlopedReLU</td><td>Learnable: ❌</td></tr>
+    <tr><td>ReCU</td><td>Inherits RePU</td><td>Learnable: ❌</td></tr>
+    <tr><td>RePU</td><td>\( f(x) = \max(0, x^\alpha) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>ReQU</td><td>Inherits RePU</td><td>Learnable: ❌</td></tr>
+    <tr><td>ReSP</td><td>\( f(x) = \begin{cases} \alpha x + \ln 2 & x \ge 0 \\ \ln(1 + e^x) & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>ReSech</td><td>\( f(x) = x \cdot \text{sech}(x) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SGELU</td><td>\( f(x) = \alpha x \cdot \text{erf}\left(\frac{x}{\sqrt{2}}\right) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SaRa</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ x / (1 + \alpha e^{-\beta x}) & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>Serf</td><td>\( f(x) = x \cdot \text{erf}(\ln(1 + e^x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>ShiLU</td><td>\( f(x) = a \cdot \max(0, x) + b \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>ShiftedReLU</td><td>\( f(x) = \max(x, -1) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SiELU</td><td>\( f(x) = x \cdot \sigma(2 \sqrt{2 / \pi} (x + 0.044715 x^3)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SigLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ \frac{1 - e^{-2x}}{1 + e^{-2x}} & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SigmoidDerivative</td><td>\( f(x) = e^{-x} \cdot \sigma(x)^2 \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SinSig</td><td>\( f(x) = x \cdot \sin\left(\frac{\pi}{2} \sigma(x)\right) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SineReLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ \epsilon (\sin x - \cos x) & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SlopedReLU</td><td>\( f(x) = \begin{cases} \alpha x & x \ge 0 \\ 0 & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>Smish</td><td>\( f(x) = x \cdot \tanh(\ln(1 + \sigma(x))) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SoftModulusQ</td><td>\( f(x) = \begin{cases} x^2 (2 - |x|) & |x| \le 1 \\ |x| & |x| > 1 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SoftModulusT</td><td>\( f(x) = x \cdot \tanh(x / \alpha) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>SoftsignRReLU</td><td>\( f(x) = \begin{cases} \frac{1}{(1 + x)^2} + x & x \ge 0 \\ \frac{1}{(1 + x)^2} + a x & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>StarReLU</td><td>\( f(x) = a (\max(0, x))^2 + b \)</td><td>Learnable: ✅ (channel-wise adaptive parameters)</td></tr>
+    <tr><td>Suish</td><td>\( f(x) = \max(x, x e^{-|x|}) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>TBSReLU</td><td>\( f(x) = x \cdot \tanh\left(\frac{1 - e^{-x}}{1 + e^{-x}}\right) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>TSReLU</td><td>\( f(x) = x \cdot \tanh(\sigma(x)) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>TSiLU</td><td>\( f(x) = \frac{e^\alpha - e^{-\alpha}}{e^\alpha + e^\alpha}, \alpha = x / (1 + e^{-x}) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>TangentBipolarSigmoidReLU</td><td>Inherits TBSReLU</td><td>Learnable: ❌</td></tr>
+    <tr><td>TangentSigmoidReLU</td><td>Inherits TSReLU</td><td>Learnable: ❌</td></tr>
+    <tr><td>TanhExp</td><td>\( f(x) = x \cdot \tanh(e^x) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>TeLU</td><td>\( f(x) = x \cdot \tanh(e^x) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>ThLU</td><td>\( f(x) = \begin{cases} x & x \ge 0 \\ \tanh(x/2) & x < 0 \end{cases} \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>TripleStateSwish</td><td>\( f(x) = x a (a + b + c), a = \sigma(x), b = \sigma(x-\alpha), c = \sigma(x-\beta) \)</td><td>Learnable: ❌</td></tr>
+    <tr><td>mReLU</td><td>\( f(x) = \min(\max(0, 1-x), \max(0, 1+x)) \)</td><td>Learnable: ❌</td></tr>
+  </tbody>
+</table>
