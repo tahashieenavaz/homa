@@ -1,14 +1,36 @@
 # Core
 
-### Device Management
+## Device Management
 
 ```py
-from homa import cpu, mps, cuda, device
+from homa import cpu, mps, cuda, get_device
 
 torch.tensor([1, 2, 3, 4, 5]).to(cpu())
 torch.tensor([1, 2, 3, 4, 5]).to(cuda())
 torch.tensor([1, 2, 3, 4, 5]).to(mps())
-torch.tensor([1, 2, 3, 4, 5]).to(device())
+
+# to infer automatically
+torch.tensor([1, 2, 3, 4, 5]).to(get_device())
+```
+
+## Loading Settings
+
+You can define the settings for your script or code in `settings.json` file and load the content effortlessly using settings helper.
+
+```json
+{
+  "epochs": 100,
+  "learning_rate": 0.001
+}
+```
+
+Then in the code you could access the settings as follows.
+
+```py
+from homa import settings
+
+for epoch in range(settings("epochs")):
+    pass
 ```
 
 # Vision
