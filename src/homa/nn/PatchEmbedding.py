@@ -2,18 +2,15 @@ import torch
 
 
 class PatchEmbedding(torch.nn.Module):
-    def __init__(
-        self, image_size: int, patch_size: int, channels: int, embedding_dimension: int
-    ):
+    def __init__(self, patch_size: int, channels: int, embedding_dimension: int):
         super().__init__()
-        self.patch_size = patch_size
-        self.num_patches = (image_size // patch_size) ** 2
-        self.phi = torch.nn.Conv2d(
-            channels, embedding_dimension, kernel_size=patch_size, stride=patch_size
-        )
+        self.patch_size: int = patch_size
+        self.channels: int = channels
+        self.phi = self.Linear(channels * patch_size**2, embedding_dimension)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.phi(x)
-        x = x.flatten(2)
-        x = x.transpose(1, 2)
-        return x
+        batch_size, _, _, _ = x.shape
+        x = x.unfold(2, self.patch_size, self.patch_size)
+        x = x.unfold(3, self.patch_size, self.patch_size)
+        x = x.contiguous().view(batch_size, -1, self.channels * self.patch_size**2)
+        return self.phi(x)
