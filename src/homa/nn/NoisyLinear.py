@@ -8,13 +8,11 @@ class NoisyLinear(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        # learned parameters
         self.weight_mu = torch.nn.Parameter(torch.empty(out_features, in_features))
         self.weight_sigma = torch.nn.Parameter(torch.empty(out_features, in_features))
         self.bias_mu = torch.nn.Parameter(torch.empty(out_features))
         self.bias_sigma = torch.nn.Parameter(torch.empty(out_features))
 
-        # factorized noise buffers
         self.register_buffer("eps_in", torch.empty(in_features))
         self.register_buffer("eps_out", torch.empty(out_features))
 
