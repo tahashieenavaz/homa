@@ -16,6 +16,7 @@ dependencies = [
   "numpy",
   "torch",
   "fire",
+  "jax"
 ]
 
 [project.scripts]
